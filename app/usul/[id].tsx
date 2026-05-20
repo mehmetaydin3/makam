@@ -70,9 +70,9 @@ export default function UsulDetailScreen() {
         <Text style={styles.sectionLabel}>COMMON MAKAMS</Text>
         <View style={styles.tagRow}>
           {usul.commonMakams.map((m) => (
-            <View key={m} style={[styles.tag, { borderColor: usul.color + '55' }]}>
+            <TouchableOpacity key={m} style={[styles.tag, { borderColor: usul.color + '55' }]} onPress={() => router.push('/makam/' + m)}>
               <Text style={[styles.tagText, { color: usul.color }]}>{m}</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
