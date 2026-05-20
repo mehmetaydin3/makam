@@ -1,33 +1,51 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Animated } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getMakamById } from '../../data/makams';
 import { COLORS, SPACING, RADIUS, SEYIR_LABELS } from '../../data/constants';
+import { useState, useRef, useEffect } from 'react';
+import { audioEngine, PlaybackState } from '../../audio/audioEngine';
 
 export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const makam = getMakamById(id);
+  const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  if (!makam) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>Makam not found.</Text>
-      </SafeAreaView>
-    );
-  }
+  useEffect(() => { return () => { audioEngine.stop(); }; }, []);
+
+  useEffect(() => {
+    if (playbackState === 'playing') {
+      Animated.loop(Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.15, duration: 400, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      ])).start();
+    } else {
+      pulseAnim.stopAnimation();
+      pulseAnim.setValue(1);
+    }
+  }, [playbackState]);
+
+  if (!makam) return <SafeAreaView style={styles.container}><Text style={styles.errorText}>Makam not found.</Text></SafeAreaView>;
+
+  const handlePlay = async () => {
+    if (playbackState === 'playing') {
+      await audioEngine.stop(); setPlaybackState('idle'); setActiveIndex(-1); return;
+    }
+    const cents = makam.scale.map(d => d.cents);
+    await audioEngine.playScale(makam.durak, cents, (state, index) => {
+      setPlaybackState(state);
+      if (index !== undefined) setActiveIndex(index);
+      if (state === 'stopped') setActiveIndex(-1);
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>← Library</Text>
+        <TouchableOpacity onPress={() => { audioEngine.stop(); router.back(); }} style={styles.backButton}>
+          <Text style={styles.backText}>← Makams</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -36,27 +54,25 @@ export default function MakamDetailScreen() {
           <Text style={styles.makamName}>{makam.name}</Text>
           <Text style={styles.pronunciation}>/{makam.pronunciation}/</Text>
           <View style={styles.tagRow}>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{makam.family} family</Text>
-            </View>
-            <View style={[styles.tag, styles.tagAccent]}>
-              <Text style={[styles.tagText, styles.tagTextAccent]}>{SEYIR_LABELS[makam.seyir]}</Text>
-            </View>
+            <View style={styles.tag}><Text style={styles.tagText}>{makam.family} family</Text></View>
+            <View style={[styles.tag, styles.tagAccent]}><Text style={[styles.tagText, styles.tagTextAccent]}>{SEYIR_LABELS[makam.seyir]}</Text></View>
           </View>
         </View>
         <View style={styles.audioCard}>
           <View style={styles.audioInner}>
-            <TouchableOpacity style={styles.playButton} activeOpacity={0.8}>
-              <Text style={styles.playIcon}>▶</Text>
+            <TouchableOpacity onPress={handlePlay} activeOpacity={0.8}>
+              <Animated.View style={[styles.playButton, { backgroundColor: makam.color, transform: [{ scale: pulseAnim }] }]}>
+                <Text style={styles.playIcon}>{playbackState === 'playing' ? '■' : '▶'}</Text>
+              </Animated.View>
             </TouchableOpacity>
             <View style={styles.audioMeta}>
-              <Text style={styles.audioTitle}>Play Scale</Text>
-              <Text style={styles.audioSub}>Hear the {makam.name} makam</Text>
+              <Text style={styles.audioTitle}>{playbackState === 'playing' ? 'Playing...' : 'Play Scale'}</Text>
+              <Text style={styles.audioSub}>{playbackState === 'playing' ? `${makam.scale[activeIndex]?.name ?? ''} · ${makam.scale[activeIndex]?.cents ?? 0}¢` : `Hear the ${makam.name} makam`}</Text>
             </View>
           </View>
-          <View style={styles.waveformPlaceholder}>
-            {Array.from({ length: 40 }).map((_, i) => (
-              <View key={i} style={[styles.waveBar, { height: 4 + Math.abs(Math.sin(i * 0.8)) * 20, backgroundColor: i < 12 ? makam.color : COLORS.border }]} />
+          <View style={styles.degreeRow}>
+            {makam.scale.map((degree, i) => (
+              <View key={i} style={[styles.degreePip, { backgroundColor: i === activeIndex ? makam.color : degree.isCharacteristic ? makam.color + '55' : COLORS.border, height: i === activeIndex ? 24 : degree.isCharacteristic ? 16 : 10 }]} />
             ))}
           </View>
         </View>
@@ -65,35 +81,22 @@ export default function MakamDetailScreen() {
           <Text style={styles.description}>{makam.description}</Text>
         </View>
         <View style={styles.infoRow}>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Root</Text>
-            <Text style={styles.infoValue}>{makam.durak}</Text>
-          </View>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Dominant</Text>
-            <Text style={styles.infoValue}>{makam.guclu}</Text>
-          </View>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Time</Text>
-            <Text style={styles.infoValue}>{makam.timeOfDay}</Text>
-          </View>
+          <View style={styles.infoCard}><Text style={styles.infoLabel}>Root</Text><Text style={styles.infoValue}>{makam.durak}</Text></View>
+          <View style={styles.infoCard}><Text style={styles.infoLabel}>Dominant</Text><Text style={styles.infoValue}>{makam.guclu}</Text></View>
+          <View style={styles.infoCard}><Text style={styles.infoLabel}>Time</Text><Text style={styles.infoValue}>{makam.timeOfDay}</Text></View>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Mood</Text>
           <View style={styles.moodRow}>
-            {makam.mood.map((m) => (
-              <View key={m} style={styles.moodTag}>
-                <Text style={styles.moodText}>{m}</Text>
-              </View>
-            ))}
+            {makam.mood.map((m) => <View key={m} style={styles.moodTag}><Text style={styles.moodText}>{m}</Text></View>)}
           </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Scale</Text>
           <Text style={styles.scaleNote}>● Characteristic degree — defines the makam's color</Text>
           <View style={styles.scaleGrid}>
-            {makam.scale.map((degree) => (
-              <View key={degree.degree} style={[styles.scaleItem, degree.isCharacteristic && { borderColor: makam.color, backgroundColor: makam.color + '15' }]}>
+            {makam.scale.map((degree, i) => (
+              <View key={degree.degree} style={[styles.scaleItem, degree.isCharacteristic && { borderColor: makam.color, backgroundColor: makam.color + '15' }, i === activeIndex && { borderColor: makam.color, backgroundColor: makam.color + '30' }]}>
                 <Text style={styles.scaleDegree}>{degree.degree}</Text>
                 <Text style={styles.scaleName}>{degree.name}</Text>
                 <Text style={styles.scaleWestern}>{degree.westernNearest}</Text>
@@ -105,9 +108,7 @@ export default function MakamDetailScreen() {
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Characteristic Movement</Text>
-          <View style={styles.phraseCard}>
-            <Text style={styles.phraseText}>"{makam.characteristicPhrase}"</Text>
-          </View>
+          <View style={styles.phraseCard}><Text style={styles.phraseText}>"{makam.characteristicPhrase}"</Text></View>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Seyir</Text>
@@ -123,11 +124,7 @@ export default function MakamDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Related Makams</Text>
           <View style={styles.relatedRow}>
-            {makam.relatedMakams.map((name) => (
-              <View key={name} style={styles.relatedTag}>
-                <Text style={styles.relatedText}>{name}</Text>
-              </View>
-            ))}
+            {makam.relatedMakams.map((name) => <View key={name} style={styles.relatedTag}><Text style={styles.relatedText}>{name}</Text></View>)}
           </View>
         </View>
         <View style={[styles.section, { marginBottom: SPACING.xxxl }]}>
@@ -160,15 +157,15 @@ const styles = StyleSheet.create({
   tagAccent: { backgroundColor: COLORS.accentMuted, borderColor: COLORS.accent + '44' },
   tagText: { fontSize: 12, color: COLORS.textSecondary, textTransform: 'capitalize' },
   tagTextAccent: { color: COLORS.accent },
-  audioCard: { backgroundColor: COLORS.surface, borderRadius: 16, padding: SPACING.md, marginBottom: SPACING.lg, borderWidth: 1, borderColor: COLORS.border },
+  audioCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: SPACING.md, marginBottom: SPACING.lg, borderWidth: 1, borderColor: COLORS.border },
   audioInner: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.md },
-  playButton: { width: 44, height: 44, borderRadius: 999, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center' },
+  playButton: { width: 44, height: 44, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
   playIcon: { color: COLORS.background, fontSize: 16, marginLeft: 2 },
   audioMeta: { flex: 1 },
   audioTitle: { fontSize: 15, fontWeight: '500', color: COLORS.textPrimary },
   audioSub: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
-  waveformPlaceholder: { flexDirection: 'row', alignItems: 'center', gap: 2, height: 28 },
-  waveBar: { width: 3, borderRadius: 2 },
+  degreeRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 28 },
+  degreePip: { flex: 1, borderRadius: 2, minHeight: 10 },
   section: { marginBottom: SPACING.xl },
   sectionLabel: { fontSize: 11, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md },
   description: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 24 },
