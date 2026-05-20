@@ -1,11 +1,12 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-function TabIcon({ focused, icon, label }: { focused: boolean; icon: string; label: string }) {
+function TabIcon({ focused, name, label }: { focused: boolean; name: any; label: string }) {
   return (
     <View style={styles.tabItem}>
-      <Text style={[styles.icon, focused && styles.iconFocused]}>{icon}</Text>
-      <Text style={[styles.label, focused && styles.labelFocused]}>{label}</Text>
+      <Ionicons name={focused ? name : `${name}-outline`} size={22} color={focused ? '#C8975A' : '#504E4A'} />
+      <Text numberOfLines={1} style={[styles.label, focused && styles.labelFocused]}>{label}</Text>
     </View>
   );
 }
@@ -13,18 +14,16 @@ function TabIcon({ focused, icon, label }: { focused: boolean; icon: string; lab
 export default function TabLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false, tabBarStyle: styles.tabBar, tabBarShowLabel: false }}>
-      <Tabs.Screen name="index" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="◎" label="EXPLORE" /> }} />
-      <Tabs.Screen name="library" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="≡" label="LIBRARY" /> }} />
-      <Tabs.Screen name="learn" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon="○" label="LEARN" /> }} />
+      <Tabs.Screen name="index" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="bulb" label="Discover" /> }} />
+      <Tabs.Screen name="library" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="book" label="Makams" /> }} />
+      <Tabs.Screen name="learn" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="school" label="Learn" /> }} />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
   tabBar: { backgroundColor: '#1A1A1C', borderTopColor: '#2A2A2E', borderTopWidth: 1, height: 80, paddingBottom: 16, paddingTop: 12 },
-  tabItem: { alignItems: 'center', gap: 4 },
-  icon: { fontSize: 20, color: '#504E4A' },
-  iconFocused: { color: '#C8975A' },
-  label: { fontSize: 10, color: '#504E4A', letterSpacing: 0.5 },
+  tabItem: { alignItems: 'center', gap: 4, width: 70 },
+  label: { fontSize: 11, color: '#504E4A', letterSpacing: 0.5, textAlign: 'center' },
   labelFocused: { color: '#C8975A' },
 });
