@@ -14,9 +14,9 @@ function TabIcon({ focused, name, label }: { focused: boolean; name: any; label:
 export default function TabLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false, tabBarStyle: styles.tabBar, tabBarShowLabel: false }}>
-      <Tabs.Screen name="index" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="bulb" label="Discover" /> }} />
-      <Tabs.Screen name="library" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="book" label="Makams" /> }} />
-      <Tabs.Screen name="learn" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="school" label="Learn" /> }} />
+      <Tabs.Screen name="index" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="bulb" label="DISCOVER" /> }} />
+      <Tabs.Screen name="library" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="book" label="MAKAMS" /> }} />
+      <Tabs.Screen name="learn" options={{ tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="school" label="LEARN" /> }} />
     </Tabs>
   );
 }
@@ -24,6 +24,6 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabBar: { backgroundColor: '#1A1A1C', borderTopColor: '#2A2A2E', borderTopWidth: 1, height: 80, paddingBottom: 16, paddingTop: 12 },
   tabItem: { alignItems: 'center', gap: 4, width: 70 },
-  label: { fontSize: 11, color: '#504E4A', letterSpacing: 0.5, textAlign: 'center' },
+  label: { fontSize: 10, color: '#504E4A', letterSpacing: 1, textAlign: 'center' },
   labelFocused: { color: '#C8975A' },
 });
