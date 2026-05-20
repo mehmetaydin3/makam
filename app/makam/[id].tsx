@@ -58,13 +58,20 @@ export default function MakamDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Scale Degrees</Text>
           <View style={styles.degreeGrid}>
-            {(makam.scale || []).map((d, i) => (
-              <View key={i} style={[styles.degreeItem, d.isCharacteristic && { borderColor: makam.color }]}>
-                <Text style={styles.degreeNote}>{d.name}</Text>
-                <Text style={styles.degreeCents}>{d.cents}¢</Text>
-              </View>
-            ))}
+            {(makam.scale || []).map((d, i) => {
+              const nearest = Math.round(d.cents / 100) * 100;
+              const dev = d.cents - nearest;
+              const devStr = dev === 0 ? '' : (dev > 0 ? '+' + dev : '' + dev) + '¢';
+              return (
+                <View key={i} style={[styles.degreeItem, d.isCharacteristic && { borderColor: makam.color, borderWidth: 2 }]}>
+                  <Text style={[styles.degreeNote, d.isCharacteristic && { color: makam.color }]}>{d.westernNearest}</Text>
+                  {devStr ? <Text style={styles.degreeDev}>{devStr}</Text> : null}
+                  {d.isCharacteristic && <View style={[styles.charDot, { backgroundColor: makam.color }]} />}
+                </View>
+              );
+            })}
           </View>
+          <Text style={styles.scaleHint}>● Highlighted notes are characteristic — they define this makam’s color</Text>
         </View>
 
         <View style={styles.section}>
@@ -150,7 +157,10 @@ const styles = StyleSheet.create({
   moodText: { fontSize: 13, color: COLORS.textSecondary },
   degreeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   degreeItem: { width: '22%', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.sm, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
-  degreeNote: { fontSize: 11, color: COLORS.textSecondary, marginBottom: 4, textAlign: 'center' },
+  degreeNote: { fontSize: 13, color: COLORS.textPrimary, fontWeight: '600', textAlign: 'center' },
+  degreeDev: { fontSize: 10, color: COLORS.textTertiary, marginTop: 2 },
+  charDot: { width: 5, height: 5, borderRadius: 999, marginTop: 4 },
+  scaleHint: { fontSize: 11, color: COLORS.textTertiary, marginTop: SPACING.sm, lineHeight: 16 },
   degreeCents: { fontSize: 12, color: COLORS.textPrimary, fontWeight: '500' },
   phraseCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, borderLeftColor: COLORS.accent },
   phraseText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22, fontStyle: 'italic' },
