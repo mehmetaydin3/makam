@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.makam.app"
+      "bundleIdentifier": "com.makam.app",
+      "deploymentTarget": "15.1"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,8 +27,7 @@
       "package": "com.makam.app"
     },
     "plugins": [
-      "expo-router",
-      "expo-av"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true
