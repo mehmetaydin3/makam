@@ -130,11 +130,15 @@ export default function MakamDetailScreen() {
         <View style={[styles.section, { marginBottom: SPACING.xxxl }]}>
           <Text style={styles.sectionLabel}>Common Usul Pairings</Text>
           <View style={styles.usulRow}>
-            {makam.commonUsuls && makam.commonUsuls.map((usul) => (
-              <View key={usul} style={styles.usulTag}>
-                <Text style={styles.usulTagText}>{usul}</Text>
-              </View>
-            ))}
+            {makam.commonUsuls && makam.commonUsuls.map((usul) => {
+              const idMap = {'Düyek':'duyek','Sofyan':'sofyan','Aksak':'aksak','Semai':'semai','Curcuna':'curcuna','Muhammes':'muhammes','Devr-i Hindi':'devr-i-hindi','Yürük Semai':'yuruk-semai'};
+              const usulId = idMap[usul] || usul.toLowerCase().replace(/ /g, '-');
+              return (
+                <TouchableOpacity key={usul} style={styles.usulTag} onPress={() => router.push('/usul/' + usulId)}>
+                  <Text style={styles.usulTagText}>{usul}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           <Text style={styles.sectionLabel}>Notable Pieces</Text>
