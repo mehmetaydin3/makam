@@ -19,7 +19,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="usul"
-        options={{ title: 'Usul', tabBarIcon: ({ color, size }) => <Ionicons name="musical-notes-outline" size={size} color={color} /> }}
+        options={{ title: 'Usul', tabBarIcon: ({ color, size }) => <Ionicons name="timer-outline" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="learn"
