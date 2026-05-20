@@ -154,7 +154,7 @@ export const LESSONS: Lesson[] = [
       },
       {
         heading: 'For the practitioner',
-        body: 'If you are composing or improvising in a makam, your choice of usul is one of the most powerful decisions you can make. Start by feeling the makam's emotional character. Then ask: does this emotion need the urgency of Aksak, the steadiness of Düyek, the grace of Semai? The right pairing will feel inevitable — as if the melody and rhythm were always meant for each other.',
+        body: 'If you are composing or improvising in a makam, your choice of usul is one of the most powerful decisions you can make. Start by feeling the makam’s emotional character. Then ask: does this emotion need the urgency of Aksak, the steadiness of Düyek, the grace of Semai? The right pairing will feel inevitable — as if the melody and rhythm were always meant for each other.',
         callout: 'The great composers did not choose makam and usul separately. They heard them as one thing.',
       },
     ],
