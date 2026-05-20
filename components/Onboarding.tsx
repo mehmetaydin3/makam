@@ -1,38 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
-import {
-  View, Text, StyleSheet, Dimensions, TouchableOpacity,
-  Animated, ScrollView, StatusBar,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { COLORS, SPACING } from '../data/constants';
 
-const { width, height } = Dimensions.get('window');
-const ONBOARDING_KEY = 'makam_onboarding_complete';
+const { width } = Dimensions.get('window');
+const KEY = 'makam_onboarding_v1';
 
 const slides = [
-  {
-    key: 'makam',
-    eyebrow: 'THE SOUL OF TURKISH MUSIC',
-    title: 'What is a Makam?',
-    body: 'A makam is more than a scale. It is a world — carrying a mood, a time of day, a season, and a characteristic melodic movement that has been passed down for centuries.\n\nEach makam has its own emotional gravity. Rast lifts the spirit at dawn. Uşşak aches with longing. Hicaz burns with the drama of distant lands.',
-    accent: '#C8975A',
-  },
-  {
-    key: 'seyir',
-    eyebrow: 'THE PATH OF THE MELODY',
-    title: 'What is Seyir?',
-    body: 'Seyir is the journey a makam takes — its characteristic melodic movement through the scale.\n\nSome makams ascend, rising from the root like the sun. Others descend, falling inward toward resolution. Others undulate, searching both up and down before coming to rest.\n\nWithout seyir, a scale is just notes. With it, it becomes music.',
-    accent: '#8B7355',
-  },
-  {
-    key: 'explore',
-    eyebrow: 'YOUR GUIDE',
-    title: 'How to Explore',
-    body: 'Three paths await you.\n\n💡 DISCOVER — Browse all makams. Hear their scales, feel their moods, understand their character.\n\n📖 MAKAMS — The full library. Every makam with its scale, seyir, and notable pieces.\n\n🏛 LEARN — Lessons on Turkish music theory, tuning systems, and musical families.',
-    accent: '#C8975A',
-    isLast: true,
-  },
+  { key: 'makam', eyebrow: 'THE SOUL OF TURKISH MUSIC', title: 'What is a Makam?', body: 'A makam is more than a scale. It is a world — carrying a mood, a time of day, a season, and a characteristic melodic movement passed down for centuries.\n\nEach makam has its own emotional gravity. Rast lifts the spirit at dawn. Uşşak aches with longing. Hicaz burns with the drama of distant lands.', accent: '#C8975A', isLast: false },
+  { key: 'seyir', eyebrow: 'THE PATH OF THE MELODY', title: 'What is Seyir?', body: 'Seyir is the journey a makam takes — its characteristic melodic movement through the scale.\n\nSome makams ascend, rising from the root like the sun. Others descend, falling inward toward resolution. Others undulate, searching both directions before coming to rest.\n\nWithout seyir, a scale is just notes. With it, it becomes music.', accent: '#8B7355', isLast: false },
+  { key: 'explore', eyebrow: 'YOUR GUIDE', title: 'How to Explore', body: 'Three paths await you.\n\n💡  DISCOVER — Browse all makams, feel their moods, understand their character.\n\n📖  MAKAMS — The full library. Every makam with its scale, seyir, and notable pieces.\n\n🏛  LEARN — Lessons on Turkish music theory, tuning, and musical families.', accent: '#C8975A', isLast: true },
 ];
+
+export async function hasSeenOnboarding(): Promise<boolean> {
+  try { return (await SecureStore.getItemAsync(KEY)) === 'true'; } catch { return false; }
+}
 
 export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   const scrollRef = useRef<ScrollView>(null);
@@ -40,19 +22,17 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }).start();
   }, []);
 
   const handleNext = () => {
-    if (currentIndex < slides.length - 1) {
-      const next = currentIndex + 1;
-      scrollRef.current?.scrollTo({ x: next * width, animated: true });
-      setCurrentIndex(next);
-    }
+    const next = currentIndex + 1;
+    scrollRef.current?.scrollTo({ x: next * width, animated: true });
+    setCurrentIndex(next);
   };
 
   const handleComplete = async () => {
-    await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+    try { await SecureStore.setItemAsync(KEY, 'true'); } catch {}
     onComplete();
   };
 
@@ -60,15 +40,8 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <StatusBar barStyle="light-content" />
-      <ScrollView
-        ref={scrollRef}
-        horizontal
-        pagingEnabled
-        scrollEnabled={false}
-        showsHorizontalScrollIndicator={false}
-      >
-        {slides.map((s, i) => (
+      <ScrollView ref={scrollRef} horizontal pagingEnabled scrollEnabled={false} showsHorizontalScrollIndicator={false}>
+        {slides.map((s) => (
           <View key={s.key} style={styles.slide}>
             <View style={styles.content}>
               <Text style={styles.eyebrow}>{s.eyebrow}</Text>
@@ -79,40 +52,23 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
           </View>
         ))}
       </ScrollView>
-
-      {/* Dots */}
       <View style={styles.dots}>
         {slides.map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.dot,
-              i === currentIndex && styles.dotActive,
-              i === currentIndex && { backgroundColor: slide.accent },
-            ]}
-          />
+          <View key={i} style={[styles.dot, i === currentIndex && { width: 20, backgroundColor: slide.accent }]} />
         ))}
       </View>
-
-      {/* Button */}
       <View style={styles.buttonRow}>
-        {!slides[currentIndex].isLast ? (
+        {!slide.isLast ? (
           <>
             <TouchableOpacity onPress={handleComplete} style={styles.skipButton}>
               <Text style={styles.skipText}>Skip</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleNext}
-              style={[styles.nextButton, { backgroundColor: slide.accent }]}
-            >
+            <TouchableOpacity onPress={handleNext} style={[styles.nextButton, { backgroundColor: slide.accent }]}>
               <Text style={styles.nextText}>Continue</Text>
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity
-            onPress={handleComplete}
-            style={[styles.startButton, { backgroundColor: slide.accent }]}
-          >
+          <TouchableOpacity onPress={handleComplete} style={[styles.startButton, { backgroundColor: slide.accent }]}>
             <Text style={styles.nextText}>Begin Exploring</Text>
           </TouchableOpacity>
         )}
@@ -121,16 +77,8 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-export async function hasSeenOnboarding(): Promise<boolean> {
-  const val = await AsyncStorage.getItem(ONBOARDING_KEY);
-  return val === 'true';
-}
-
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: '#0A0A0B', zIndex: 999,
-  },
+  container: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#0A0A0B', zIndex: 999 },
   slide: { width, flex: 1, justifyContent: 'center', paddingHorizontal: SPACING.xl, paddingTop: 80 },
   content: { gap: SPACING.lg },
   eyebrow: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 3, textTransform: 'uppercase' },
@@ -139,11 +87,7 @@ const styles = StyleSheet.create({
   body: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 26 },
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 8, paddingBottom: SPACING.lg },
   dot: { width: 6, height: 6, borderRadius: 999, backgroundColor: COLORS.border },
-  dotActive: { width: 20 },
-  buttonRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: SPACING.lg, paddingBottom: 48,
-  },
+  buttonRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SPACING.lg, paddingBottom: 48 },
   skipButton: { padding: SPACING.md },
   skipText: { fontSize: 14, color: COLORS.textTertiary },
   nextButton: { paddingHorizontal: 28, paddingVertical: 14, borderRadius: 999 },
