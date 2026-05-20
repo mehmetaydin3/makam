@@ -67,7 +67,7 @@ export default function MakamDetailScreen() {
               if (abs >= 36 && abs <= 64) interp = '¼ tone ' + dir;
               else if (abs >= 16 && abs <= 35) interp = 'slightly ' + dir;
               else if (abs >= 65 && abs <= 85) interp = '¾ tone ' + dir;
-              const centsLabel = abs > 5 ? (dev > 0 ? '+' : '') + dev + '¢' : '';
+              const centsLabel = abs > 15 ? (dev > 0 ? '+' : '') + dev + '¢' : '';
               return (
                 <View key={i} style={[styles.degreeItem, d.isCharacteristic && { borderColor: makam.color, borderWidth: 2 }]}>
                   <Text style={[styles.degreeNote, d.isCharacteristic && { color: makam.color }]}>{d.westernNearest}</Text>
