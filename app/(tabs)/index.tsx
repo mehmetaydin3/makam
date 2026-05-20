@@ -48,7 +48,7 @@ export default function ExploreScreen() {
         )}
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters} style={{ marginBottom: 4 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersScroll} contentContainerStyle={styles.filters}>
         {FILTERS.map((f) => (
           <TouchableOpacity
             key={f}
@@ -110,7 +110,8 @@ const styles = StyleSheet.create({
   searchBox: { flexDirection: 'row', alignItems: 'center', marginHorizontal: SPACING.lg, marginVertical: SPACING.sm, backgroundColor: COLORS.surface, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: SPACING.md },
   searchInput: { flex: 1, fontSize: 15, color: COLORS.textPrimary, paddingVertical: 12 },
   clearButton: { fontSize: 14, color: COLORS.textTertiary, padding: 4 },
-  filters: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.sm, flexDirection: "row" },
+  filtersScroll: { marginBottom: SPACING.sm },
+  filters: { paddingHorizontal: SPACING.lg, alignItems: 'center' },
   filterChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface, marginRight: 8 },
   filterChipActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
   filterText: { fontSize: 13, color: COLORS.textSecondary },
