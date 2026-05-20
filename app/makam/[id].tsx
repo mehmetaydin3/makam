@@ -61,17 +61,24 @@ export default function MakamDetailScreen() {
             {(makam.scale || []).map((d, i) => {
               const nearest = Math.round(d.cents / 100) * 100;
               const dev = d.cents - nearest;
-              const devStr = dev === 0 ? '' : (dev > 0 ? '+' + dev : '' + dev) + '¢';
+              const abs = Math.abs(dev);
+              const dir = dev < 0 ? '♭' : '♯';
+              let interp = '';
+              if (abs >= 36 && abs <= 64) interp = '¼ tone ' + dir;
+              else if (abs >= 16 && abs <= 35) interp = 'slightly ' + dir;
+              else if (abs >= 65 && abs <= 85) interp = '¾ tone ' + dir;
+              const centsLabel = abs > 5 ? (dev > 0 ? '+' : '') + dev + '¢' : '';
               return (
                 <View key={i} style={[styles.degreeItem, d.isCharacteristic && { borderColor: makam.color, borderWidth: 2 }]}>
                   <Text style={[styles.degreeNote, d.isCharacteristic && { color: makam.color }]}>{d.westernNearest}</Text>
-                  {devStr ? <Text style={styles.degreeDev}>{devStr}</Text> : null}
-                  {d.isCharacteristic && <View style={[styles.charDot, { backgroundColor: makam.color }]} />}
+                  {interp ? <Text style={[styles.degreeInterp, d.isCharacteristic && { color: makam.color + 'cc' }]}>{interp}</Text> : null}
+                  {centsLabel && !interp ? <Text style={styles.degreeDev}>{centsLabel}</Text> : null}
+                  {centsLabel && interp ? <Text style={styles.degreeCentsSmall}>{centsLabel}</Text> : null}
                 </View>
               );
             })}
           </View>
-          <Text style={styles.scaleHint}>● Highlighted notes are characteristic — they define this makam’s color</Text>
+          <Text style={styles.scaleHint}>Green notes are where this makam lives — they can’t be swapped for standard tuning.</Text>
         </View>
 
         <View style={styles.section}>
@@ -157,10 +164,11 @@ const styles = StyleSheet.create({
   moodText: { fontSize: 13, color: COLORS.textSecondary },
   degreeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   degreeItem: { width: '22%', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.sm, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
-  degreeNote: { fontSize: 13, color: COLORS.textPrimary, fontWeight: '600', textAlign: 'center' },
-  degreeDev: { fontSize: 10, color: COLORS.textTertiary, marginTop: 2 },
-  charDot: { width: 5, height: 5, borderRadius: 999, marginTop: 4 },
-  scaleHint: { fontSize: 11, color: COLORS.textTertiary, marginTop: SPACING.sm, lineHeight: 16 },
+  degreeNote: { fontSize: 15, color: COLORS.textPrimary, fontWeight: '600', textAlign: 'center' },
+  degreeInterp: { fontSize: 10, color: COLORS.textSecondary, marginTop: 3, textAlign: 'center' },
+  degreeDev: { fontSize: 10, color: COLORS.textTertiary, marginTop: 2, textAlign: 'center' },
+  degreeCentsSmall: { fontSize: 9, color: COLORS.textTertiary, marginTop: 1, textAlign: 'center' },
+  scaleHint: { fontSize: 12, color: COLORS.textTertiary, marginTop: SPACING.md, lineHeight: 18, fontStyle: 'italic' },
   degreeCents: { fontSize: 12, color: COLORS.textPrimary, fontWeight: '500' },
   phraseCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, borderLeftColor: COLORS.accent },
   phraseText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22, fontStyle: 'italic' },
