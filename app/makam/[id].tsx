@@ -33,7 +33,7 @@ export default function MakamDetailScreen() {
     if (playbackState === 'playing') {
       await audioEngine.stop(); setPlaybackState('idle'); setActiveIndex(-1); return;
     }
-    const cents = makam.scale.map(d => d.cents);
+    const cents = makam.scaleDegreeCents;
     await audioEngine.playScale(makam.durak, cents, (state, index) => {
       setPlaybackState(state);
       if (index !== undefined) setActiveIndex(index);
@@ -67,12 +67,12 @@ export default function MakamDetailScreen() {
             </TouchableOpacity>
             <View style={styles.audioMeta}>
               <Text style={styles.audioTitle}>{playbackState === 'playing' ? 'Playing...' : 'Play Scale'}</Text>
-              <Text style={styles.audioSub}>{playbackState === 'playing' ? `${makam.scale[activeIndex]?.name ?? ''} · ${makam.scale[activeIndex]?.cents ?? 0}¢` : `Hear the ${makam.name} makam`}</Text>
+              <Text style={styles.audioSub}>{playbackState === 'playing' ? `${'Note'} · ${makam.scaleDegreeCents?.[activeIndex] ?? 0}¢` : `Hear the ${makam.name} makam`}</Text>
             </View>
           </View>
           <View style={styles.degreeRow}>
-            {makam.scale.map((degree, i) => (
-              <View key={i} style={[styles.degreePip, { backgroundColor: i === activeIndex ? makam.color : degree.isCharacteristic ? makam.color + '55' : COLORS.border, height: i === activeIndex ? 24 : degree.isCharacteristic ? 16 : 10 }]} />
+            {makam.scaleDegreeCents && makam.scaleDegreeCents.map((cents, i) => (
+              <View key={i} style={[styles.degreePip, { backgroundColor: i === activeIndex ? makam.color : COLORS.border, height: i === activeIndex ? 24 : 10 }]} />
             ))}
           </View>
         </View>
@@ -95,7 +95,7 @@ export default function MakamDetailScreen() {
           <Text style={styles.sectionLabel}>Scale</Text>
           <Text style={styles.scaleNote}>● Characteristic degree — defines the makam's color</Text>
           <View style={styles.scaleGrid}>
-            {makam.scale.map((degree, i) => (
+            {makam.scaleDegreeCents && makam.scaleDegreeCents.map((cents, i) => (
               <View key={degree.degree} style={[styles.scaleItem, degree.isCharacteristic && { borderColor: makam.color, backgroundColor: makam.color + '15' }, i === activeIndex && { borderColor: makam.color, backgroundColor: makam.color + '30' }]}>
                 <Text style={styles.scaleDegree}>{degree.degree}</Text>
                 <Text style={styles.scaleName}>{degree.name}</Text>
