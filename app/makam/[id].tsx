@@ -128,10 +128,22 @@ export default function MakamDetailScreen() {
           </View>
         </View>
         <View style={[styles.section, { marginBottom: SPACING.xxxl }]}>
+          <Text style={styles.sectionLabel}>Common Usuls</Text>
+          <View style={styles.usulRow}>
+            {makam.commonUsuls && makam.commonUsuls.map((usul) => (
+              <View key={usul} style={styles.usulTag}>
+                <Text style={styles.usulTagText}>{usul}</Text>
+              </View>
+            ))}
+          </View>
+
           <Text style={styles.sectionLabel}>Notable Pieces</Text>
           {makam.notablePieces.map((piece, i) => (
             <View key={i} style={styles.pieceRow}>
-              <Text style={styles.pieceTitle}>{piece.title}</Text>
+              <View style={styles.pieceTitleRow}>
+                <Text style={styles.pieceTitle}>{piece.title}</Text>
+                {piece.usul && <View style={styles.pieceUsulBadge}><Text style={styles.pieceUsulText}>{piece.usul}</Text></View>}
+              </View>
               <Text style={styles.pieceComposer}>{piece.composer}</Text>
             </View>
           ))}
@@ -194,6 +206,12 @@ const styles = StyleSheet.create({
   relatedTag: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border },
   relatedText: { fontSize: 13, color: COLORS.textSecondary },
   pieceRow: { paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  pieceTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, flexWrap: 'wrap' },
+  pieceUsulBadge: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: COLORS.surfaceRaised, borderWidth: 1, borderColor: COLORS.border },
+  pieceUsulText: { fontSize: 10, color: COLORS.textTertiary, letterSpacing: 0.5 },
+  usulRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginBottom: SPACING.lg },
+  usulTag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: COLORS.accent + '55', backgroundColor: COLORS.surface },
+  usulTagText: { fontSize: 13, color: COLORS.accent, fontWeight: '500' },
   pieceTitle: { fontSize: 15, color: COLORS.textPrimary, marginBottom: 2 },
   pieceComposer: { fontSize: 13, color: COLORS.textSecondary },
 });
