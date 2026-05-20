@@ -420,6 +420,8 @@ export const MAKAM_FAMILIES = [...new Set(MAKAMS.map((m) => m.family))];
 export const SEYIR_TYPES: Seyir[] = ['ascending', 'descending', 'undulating'
   {
     id: 'nihavend',
+    pronunciation: 'nee-hah-VEND',
+    characteristicPhrase: 'A farewell without bitterness',
     name: 'Nihavend',
     pronunciation: 'nee-hah-VEND',
     description: 'Nihavend is the closest Turkish makam to the Western minor scale, yet it carries a distinctly Eastern character. Its descending seyir gives it a quality of resignation and longing that has made it one of the most beloved makams in Turkish classical and popular music alike.',
@@ -429,7 +431,7 @@ export const SEYIR_TYPES: Seyir[] = ['ascending', 'descending', 'undulating'
     timeOfDay: 'Evening',
     season: 'Autumn',
     mood: ['Melancholic', 'Resigned', 'Tender', 'Longing'],
-    seyir: 'Descending',
+    seyir: 'descending',
     family: 'Nihavend',
     relatedMakams: ['Ussak', 'Buselik', 'Hüseyni'],
     description2: 'Often called the most accessible of the makams for Western ears, Nihavend is deceptive in its simplicity. Its true depth lies in the subtle flattening of the sixth degree and the characteristic descending phrases that give it its unmistakable emotional weight.',
