@@ -30,6 +30,7 @@ export type Makam = {
   notablePieces: {
     title: string;
     composer: string;
+    usul?: string;
   }[];
   color: string; // UI accent per makam
 };
@@ -66,8 +67,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Rast Saz Semaisi', composer: 'Tanburi Cemil Bey' },
-      { title: 'Yine Bir Gülnihal', composer: 'Hacı Arif Bey' },
+      { title: 'Rast Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
+      { title: 'Yine Bir Gülnihal', composer: 'Hacı Arif Bey', usul: 'Düyek' },
     ],
     color: '#C8975A',
   },
@@ -102,8 +103,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Uşşak Peşrev', composer: 'Hammamizade İsmail Dede Efendi' },
-      { title: 'Geçti Bezm-i Safâ', composer: 'Hacı Arif Bey' },
+      { title: 'Uşşak Peşrev', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Devr-i Hindi' },
+      { title: 'Geçti Bezm-i Safâ', composer: 'Hacı Arif Bey', usul: 'Aksak' },
     ],
     color: '#7A6E9E',
   },
@@ -138,8 +139,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Hicaz Saz Semaisi', composer: 'Tanburi Cemil Bey' },
-      { title: 'Dil Bir Perî-veş Yâre Düştü', composer: 'Hammamizade İsmail Dede Efendi' },
+      { title: 'Hicaz Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
+      { title: 'Dil Bir Perî-veş Yâre Düştü', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Düyek' },
     ],
     color: '#B85C38',
   },
@@ -174,8 +175,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Hüseyni Peşrev', composer: 'Hafız Post' },
-      { title: 'Mey İçmekten Men Etme', composer: 'Mustafa Itri' },
+      { title: 'Hüseyni Peşrev', composer: 'Hafız Post', usul: 'Devr-i Hindi' },
+      { title: 'Mey İçmekten Men Etme', composer: 'Mustafa Itri', usul: 'Düyek' },
     ],
     color: '#4A7C59',
   },
@@ -210,8 +211,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Saba Ilahi', composer: 'Various (folk tradition)' },
-      { title: 'Saba Peşrev', composer: 'Tanburi Cemil Bey' },
+      { title: 'Saba Ilahi', composer: 'Various (folk tradition)', usul: 'Sofyan' },
+      { title: 'Saba Peşrev', composer: 'Tanburi Cemil Bey', usul: 'Devr-i Hindi' },
     ],
     color: '#3A5068',
   },
@@ -246,8 +247,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Segah Mevlevi Ayin', composer: 'Hammamizade İsmail Dede Efendi' },
-      { title: 'Segah Beste', composer: 'Mustafa Itri' },
+      { title: 'Segah Mevlevi Ayin', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Aksak' },
+      { title: 'Segah Beste', composer: 'Mustafa Itri', usul: 'Muhammes' },
     ],
     color: '#5C4A7A',
   },
@@ -282,8 +283,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Kürd Peşrev', composer: 'Hafız Post' },
-      { title: 'Kurd Saz Semaisi', composer: 'Tanburi Cemil Bey' },
+      { title: 'Kürd Peşrev', composer: 'Hafız Post', usul: 'Devr-i Hindi' },
+      { title: 'Kurd Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
     ],
     color: '#6B5B45',
   },
@@ -318,8 +319,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Neva Kâr', composer: 'Mustafa Itri' },
-      { title: 'Neva Peşrev', composer: 'Hammamizade İsmail Dede Efendi' },
+      { title: 'Neva Kâr', composer: 'Mustafa Itri', usul: 'Muhammes' },
+      { title: 'Neva Peşrev', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Devr-i Hindi' },
     ],
     color: '#5A8A7A',
   },
@@ -354,8 +355,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Buselik Peşrev', composer: 'Kemani Hızır Ağa' },
-      { title: 'Buselik Saz Semaisi', composer: 'Tanburi Cemil Bey' },
+      { title: 'Buselik Peşrev', composer: 'Kemani Hızır Ağa', usul: 'Düyek' },
+      { title: 'Buselik Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
     ],
     color: '#7A8A6A',
   },
@@ -390,8 +391,8 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Çargah Peşrev', composer: 'Hammamizade İsmail Dede Efendi' },
-      { title: 'Çargah Saz Semaisi', composer: 'Tanburi Cemil Bey' },
+      { title: 'Çargah Peşrev', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Devr-i Hindi' },
+      { title: 'Çargah Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
     ],
     color: '#C8A84B',
   },
