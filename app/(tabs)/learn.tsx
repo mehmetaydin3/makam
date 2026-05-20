@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { LESSONS } from '../../data/education';
 import { COLORS, SPACING } from '../../data/constants';
 
-function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void }) {
+function LessonReader({ lesson, onClose }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.readerHeader}>
@@ -12,29 +12,29 @@ function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void })
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.readerScroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.lessonEyebrow}>{lesson.category?.toUpperCase()}</Text>
+        <Text style={styles.lessonSubtitle}>{lesson.subtitle}</Text>
         <Text style={styles.lessonTitle}>{lesson.title}</Text>
+        <Text style={styles.lessonTime}>{lesson.estimatedMinutes} min read</Text>
         <View style={styles.lessonDivider} />
-        <Text style={styles.lessonBody}>{lesson.content}</Text>
-        {lesson.keyPoints && (
-          <View style={styles.keyPointsCard}>
-            <Text style={styles.keyPointsLabel}>KEY POINTS</Text>
-            {lesson.keyPoints.map((point: string, i: number) => (
-              <View key={i} style={styles.keyPoint}>
-                <View style={styles.keyPointDot} />
-                <Text style={styles.keyPointText}>{point}</Text>
+        {lesson.sections && lesson.sections.map((section, i) => (
+          <View key={i} style={styles.section}>
+            <Text style={styles.sectionHeading}>{section.heading}</Text>
+            <Text style={styles.sectionBody}>{section.body}</Text>
+            {section.callout ? (
+              <View style={styles.calloutCard}>
+                <Text style={styles.calloutText}>{section.callout}</Text>
               </View>
-            ))}
+            ) : null}
           </View>
-        )}
-        <View style={{ height: SPACING.xxxl }} />
+        ))}
+        <View style={{ height: 80 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 export default function LearnScreen() {
-  const [selectedLesson, setSelectedLesson] = useState<any | null>(null);
+  const [selectedLesson, setSelectedLesson] = useState(null);
 
   if (selectedLesson) {
     return <LessonReader lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />;
@@ -49,24 +49,19 @@ export default function LearnScreen() {
       </View>
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
         {LESSONS.map((lesson, i) => (
-          <TouchableOpacity
-            key={lesson.id}
-            style={styles.card}
-            activeOpacity={0.75}
-            onPress={() => setSelectedLesson(lesson)}
-          >
+          <TouchableOpacity key={lesson.id} style={styles.card} activeOpacity={0.75} onPress={() => setSelectedLesson(lesson)}>
             <View style={styles.cardLeft}>
               <Text style={styles.lessonNumber}>{String(i + 1).padStart(2, '0')}</Text>
             </View>
             <View style={styles.cardBody}>
-              <Text style={styles.cardCategory}>{lesson.category?.toUpperCase()}</Text>
               <Text style={styles.cardTitle}>{lesson.title}</Text>
-              <Text style={styles.cardSummary} numberOfLines={2}>{lesson.summary}</Text>
+              <Text style={styles.cardSummary} numberOfLines={2}>{lesson.subtitle}</Text>
+              <Text style={styles.cardTime}>{lesson.estimatedMinutes} min read</Text>
             </View>
             <Text style={styles.arrow}>›</Text>
           </TouchableOpacity>
         ))}
-        <View style={{ height: SPACING.xxxl }} />
+        <View style={{ height: 80 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -79,29 +74,25 @@ const styles = StyleSheet.create({
   heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
   list: { paddingHorizontal: SPACING.lg, gap: SPACING.sm },
-  card: {
-    backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1,
-    borderColor: COLORS.border, flexDirection: 'row', alignItems: 'center',
-    padding: SPACING.md, gap: SPACING.md,
-  },
+  card: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, flexDirection: 'row', alignItems: 'center', padding: SPACING.md, gap: SPACING.md },
   cardLeft: { width: 36, alignItems: 'center' },
   lessonNumber: { fontSize: 20, fontWeight: '200', color: COLORS.accent, letterSpacing: -1 },
-  cardBody: { flex: 1, gap: 4 },
-  cardCategory: { fontSize: 10, color: COLORS.textTertiary, letterSpacing: 1.5 },
+  cardBody: { flex: 1, gap: 3 },
   cardTitle: { fontSize: 16, fontWeight: '400', color: COLORS.textPrimary },
   cardSummary: { fontSize: 12, color: COLORS.textSecondary, lineHeight: 17 },
+  cardTime: { fontSize: 11, color: COLORS.textTertiary, marginTop: 2 },
   arrow: { fontSize: 20, color: COLORS.textTertiary },
   readerHeader: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
   backButton: { alignSelf: 'flex-start' },
   backText: { color: COLORS.accent, fontSize: 15 },
   readerScroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
-  lessonEyebrow: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, marginBottom: SPACING.sm },
-  lessonTitle: { fontSize: 36, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, lineHeight: 42, marginBottom: SPACING.lg },
-  lessonDivider: { width: 40, height: 2, backgroundColor: COLORS.accent, borderRadius: 999, marginBottom: SPACING.lg },
-  lessonBody: { fontSize: 16, color: COLORS.textSecondary, lineHeight: 28 },
-  keyPointsCard: { marginTop: SPACING.xl, backgroundColor: COLORS.surface, borderRadius: 16, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, gap: SPACING.md },
-  keyPointsLabel: { fontSize: 11, color: COLORS.accent, letterSpacing: 2 },
-  keyPoint: { flexDirection: 'row', gap: SPACING.sm, alignItems: 'flex-start' },
-  keyPointDot: { width: 5, height: 5, borderRadius: 999, backgroundColor: COLORS.accent, marginTop: 7 },
-  keyPointText: { flex: 1, fontSize: 14, color: COLORS.textSecondary, lineHeight: 21 },
+  lessonSubtitle: { fontSize: 12, color: COLORS.textTertiary, letterSpacing: 1, marginBottom: 8, textTransform: 'uppercase' },
+  lessonTitle: { fontSize: 34, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, lineHeight: 40 },
+  lessonTime: { fontSize: 12, color: COLORS.textTertiary, marginTop: 4 },
+  lessonDivider: { width: 40, height: 2, backgroundColor: COLORS.accent, borderRadius: 999, marginVertical: SPACING.lg },
+  section: { marginBottom: SPACING.xl, gap: SPACING.sm },
+  sectionHeading: { fontSize: 18, fontWeight: '500', color: COLORS.textPrimary },
+  sectionBody: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 26 },
+  calloutCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderLeftWidth: 3, borderLeftColor: COLORS.accent, borderWidth: 1, borderColor: COLORS.border },
+  calloutText: { fontSize: 14, color: COLORS.accent, lineHeight: 22, fontStyle: 'italic' },
 });
