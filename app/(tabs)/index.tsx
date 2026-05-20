@@ -13,13 +13,8 @@ export default function ExploreScreen() {
 
   const filtered = MAKAMS.filter((m) => {
     const q = query.toLowerCase();
-    const matchesQuery =
-      q === '' ||
-      m.name.toLowerCase().includes(q) ||
-      m.mood.some((mood) => mood.toLowerCase().includes(q)) ||
-      m.description.toLowerCase().includes(q);
-    const matchesSeyir =
-      seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
+    const matchesQuery = q === '' || m.name.toLowerCase().includes(q) || m.mood.some((mood) => mood.toLowerCase().includes(q)) || m.description.toLowerCase().includes(q);
+    const matchesSeyir = seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
     return matchesQuery && matchesSeyir;
   });
 
@@ -43,12 +38,12 @@ export default function ExploreScreen() {
         />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => setQuery('')}>
-            <Text style={styles.clearButton}>✕</Text>
+            <Text style={styles.clearButton}>x</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersScroll} contentContainerStyle={styles.filters}>
+      <View style={[styles.filtersRow, { display: "none" }]}>
         {FILTERS.map((f) => (
           <TouchableOpacity
             key={f}
@@ -58,7 +53,7 @@ export default function ExploreScreen() {
             <Text style={[styles.filterText, seyirFilter === f && styles.filterTextActive]}>{f}</Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
 
       <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
         {filtered.length === 0 ? (
@@ -72,7 +67,7 @@ export default function ExploreScreen() {
               key={makam.id}
               style={styles.card}
               activeOpacity={0.75}
-              onPress={() => router.push(`/makam/${makam.id}`)}
+              onPress={() => router.push('/makam/' + makam.id)}
             >
               <View style={[styles.colorStrip, { backgroundColor: makam.color }]} />
               <View style={styles.cardBody}>
@@ -110,9 +105,8 @@ const styles = StyleSheet.create({
   searchBox: { flexDirection: 'row', alignItems: 'center', marginHorizontal: SPACING.lg, marginVertical: SPACING.sm, backgroundColor: COLORS.surface, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border, paddingHorizontal: SPACING.md },
   searchInput: { flex: 1, fontSize: 15, color: COLORS.textPrimary, paddingVertical: 12 },
   clearButton: { fontSize: 14, color: COLORS.textTertiary, padding: 4 },
-  filtersScroll: { marginBottom: SPACING.sm },
-  filters: { paddingHorizontal: SPACING.lg, alignItems: 'center' },
-  filterChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface, marginRight: 8 },
+  filtersRow: { flexDirection: 'row', paddingHorizontal: SPACING.lg, paddingBottom: SPACING.sm, gap: 8 },
+  filterChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface },
   filterChipActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
   filterText: { fontSize: 13, color: COLORS.textSecondary },
   filterTextActive: { color: '#0A0A0B', fontWeight: '600' },
