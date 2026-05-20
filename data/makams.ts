@@ -439,5 +439,4 @@ export const getMakamsBySeyir = (seyir: Seyir): Makam[] =>
   MAKAMS.filter((m) => m.seyir === seyir);
 
 export const MAKAM_FAMILIES = [...new Set(MAKAMS.map((m) => m.family))];
-export const SEYIR_TYPES: Seyir[] = ['ascending', 'descending', 'undulating']
-];
+export const SEYIR_TYPES: Seyir[] = ['ascending', 'descending', 'undulating'];
