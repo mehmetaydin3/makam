@@ -18,13 +18,14 @@ export default function TabLayout() {
         options={{ title: 'Explore', tabBarIcon: ({ color, size }) => <Ionicons name="compass-outline" size={size} color={color} /> }}
       />
       <Tabs.Screen
+        name="usul"
+        options={{ title: 'Usul', tabBarIcon: ({ color, size }) => <Ionicons name="musical-notes-outline" size={size} color={color} /> }}
+      />
+      <Tabs.Screen
         name="learn"
         options={{ title: 'Learn', tabBarIcon: ({ color, size }) => <Ionicons name="school-outline" size={size} color={color} /> }}
       />
-      <Tabs.Screen
-        name="library"
-        options={{ href: null }}
-      />
+      <Tabs.Screen name="library" options={{ href: null }} />
     </Tabs>
   );
 }
