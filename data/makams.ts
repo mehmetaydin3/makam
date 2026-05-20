@@ -32,6 +32,7 @@ export type Makam = {
     composer: string;
     usul?: string;
   }[];
+  commonUsuls: string[];
   color: string; // UI accent per makam
 };
 
@@ -41,7 +42,8 @@ export const MAKAMS: Makam[] = [
     name: 'Rast',
     pronunciation: 'rahst',
     family: 'Rast',
-    seyir: 'ascending',
+    commonUsuls: ['Düyek', 'Sofyan', 'Yürük Semai'],
+  seyir: 'ascending',
     durak: 'Sol (G)',
     guclu: 'Re (D)',
     scale: [
@@ -77,7 +79,8 @@ export const MAKAMS: Makam[] = [
     name: 'Uşşak',
     pronunciation: 'oosh-SHAHK',
     family: 'Uşşak',
-    seyir: 'descending',
+    commonUsuls: ['Aksak', 'Düyek', 'Devr-i Hindi'],
+  seyir: 'descending',
     durak: 'La (A)',
     guclu: 'Re (D)',
     scale: [
@@ -113,7 +116,8 @@ export const MAKAMS: Makam[] = [
     name: 'Hicaz',
     pronunciation: 'hee-JAHZ',
     family: 'Hicaz',
-    seyir: 'ascending',
+    commonUsuls: ['Aksak', 'Düyek', 'Curcuna'],
+  seyir: 'ascending',
     durak: 'Re (D)',
     guclu: 'La (A)',
     scale: [
@@ -149,7 +153,8 @@ export const MAKAMS: Makam[] = [
     name: 'Hüseyni',
     pronunciation: 'hoo-SAY-nee',
     family: 'Uşşak',
-    seyir: 'ascending',
+    commonUsuls: ['Düyek', 'Aksak', 'Devr-i Hindi'],
+  seyir: 'ascending',
     durak: 'La (A)',
     guclu: 'Mi (E)',
     scale: [
@@ -185,7 +190,8 @@ export const MAKAMS: Makam[] = [
     name: 'Saba',
     pronunciation: 'sah-BAH',
     family: 'Saba',
-    seyir: 'ascending',
+    commonUsuls: ['Aksak', 'Devr-i Hindi', 'Sofyan'],
+  seyir: 'ascending',
     durak: 'Re (D)',
     guclu: 'La♭ (A♭)',
     scale: [
@@ -221,7 +227,8 @@ export const MAKAMS: Makam[] = [
     name: 'Segah',
     pronunciation: 'seh-GAH',
     family: 'Segah',
-    seyir: 'ascending',
+    commonUsuls: ['Aksak', 'Muhammes', 'Semai'],
+  seyir: 'ascending',
     durak: 'Mi Koma♭ (E♭+)',
     guclu: 'Si♭ koma+ (B♭+)',
     scale: [
@@ -329,7 +336,8 @@ export const MAKAMS: Makam[] = [
     name: 'Buselik',
     pronunciation: 'boo-seh-LIK',
     family: 'Buselik',
-    seyir: 'ascending',
+    commonUsuls: ['Düyek', 'Sofyan', 'Aksak'],
+  seyir: 'ascending',
     durak: 'La (A)',
     guclu: 'Mi (E)',
     scale: [
@@ -365,7 +373,8 @@ export const MAKAMS: Makam[] = [
     name: 'Çargah',
     pronunciation: 'char-GAH',
     family: 'Çargah',
-    seyir: 'ascending',
+    commonUsuls: ['Düyek', 'Aksak', 'Devr-i Hindi'],
+  seyir: 'ascending',
     durak: 'Do (C)',
     guclu: 'Sol (G)',
     scale: [
