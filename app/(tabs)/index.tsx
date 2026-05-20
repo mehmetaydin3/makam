@@ -11,7 +11,7 @@ export default function DiscoverScreen() {
       <View style={styles.header}>
         <Text style={styles.eyebrow}>TURKISH MAKAM</Text>
         <Text style={styles.heading}>Discover</Text>
-        <Text style={styles.subheading}>Select a makam to explore its sound and character.</Text>
+        <Text style={styles.subheading}>A makam is a melodic framework — a scale, mood, and movement combined. Select one to explore.</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
@@ -54,8 +54,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, paddingBottom: SPACING.md },
   eyebrow: { fontSize: 12, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 },
-  heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
-  subheading: { fontSize: 14, color: COLORS.textSecondary },
+  heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 8 },
+  subheading: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
   grid: { paddingHorizontal: SPACING.lg, gap: SPACING.md },
   card: {
     backgroundColor: COLORS.surface,
