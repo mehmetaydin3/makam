@@ -106,4 +106,57 @@ export const LESSONS: Lesson[] = [
       },
     ],
   },
+
+  {
+    id: 'what-is-usul',
+    title: 'What is Usul?',
+    subtitle: 'The rhythmic heartbeat beneath the melody',
+    estimatedMinutes: 4,
+    sections: [
+      {
+        heading: 'More than a time signature',
+        body: 'In Western music, rhythm is often reduced to a time signature — 4/4, 3/4, 6/8. In Turkish music, usul is something far richer. It is a complete rhythmic personality: a specific pattern of strong and weak beats, a tempo character, and an emotional weight that shapes everything the melody can do.',
+        callout: 'Usul is to rhythm what makam is to melody — a framework with a soul.',
+      },
+      {
+        heading: 'The architecture of the beat',
+        body: 'Each usul has a fixed number of beats arranged into a specific pattern. Düyek moves in eight beats with a steady, grounded pulse. Aksak limps forward in nine, its asymmetry creating an irresistible forward lean. Semai glides in three, elegant and circular. These are not interchangeable — each usul carries a distinct character that shapes the emotional world of the piece.',
+      },
+      {
+        heading: 'Strong and weak beats',
+        body: 'Within each usul, beats are not equal. Some are struck strongly (düm), others lightly (tek), and others with medium weight. This hierarchy of beats creates the rhythmic identity of the usul — and an experienced listener can identify an usul from its pattern alone, the way a Western listener might recognize a waltz from its first three beats.',
+      },
+      {
+        heading: 'The usul as a living thing',
+        body: 'In performance, the usul is not just counted — it is felt. Drummers and percussionists internalize the pattern until it becomes instinctive. Melodic instruments breathe within the usul, sometimes anticipating beats, sometimes delaying resolution. This interplay between the fixed usul and the expressive melody is the heartbeat of Turkish classical music.',
+        callout: 'You cannot fully hear a makam until you feel the usul beneath it.',
+      },
+    ],
+  },
+  {
+    id: 'makam-and-usul',
+    title: 'Makam and Usul Together',
+    subtitle: 'How melody and rhythm create a complete musical world',
+    estimatedMinutes: 5,
+    sections: [
+      {
+        heading: 'Two pillars of one tradition',
+        body: 'Turkish classical music rests on two foundations: makam and usul. Makam governs the melodic world — which notes to use, how to move between them, where to rest and where to resolve. Usul governs the rhythmic world — the pulse, the weight of beats, the tempo character. Together they define not just how a piece sounds, but how it feels.',
+      },
+      {
+        heading: 'The same makam, different worlds',
+        body: 'A makam sounds different depending on which usul carries it. Hicaz in Aksak — with its nine limping beats — feels dramatic and searching. Hicaz in Sofyan — steady and four-square — feels more dignified, almost ceremonial. The makam provides the emotional palette; the usul determines how that emotion moves through time.',
+        callout: 'Changing the usul is like changing the weather in which the makam lives.',
+      },
+      {
+        heading: 'Traditional pairings',
+        body: 'Over centuries, certain makam-usul combinations became deeply established. Uşşak in Aksak is among the most beloved pairings in Turkish music — the limping rhythm perfectly matching the makam’s yearning character. Rast in Düyek is the grounded, morning pairing. These are not rules but accumulated wisdom — the result of thousands of compositions finding their natural home.',
+      },
+      {
+        heading: 'For the practitioner',
+        body: 'If you are composing or improvising in a makam, your choice of usul is one of the most powerful decisions you can make. Start by feeling the makam's emotional character. Then ask: does this emotion need the urgency of Aksak, the steadiness of Düyek, the grace of Semai? The right pairing will feel inevitable — as if the melody and rhythm were always meant for each other.',
+        callout: 'The great composers did not choose makam and usul separately. They heard them as one thing.',
+      },
+    ],
+  },
 ];
