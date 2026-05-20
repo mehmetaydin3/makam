@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { MAKAMS } from '../../data/makams';
@@ -27,6 +28,7 @@ export default function ExploreScreen() {
       </View>
 
       <View style={styles.searchBox}>
+        <Ionicons name="search-outline" size={16} color={COLORS.textTertiary} style={{ marginRight: 6 }} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search by name, mood, character..."
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
   filterChipActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
   filterText: { fontSize: 13, color: COLORS.textSecondary },
   filterTextActive: { color: '#0A0A0B', fontWeight: '600' },
-  grid: { paddingHorizontal: SPACING.lg, gap: SPACING.sm },
+  grid: { paddingHorizontal: SPACING.lg, gap: SPACING.sm, paddingTop: SPACING.md },
   card: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', flexDirection: 'row' },
   colorStrip: { width: 4 },
   cardBody: { flex: 1, padding: SPACING.md, gap: SPACING.sm },
