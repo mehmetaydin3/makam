@@ -78,7 +78,7 @@ export default function MakamDetailScreen() {
               );
             })}
           </View>
-          <Text style={styles.scaleHint}>Green notes are where this makam lives — they can’t be swapped for standard tuning.</Text>
+          <Text style={styles.scaleHint}>Highlighted notes are where this makam lives — they can’t be swapped for standard tuning.</Text>
         </View>
 
         <View style={styles.section}>
