@@ -23,7 +23,7 @@ export default function ExploreScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.eyebrow}>TURKISH MAKAM</Text>
-        <Text style={styles.heading}>Explore</Text>
+        <Text style={styles.heading}>Makam</Text>
         <Text style={styles.subheading}>A makam is a melodic framework — a scale, mood, and movement combined.</Text>
       </View>
 
