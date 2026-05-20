@@ -15,7 +15,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Makam', tabBarIcon: ({ color, size }) => <Ionicons name="musical-note-outline" size={size} color={color} /> }}
+        options={{ title: 'Makam', tabBarIcon: ({ color, size }) => <Ionicons name="cellular-outline" size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="usul"
