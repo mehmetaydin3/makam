@@ -26,7 +26,7 @@ export const USULS: Usul[] = [
     tempo: 'moderate',
     feel: 'Grounded and flowing. The most common usul in Turkish classical music — the heartbeat of the fasıl.',
     description: 'Düyek is the backbone of Turkish classical music. Its 8/8 pattern (2+2+2+2) creates a steady, walking pulse that supports a wide range of emotional expressions. From joyful şarkıs to melancholic saz semais, Düyek carries them all.',
-    commonMakams: ['rast', 'huseyni', 'nihavend', 'kurdilihicazkar'],
+    commonMakams: ['rast', 'huseyni', 'neva', 'kurdilihicazkar'],
     notablePieces: [
       { title: 'Yine Bir Gülnihal', composer: 'Hacı Arif Bey', makam: 'Uşşak' },
       { title: 'Bir Devr-i Kadim Şarkısı', composer: 'Münir Nurettin Selçuk', makam: 'Rast' },
@@ -60,7 +60,7 @@ export const USULS: Usul[] = [
     tempo: 'moderate',
     feel: 'Limping, asymmetric, hypnotic. Aksak means "limping" in Turkish — its irregular pulse creates an irresistible forward momentum.',
     description: 'Aksak is one of the defining sounds of Turkish music — its 9/8 pattern (2+2+2+3) creates an asymmetric pulse that feels like walking with a beautiful limp. It is deeply associated with the melancholic makams and the longing that runs through Turkish musical culture.',
-    commonMakams: ['ussak', 'huseyni', 'saba', 'karcighar'],
+    commonMakams: ['ussak', 'huseyni', 'saba', 'kurd'],
     notablePieces: [
       { title: 'Uşşak Saz Semaisi', composer: 'Tanburi Cemil Bey', makam: 'Uşşak' },
       { title: 'Hüseyni Peşrev', composer: 'Hammamizade', makam: 'Hüseyni' },
@@ -77,7 +77,7 @@ export const USULS: Usul[] = [
     tempo: 'moderate',
     feel: 'Lilting and elegant. The waltz of Turkish music — graceful, circular, intimate.',
     description: 'Semai gives Turkish music its most dance-like quality. Its 3/4 pattern creates a gentle swaying motion that pairs beautifully with lyrical, expressive makams. The Saz Semaisi is an entire compositional form built around this usul — a journey through a makam in three or four hanes.',
-    commonMakams: ['huseyni', 'ussak', 'rast', 'nihavend'],
+    commonMakams: ['huseyni', 'ussak', 'rast', 'neva'],
     notablePieces: [
       { title: 'Hicaz Saz Semaisi', composer: 'Tanburi Cemil Bey', makam: 'Hicaz' },
       { title: 'Nihavend Saz Semaisi', composer: 'Şevki Bey', makam: 'Nihavend' },
@@ -94,7 +94,7 @@ export const USULS: Usul[] = [
     tempo: 'fast',
     feel: 'Playful and tumbling. Curcuna races forward with an infectious, almost mischievous energy.',
     description: 'Curcuna is the most playful of the common usuls. Its 10/8 pattern (3+2+2+3 or variations) creates a rolling, tumbling feel that suits lively, celebratory pieces. Often used in dance music and lighter repertoire, Curcuna brings joy and movement to any makam it carries.',
-    commonMakams: ['rast', 'hicaz', 'huseyni', 'nihavend'],
+    commonMakams: ['rast', 'hicaz', 'huseyni', 'neva'],
     notablePieces: [
       { title: 'Rast Curcuna Şarkı', composer: 'Hacı Arif Bey', makam: 'Rast' },
       { title: 'Hicaz Longa', composer: 'Tanburi Cemil Bey', makam: 'Hicaz' },
@@ -128,7 +128,7 @@ export const USULS: Usul[] = [
     tempo: 'moderate',
     feel: 'Exotic and yearning. Seven beats create a sense of incompleteness — always reaching forward.',
     description: 'Devr-i Hindi — the Indian cycle — brings an exotic, searching quality to Turkish music. Its 7/8 pattern (2+2+3) creates a constant forward lean, as if the music is always about to arrive somewhere it never quite reaches. Deeply associated with makams of longing and spiritual searching.',
-    commonMakams: ['saba', 'ussak', 'segah', 'karcighar'],
+    commonMakams: ['saba', 'ussak', 'segah', 'kurd'],
     notablePieces: [
       { title: 'Saba Şarkı', composer: 'Hacı Arif Bey', makam: 'Saba' },
       { title: 'Karcığar Beste', composer: 'Dede Efendi', makam: 'Karcığar' },
@@ -145,7 +145,7 @@ export const USULS: Usul[] = [
     tempo: 'fast',
     feel: 'Running and joyful. Yürük means "walking fast" — this usul skips forward with irrepressible energy.',
     description: 'Yürük Semai is the fast cousin of the regular Semai. Its 6/8 pattern at quick tempo creates a skipping, dancing feel that is among the most beloved in Turkish music. The Yürük Semai is also a compositional form — pieces written in this form are some of the gems of the classical repertoire.',
-    commonMakams: ['rast', 'huseyni', 'hicaz', 'nihavend'],
+    commonMakams: ['rast', 'huseyni', 'hicaz', 'neva'],
     notablePieces: [
       { title: 'Rast Yürük Semai', composer: 'Dede Efendi', makam: 'Rast' },
       { title: 'Hicaz Yürük Semai', composer: 'Hammamizade', makam: 'Hicaz' },
