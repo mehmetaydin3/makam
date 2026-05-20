@@ -128,7 +128,7 @@ export default function MakamDetailScreen() {
           </View>
         </View>
         <View style={[styles.section, { marginBottom: SPACING.xxxl }]}>
-          <Text style={styles.sectionLabel}>Common Usuls</Text>
+          <Text style={styles.sectionLabel}>Common Usul Pairings</Text>
           <View style={styles.usulRow}>
             {makam.commonUsuls && makam.commonUsuls.map((usul) => (
               <View key={usul} style={styles.usulTag}>
