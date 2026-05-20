@@ -3,17 +3,17 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getMakamById } from '../../data/makams';
 import { COLORS, SPACING } from '../../data/constants';
 
-const SEYIR_LABELS = { ascending: 'Ascending \u2197', descending: 'Descending \u2198', undulating: 'Undulating \u2197\u2198' };
+const SEYIR_LABELS = { ascending: 'Ascending ↗', descending: 'Descending ↘', undulating: 'Undulating ↗↘' };
 
 export default function MakamDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams();
   const router = useRouter();
   const makam = getMakamById(id);
 
   if (!makam) return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Text style={styles.backText}>\u2190 Makams</Text>
+      <TouchableOpacity onPress={() => router.back()} style={styles.header}>
+        <Text style={styles.backText}>← Makams</Text>
       </TouchableOpacity>
       <Text style={styles.errorText}>Makam not found.</Text>
     </SafeAreaView>
@@ -23,7 +23,7 @@ export default function MakamDetailScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>\u2190 Makams</Text>
+          <Text style={styles.backText}>← Makams</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -51,17 +51,17 @@ export default function MakamDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Mood</Text>
           <View style={styles.moodRow}>
-            {makam.mood.map((m) => <View key={m} style={styles.moodTag}><Text style={styles.moodText}>{m}</Text></View>)}
+            {(makam.mood || []).map((m) => <View key={m} style={styles.moodTag}><Text style={styles.moodText}>{m}</Text></View>)}
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Scale Degrees (cents)</Text>
+          <Text style={styles.sectionLabel}>Scale Degrees</Text>
           <View style={styles.degreeGrid}>
-            {makam.scaleDegreeCents && makam.scaleDegreeCents.map((cents, i) => (
-              <View key={i} style={styles.degreeItem}>
-                <Text style={styles.degreeNum}>{i + 1}</Text>
-                <Text style={styles.degreeCents}>{cents}\u00a2</Text>
+            {(makam.scale || []).map((d, i) => (
+              <View key={i} style={[styles.degreeItem, d.isCharacteristic && { borderColor: makam.color }]}>
+                <Text style={styles.degreeNote}>{d.name}</Text>
+                <Text style={styles.degreeCents}>{d.cents}¢</Text>
               </View>
             ))}
           </View>
@@ -82,15 +82,19 @@ export default function MakamDetailScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Related Makams</Text>
           <View style={styles.relatedRow}>
-            {makam.relatedMakams.map((name) => <View key={name} style={styles.relatedTag}><Text style={styles.relatedText}>{name}</Text></View>)}
+            {(makam.relatedMakams || []).map((name) => (
+              <TouchableOpacity key={name} style={styles.relatedTag} onPress={() => router.push('/makam/' + name.toLowerCase())}>
+                <Text style={styles.relatedText}>{name}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Common Usul Pairings</Text>
           <View style={styles.usulRow}>
-            {makam.commonUsuls && makam.commonUsuls.map((usul) => {
-              const idMap = {'D\u00fcyek':'duyek','Sofyan':'sofyan','Aksak':'aksak','Semai':'semai','Curcuna':'curcuna','Muhammes':'muhammes','Devr-i Hindi':'devr-i-hindi','Y\u00fcr\u00fck Semai':'yuruk-semai'};
+            {(makam.commonUsuls || []).map((usul) => {
+              const idMap = {'Düyek':'duyek','Sofyan':'sofyan','Aksak':'aksak','Semai':'semai','Curcuna':'curcuna','Muhammes':'muhammes','Devr-i Hindi':'devr-i-hindi','Yürük Semai':'yuruk-semai'};
               const usulId = idMap[usul] || usul.toLowerCase().replace(/ /g, '-');
               return (
                 <TouchableOpacity key={usul} style={styles.usulTag} onPress={() => router.push('/usul/' + usulId)}>
@@ -101,9 +105,9 @@ export default function MakamDetailScreen() {
           </View>
         </View>
 
-        <View style={[styles.section, { marginBottom: 80 }]}>
+        <View style={{ marginBottom: 80 }}>
           <Text style={styles.sectionLabel}>Notable Pieces</Text>
-          {makam.notablePieces.map((piece, i) => (
+          {(makam.notablePieces || []).map((piece, i) => (
             <View key={i} style={styles.pieceRow}>
               <View style={styles.pieceTitleRow}>
                 <Text style={styles.pieceTitle}>{piece.title}</Text>
@@ -122,7 +126,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   errorText: { color: COLORS.textSecondary, padding: SPACING.lg },
   header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
-  backButton: { alignSelf: 'flex-start', paddingHorizontal: SPACING.lg, paddingTop: SPACING.md },
+  backButton: { alignSelf: 'flex-start' },
   backText: { color: COLORS.accent, fontSize: 15 },
   scroll: { paddingHorizontal: SPACING.lg },
   hero: { marginBottom: SPACING.lg, paddingTop: SPACING.sm },
@@ -146,8 +150,8 @@ const styles = StyleSheet.create({
   moodText: { fontSize: 13, color: COLORS.textSecondary },
   degreeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   degreeItem: { width: '22%', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.sm, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
-  degreeNum: { fontSize: 10, color: COLORS.textTertiary, marginBottom: 4 },
-  degreeCents: { fontSize: 13, color: COLORS.textPrimary, fontWeight: '500' },
+  degreeNote: { fontSize: 11, color: COLORS.textSecondary, marginBottom: 4, textAlign: 'center' },
+  degreeCents: { fontSize: 12, color: COLORS.textPrimary, fontWeight: '500' },
   phraseCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, borderLeftColor: COLORS.accent },
   phraseText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22, fontStyle: 'italic' },
   seyirCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border },
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
   relatedRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   relatedTag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border },
   relatedText: { fontSize: 13, color: COLORS.textSecondary },
-  usulRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
+  usulRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginBottom: SPACING.lg },
   usulTag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: COLORS.accent + '55', backgroundColor: COLORS.surface },
   usulTagText: { fontSize: 13, color: COLORS.accent, fontWeight: '500' },
   pieceRow: { paddingVertical: SPACING.md, borderBottomWidth: 1, borderBottomColor: COLORS.border },
