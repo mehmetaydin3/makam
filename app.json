@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.makam.app",
+      "bundleIdentifier": "com.mehmetaydin.makam",
       "deploymentTarget": "15.1"
     },
     "android": {
@@ -31,6 +31,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d87be370-d0ea-4766-812a-198ff080b3ac"
+      }
     }
   }
 }
