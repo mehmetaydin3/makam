@@ -84,6 +84,7 @@ export default function MakamDetailScreen() {
               );
             })}
           </View>
+          {makam.characterNote ? <Text style={styles.characterNote}>{makam.characterNote}</Text> : null}
           <Text style={styles.scaleHint}>Highlighted notes are where this makam lives — they can’t be swapped for standard tuning.</Text>
         </View>
 
@@ -178,6 +179,7 @@ const styles = StyleSheet.create({
   degreeDev: { fontSize: 10, color: COLORS.textTertiary, marginTop: 2, textAlign: 'center' },
   degreeCentsSmall: { fontSize: 9, color: COLORS.textTertiary, marginTop: 1, textAlign: 'center' },
   scaleHint: { fontSize: 12, color: COLORS.textTertiary, marginTop: SPACING.md, lineHeight: 18, fontStyle: 'italic' },
+  characterNote: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 20, fontStyle: 'italic', marginTop: SPACING.sm, marginBottom: SPACING.sm },
   degreeCents: { fontSize: 12, color: COLORS.textPrimary, fontWeight: '500' },
   phraseCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, borderLeftColor: COLORS.accent },
   phraseText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22, fontStyle: 'italic' },

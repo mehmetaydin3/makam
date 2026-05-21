@@ -9,7 +9,7 @@ const KEY = 'makam_onboarding_v1';
 const slides = [
   { key: 'makam', eyebrow: 'THE SOUL OF TURKISH MUSIC', title: 'What is a Makam?', body: 'A makam is more than a scale. It is a world — carrying a mood, a time of day, a season, and a characteristic melodic movement passed down for centuries.\n\nEach makam has its own emotional gravity. Rast lifts the spirit at dawn. Uşşak aches with longing. Hicaz burns with the drama of distant lands.', accent: '#C8975A', isLast: false },
   { key: 'seyir', eyebrow: 'THE PATH OF THE MELODY', title: 'What is Seyir?', body: 'Seyir is the journey a makam takes — its characteristic melodic movement through the scale.\n\nSome makams ascend, rising from the root like the sun. Others descend, falling inward toward resolution. Others undulate, searching both directions before coming to rest.\n\nWithout seyir, a scale is just notes. With it, it becomes music.', accent: '#8B7355', isLast: false },
-  { key: 'explore', eyebrow: 'YOUR GUIDE', title: 'How to Explore', body: 'Three paths await you.\n\n💡  DISCOVER — Browse all makams, feel their moods, understand their character.\n\n📖  MAKAMS — The full library. Every makam with its scale, seyir, and notable pieces.\n\n🏛  LEARN — Lessons on Turkish music theory, tuning, and musical families.', accent: '#C8975A', isLast: true },
+  { key: 'explore', eyebrow: 'YOUR GUIDE', title: 'How to Explore', body: 'Three paths await you.\n\n♪  MAKAM — Browse all 11 makams, their scales, moods, and microtones.\n\n⧖  USUL — The rhythmic cycles. Pattern, feel, and pulse.\n\n📖  LEARN — Lessons on Turkish music theory, tuning, and musical families.', accent: '#C8975A', isLast: true },
 ];
 
 export async function hasSeenOnboarding(): Promise<boolean> {

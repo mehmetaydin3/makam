@@ -71,9 +71,10 @@ export const MAKAMS: Makam[] = [
       sampleFile: null,
     },
     notablePieces: [
-      { title: 'Rast Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
+      { title: 'Rast Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Devr-i Hindi' },
       { title: 'Yine Bir Gülnihal', composer: 'Hacı Arif Bey', usul: 'Düyek' },
     ],
+    westernAnalogy: 'Think of Rast as a major scale with a warm, slightly flat third and sixth. Where C major feels bright and resolved, Rast feels sunny but tinged with longing — like a major scale that has lived too long in the East to forget what it felt like.',
     color: '#C8975A',
   },
   {
@@ -111,6 +112,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Uşşak Peşrev', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Devr-i Hindi' },
       { title: 'Geçti Bezm-i Safâ', composer: 'Hacı Arif Bey', usul: 'Aksak' },
     ],
+    westernAnalogy: 'The neutral second of Uşşak sits exactly between a minor 2nd and a major 2nd — a sound no piano key can produce. If you know Phrygian mode, Uşşak is its more emotional, sighing Turkish cousin.',
     color: '#7A6E9E',
   },
   {
@@ -124,7 +126,7 @@ export const MAKAMS: Makam[] = [
     guclu: 'La (A)',
     scale: [
       { degree: 1, name: 'Re', cents: 0, westernNearest: 'D' },
-      { degree: 2, name: 'Mi♭', cents: 90, westernNearest: 'E♭' },
+      { degree: 2, name: 'Mi♭', cents: 90, westernNearest: 'E♭', isCharacteristic: true },
       { degree: 3, name: 'Fa#', cents: 420, westernNearest: 'F#', isCharacteristic: true },
       { degree: 4, name: 'Sol', cents: 498, westernNearest: 'G' },
       { degree: 5, name: 'La', cents: 702, westernNearest: 'A' },
@@ -148,6 +150,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Hicaz Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
       { title: 'Dil Bir Perî-veş Yâre Düştü', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Düyek' },
     ],
+    westernAnalogy: 'Hicaz’s augmented second (E♭ to F♯) is the same interval Western composers use to evoke ‘the exotic Orient.’ But in Turkish music it isn’t a color — it’s the grammar. Think of the Spanish Phrygian scale, but with more fire.',
     color: '#B85C38',
   },
   {
@@ -185,6 +188,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Hüseyni Peşrev', composer: 'Hafız Post', usul: 'Devr-i Hindi' },
       { title: 'Mey İçmekten Men Etme', composer: 'Mustafa Itri', usul: 'Düyek' },
     ],
+    westernAnalogy: 'Hüseyní shares its structure with the Dorian mode, but its neutral second gives it a weight and longing that Dorian never quite achieves. If Dorian is reflective, Hüseyní is quietly heartbroken.',
     color: '#4A7C59',
   },
   {
@@ -222,6 +226,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Saba Ilahi', composer: 'Various (folk tradition)', usul: 'Sofyan' },
       { title: 'Saba Peşrev', composer: 'Tanburi Cemil Bey', usul: 'Devr-i Hindi' },
     ],
+    westernAnalogy: 'Saba has no direct Western equivalent. Its compressed lower tetrachord — two consecutive neutral intervals — creates a claustrophobic, grief-laden sound that sits between minor and something darker. Think of a minor scale that has given up hope.',
     color: '#3A5068',
   },
   {
@@ -260,6 +265,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Segah Mevlevi Ayin', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Aksak' },
       { title: 'Segah Beste', composer: 'Mustafa Itri', usul: 'Muhammes' },
     ],
+    westernAnalogy: 'Segah’s tonic sits between E♭ and E on the equal-tempered scale — a note that literally does not exist on a piano. If you have ever felt that minor scales don’t go deep enough, Segah goes deeper.',
     color: '#5C4A7A',
   },
   {
@@ -267,6 +273,7 @@ export const MAKAMS: Makam[] = [
     name: 'Kurd',
     pronunciation: 'koord',
     family: 'Kurd',
+    commonUsuls: ['Aksak', 'Düyek', 'Devr-i Hindi'],
     seyir: 'descending',
     durak: 'Re (D)',
     guclu: 'La (A)',
@@ -296,6 +303,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Kürd Peşrev', composer: 'Hafız Post', usul: 'Devr-i Hindi' },
       { title: 'Kurd Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
     ],
+    westernAnalogy: 'Kurd is essentially the Phrygian mode — the same scale guitarists use for flamenco and metal. Its characteristic E♭ is slightly sharper than a true semitone, giving it a roughness that pure Phrygian lacks.',
     color: '#6B5B45',
   },
   {
@@ -303,6 +311,7 @@ export const MAKAMS: Makam[] = [
     name: 'Neva',
     pronunciation: 'neh-VAH',
     family: 'Rast',
+    commonUsuls: ['Düyek', 'Aksak', 'Semai'],
     seyir: 'ascending',
     durak: 'La (A)',
     guclu: 'Re (D)',
@@ -332,6 +341,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Neva Kâr', composer: 'Mustafa Itri', usul: 'Muhammes' },
       { title: 'Neva Peşrev', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Devr-i Hindi' },
     ],
+    westernAnalogy: 'Neva is Rast transposed up a fifth, sharing its warmth and the same characteristic neutral intervals. For Western musicians, think of it as a major scale where the third and sixth are consistently a quarter-tone flat.',
     color: '#5A8A7A',
   },
   {
@@ -369,6 +379,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Buselik Peşrev', composer: 'Kemani Hızır Ağa', usul: 'Düyek' },
       { title: 'Buselik Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
     ],
+    westernAnalogy: 'Buselik is the closest makam to the natural minor (Aeolian) scale. Its third is slightly flat of the Western minor third — giving it a darkness that natural minor almost reaches, but never quite does.',
     color: '#7A8A6A',
   },
   {
@@ -407,6 +418,7 @@ export const MAKAMS: Makam[] = [
       { title: 'Çargah Peşrev', composer: 'Hammamizade İsmail Dede Efendi', usul: 'Devr-i Hindi' },
       { title: 'Çargah Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak' },
     ],
+    westernAnalogy: 'Çargah is essentially C major — the same scale, nearly the same tuning. Its intervals match equal temperament more closely than any other makam. The difference is in how it moves, not in its notes.',
     color: '#C8A84B',
   },
   {
@@ -433,12 +445,13 @@ export const MAKAMS: Makam[] = [
     mood: ['Melancholic', 'Resigned', 'Tender', 'Longing'],
     seyir: 'descending',
     family: 'Nihavend',
-    relatedMakams: ['ussak', 'buselik', 'huseyni'],
+    relatedMakams: ['Uşşak', 'Buselik', 'Hüseyní'],
     commonUsuls: ['Düyek', 'Sofyan', 'Semai'],
     notablePieces: [
       { title: 'Nihavend Longa', composer: 'Tanburi Cemil Bey', usul: 'Düyek' },
       { title: 'Nihavend Saz Semaisi', composer: 'Şevki Bey', usul: 'Aksak' },
     ],
+    westernAnalogy: 'Nihavend is natural minor with a raised seventh in ascent — almost identical to the Western harmonic minor scale. Of all the makams, it will sound most immediately familiar to Western-trained ears.',
     color: '#6B7FA3',
   },
 ];

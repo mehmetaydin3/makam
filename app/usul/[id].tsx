@@ -26,7 +26,7 @@ export default function UsulDetailScreen() {
   if (!usul) return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Text style={styles.backText}>← Back</Text>
+        <Text style={styles.backText}>← Usul</Text>
       </TouchableOpacity>
       <Text style={{ color: COLORS.textSecondary, padding: SPACING.lg }}>Usul not found.</Text>
     </SafeAreaView>
@@ -36,7 +36,7 @@ export default function UsulDetailScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>← Back</Text>
+          <Text style={styles.backText}>← Usul</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -69,11 +69,14 @@ export default function UsulDetailScreen() {
 
         <Text style={styles.sectionLabel}>COMMON MAKAMS</Text>
         <View style={styles.tagRow}>
-          {usul.commonMakams.map((m) => (
-            <TouchableOpacity key={m} style={[styles.tag, { borderColor: usul.color + '55' }]} onPress={() => router.push('/makam/' + m)}>
-              <Text style={[styles.tagText, { color: usul.color }]}>{m}</Text>
-            </TouchableOpacity>
-          ))}
+          {usul.commonMakams.map((m) => {
+            const n = {'rast':'Rast','ussak':'Uşşak','hicaz':'Hicaz','huseyni':'Hüseyní','saba':'Saba','segah':'Segah','kurd':'Kurd','neva':'Neva','buselik':'Buselik','cargah':'Çargah','nihavend':'Nihavend','kurdilihicazkar':'Kürdilihicazkar'};
+            return (
+              <TouchableOpacity key={m} style={[styles.tag, { borderColor: usul.color + '55' }]} onPress={() => router.push('/makam/' + m)}>
+                <Text style={[styles.tagText, { color: usul.color }]}>{n[m] || m}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         <Text style={styles.sectionLabel}>NOTABLE PIECES</Text>

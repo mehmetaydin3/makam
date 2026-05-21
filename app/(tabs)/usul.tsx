@@ -60,11 +60,14 @@ function UsulDetail({ usul, onClose }: { usul: any; onClose: () => void }) {
 
         <Text style={styles.sectionLabel}>COMMON MAKAMS</Text>
         <View style={styles.tagRow}>
-          {usul.commonMakams.map((m: string) => (
-            <View key={m} style={[styles.tag, { borderColor: usul.color + '55' }]}>
-              <Text style={[styles.tagText, { color: usul.color }]}>{m}</Text>
-            </View>
-          ))}
+          {usul.commonMakams.map((m: string) => {
+              const n: Record<string,string> = {'rast':'Rast','ussak':'Uşşak','hicaz':'Hicaz','huseyni':'Hüseyní','saba':'Saba','segah':'Segah','kurd':'Kurd','neva':'Neva','buselik':'Buselik','cargah':'Çargah','nihavend':'Nihavend','kurdilihicazkar':'Kürdilihicazkar'};
+              return (
+                <View key={m} style={[styles.tag, { borderColor: usul.color + '55' }]}>
+                  <Text style={[styles.tagText, { color: usul.color }]}>{n[m] || m}</Text>
+                </View>
+              );
+            })}
         </View>
 
         <Text style={styles.sectionLabel}>NOTABLE PIECES</Text>
