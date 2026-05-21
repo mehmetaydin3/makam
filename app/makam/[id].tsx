@@ -41,6 +41,12 @@ export default function MakamDetailScreen() {
           <Text style={styles.sectionLabel}>About</Text>
           <Text style={styles.description}>{makam.description}</Text>
         </View>
+        {makam.westernAnalogy ? (
+          <View style={styles.analogyCard}>
+            <Text style={styles.analogyLabel}>FOR WESTERN MUSICIANS</Text>
+            <Text style={styles.analogyText}>{makam.westernAnalogy}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.infoRow}>
           <View style={styles.infoCard}><Text style={styles.infoLabel}>Root</Text><Text style={styles.infoValue}>{makam.durak}</Text></View>
@@ -155,6 +161,9 @@ const styles = StyleSheet.create({
   section: { marginBottom: SPACING.xl },
   sectionLabel: { fontSize: 11, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md },
   description: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 24 },
+  analogyCard: { backgroundColor: COLORS.accentMuted, borderRadius: 12, padding: SPACING.md, marginBottom: SPACING.xl, borderWidth: 1, borderColor: COLORS.accent + '33', borderLeftWidth: 3, borderLeftColor: COLORS.accent },
+  analogyLabel: { fontSize: 10, color: COLORS.accent, letterSpacing: 2, marginBottom: 6 },
+  analogyText: { fontSize: 14, color: COLORS.textPrimary, lineHeight: 22 },
   infoRow: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.xl },
   infoCard: { flex: 1, backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
   infoLabel: { fontSize: 10, color: COLORS.textTertiary, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 },

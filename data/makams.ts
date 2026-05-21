@@ -22,6 +22,7 @@ export type Makam = {
   season: string;
   description: string;
   characteristicPhrase: string;
+  westernAnalogy?: string;
   relatedMakams: string[];
   audio: {
     toneFile: string | null;
