@@ -34,6 +34,7 @@ export type Makam = {
     usul?: string;
   }[];
   commonUsuls: string[];
+  characterNote?: string;
   color: string; // UI accent per makam
 };
 
@@ -226,6 +227,7 @@ export const MAKAMS: Makam[] = [
   {
     id: 'segah',
     name: 'Segah',
+    characterNote: 'Segah’s microtonality lives in the tonic itself — the opening E♭ sits between Eb and E, giving the whole scale its floating, otherworldly quality.',
     pronunciation: 'seh-GAH',
     family: 'Segah',
     commonUsuls: ['Aksak', 'Muhammes', 'Semai'],
@@ -372,6 +374,7 @@ export const MAKAMS: Makam[] = [
   {
     id: 'cargah',
     name: 'Çargah',
+    characterNote: 'Çargah uses no microtones by design. Its brightness comes from pure, open intervals — the closest Turkish makam to the Western major scale.',
     pronunciation: 'char-GAH',
     family: 'Çargah',
     commonUsuls: ['Düyek', 'Aksak', 'Devr-i Hindi'],
@@ -409,6 +412,7 @@ export const MAKAMS: Makam[] = [
   {
     id: 'nihavend',
     name: 'Nihavend',
+    characterNote: 'Nihavend’s character comes from its descending seyir and emotional weight, not microtonal deviation. It is the most Western-sounding of all makams.',
     pronunciation: 'nee-hah-VEND',
     characteristicPhrase: 'A farewell without bitterness',
     description: 'Nihavend is the closest Turkish makam to the Western minor scale, yet carries a distinctly Eastern character. Its descending seyir gives it a quality of resignation and longing.',
