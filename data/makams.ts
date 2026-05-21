@@ -124,7 +124,7 @@ export const MAKAMS: Makam[] = [
     scale: [
       { degree: 1, name: 'Re', cents: 0, westernNearest: 'D' },
       { degree: 2, name: 'Mi♭', cents: 90, westernNearest: 'E♭' },
-      { degree: 3, name: 'Fa#', cents: 450, westernNearest: 'F#', isCharacteristic: true },
+      { degree: 3, name: 'Fa#', cents: 420, westernNearest: 'F#', isCharacteristic: true },
       { degree: 4, name: 'Sol', cents: 498, westernNearest: 'G' },
       { degree: 5, name: 'La', cents: 702, westernNearest: 'A' },
       { degree: 6, name: 'Si♭', cents: 792, westernNearest: 'B♭' },
