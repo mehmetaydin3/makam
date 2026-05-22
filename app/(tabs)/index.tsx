@@ -74,7 +74,7 @@ export default function ExploreScreen() {
             <Text style={styles.heading}>Makam</Text>
           </View>
           <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/settings')}>
-            <Ionicons name="settings-outline" size={20} color={COLORS.textTertiary} />
+            <Ionicons name="settings-outline" size={20} color={COLORS.accent} />
           </TouchableOpacity>
         </View>
         <Text style={styles.subheading}>A melodic framework — scale, mood, and movement combined.</Text>
@@ -95,7 +95,7 @@ export default function ExploreScreen() {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={() => setQuery('')}>
-              <Ionicons name="close-circle" size={16} color={COLORS.textTertiary} />
+              <Ionicons name="close-circle" size={16} color={COLORS.accent} />
             </TouchableOpacity>
           )}
         </View>
