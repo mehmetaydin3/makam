@@ -20,6 +20,30 @@ export default function ExploreScreen() {
 
   const activeFilterCount = (seyirFilter !== 'All' ? 1 : 0) + (familyFilter !== 'All' ? 1 : 0);
 
+  const SYNONYMS: Record<string, string[]> = {
+    happy: ["joyful", "bright", "clear"],
+    sad: ["melancholic", "grief", "weeping", "longing", "resigned"],
+    dark: ["solemn", "introspective", "rugged", "grief"],
+    love: ["longing", "tender", "intimate", "yearning"],
+    angry: ["intense", "dramatic", "heroic"],
+    peaceful: ["serene", "calm", "balanced", "elegant"],
+    spiritual: ["mystical", "devotional", "transcendent", "elevated"],
+    crying: ["grief", "weeping", "melancholic"],
+    strong: ["strong", "masculine", "direct", "noble", "heroic"],
+    exotic: ["exotic", "dramatic", "intense"],
+    mysterious: ["mystical", "devotional", "elevated"],
+    prayer: ["devotional", "mystical", "transcendent"],
+    dance: ["bright", "joyful", "uncomplicated"],
+  };
+
+  const expandQuery = (q: string): string[] => {
+    const terms = [q];
+    Object.entries(SYNONYMS).forEach(([key, values]) => {
+      if (key.includes(q) || q.includes(key)) terms.push(...values);
+    });
+    return terms;
+  };
+
   const filtered = MAKAMS.filter((m) => {
     const q = query.toLowerCase();
     const matchesQuery = q === '' ||
