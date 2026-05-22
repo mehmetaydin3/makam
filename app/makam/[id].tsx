@@ -1,16 +1,73 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
-import { getMakamById } from '../../data/makams';
+import YoutubePlayer from 'react-native-youtube-iframe';
+import { getMakamById, AudioExample } from '../../data/makams';
 import { COLORS, SPACING } from '../../data/constants';
 import { audioEngine, PlaybackState } from '../../audio/audioEngine';
 
-const SEYIR_LABELS = { ascending: 'Ascending ↗', descending: 'Descending ↘', undulating: 'Undulating ↗↘' };
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
+
+const SEYIR_LABELS = {
+  ascending: 'Ascending ↗',
+  descending: 'Descending ↘',
+  undulating: 'Undulating ↗↘',
+};
+
+function AudioCard({
+  example,
+  label,
+  color,
+  showTaksimExplainer = false,
+}: {
+  example: AudioExample;
+  label: string;
+  color: string;
+  showTaksimExplainer?: boolean;
+}) {
+  return (
+    <View style={[styles.audioCard, { borderLeftColor: color }]}>
+      <Text style={[styles.audioCardLabel, { color }]}>{label}</Text>
+
+      {showTaksimExplainer && (
+        <View style={styles.explainerBox}>
+          <Text style={styles.explainerText}>
+            A taksim is a free-form improvisation — no fixed rhythm, no composed melody. The musician explores the makam through spontaneous expression. It is the purest way to hear what a makam sounds like.
+          </Text>
+        </View>
+      )}
+
+      <Text style={styles.audioTitle}>{example.title}</Text>
+      <Text style={styles.audioMeta}>
+        {example.composer}
+        {example.performer !== example.composer ? ' · ' + example.performer : ''}
+        {example.year ? ' · ' + example.year : ''}
+      </Text>
+      <Text style={styles.audioDescription}>{example.description}</Text>
+
+      <View style={styles.playerWrapper}>
+        <YoutubePlayer
+          height={PLAYER_HEIGHT}
+          videoId={example.youtubeId}
+          webViewProps={{
+            allowsInlineMediaPlayback: true,
+            mediaPlaybackRequiresUserAction: false,
+          }}
+          initialPlayerParams={{
+            rel: false,
+            modestbranding: true,
+          }}
+        />
+      </View>
+    </View>
+  );
+}
 
 export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const makam = getMakamById(id);
+  const makam = getMakamById(id as string);
   const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
 
@@ -56,47 +113,93 @@ export default function MakamDetailScreen() {
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+
+        {/* HERO */}
         <View style={styles.hero}>
           <View style={[styles.colorBar, { backgroundColor: makam.color }]} />
           <Text style={styles.makamName}>{makam.name}</Text>
           <Text style={styles.pronunciation}>/{makam.pronunciation}/</Text>
           <View style={styles.tagRow}>
-            <View style={styles.tag}><Text style={styles.tagText}>{makam.family} family</Text></View>
-            <View style={[styles.tag, styles.tagAccent]}><Text style={[styles.tagText, styles.tagTextAccent]}>{SEYIR_LABELS[makam.seyir]}</Text></View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{makam.family} family</Text>
+            </View>
+            <View style={[styles.tag, styles.tagAccent]}>
+              <Text style={[styles.tagText, styles.tagTextAccent]}>
+                {SEYIR_LABELS[makam.seyir]}
+              </Text>
+            </View>
           </View>
-          <TouchableOpacity
-            style={[styles.playButton, { borderColor: makam.color }, isPlaying && { backgroundColor: makam.color }]}
-            onPress={handlePlayStop}
-          >
-            <Text style={[styles.playButtonText, isPlaying && { color: '#fff' }]}>
-              {isPlaying ? '■  Stop' : '▶  Play Scale'}
-            </Text>
-          </TouchableOpacity>
         </View>
 
+        {/* ABOUT */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>About</Text>
           <Text style={styles.description}>{makam.description}</Text>
         </View>
+
+        {/* WESTERN ANALOGY */}
         {makam.westernAnalogy ? (
           <View style={styles.analogyCard}>
             <Text style={styles.analogyLabel}>FOR WESTERN MUSICIANS</Text>
             <Text style={styles.analogyText}>{makam.westernAnalogy}</Text>
           </View>
         ) : null}
+
+        {/* INFO ROW */}
         <View style={styles.infoRow}>
-          <View style={styles.infoCard}><Text style={styles.infoLabel}>Root</Text><Text style={styles.infoValue}>{makam.durak}</Text></View>
-          <View style={styles.infoCard}><Text style={styles.infoLabel}>Dominant</Text><Text style={styles.infoValue}>{makam.guclu}</Text></View>
-          <View style={styles.infoCard}><Text style={styles.infoLabel}>Time</Text><Text style={styles.infoValue}>{makam.timeOfDay}</Text></View>
+          <View style={styles.infoCard}>
+            <Text style={styles.infoLabel}>Root</Text>
+            <Text style={styles.infoValue}>{makam.durak}</Text>
+          </View>
+          <View style={styles.infoCard}>
+            <Text style={styles.infoLabel}>Dominant</Text>
+            <Text style={styles.infoValue}>{makam.guclu}</Text>
+          </View>
+          <View style={styles.infoCard}>
+            <Text style={styles.infoLabel}>Time</Text>
+            <Text style={styles.infoValue}>{makam.timeOfDay}</Text>
+          </View>
         </View>
+
+        {/* MOOD */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Mood</Text>
           <View style={styles.moodRow}>
-            {(makam.mood || []).map((m) => <View key={m} style={styles.moodTag}><Text style={styles.moodText}>{m}</Text></View>)}
+            {(makam.mood || []).map((m) => (
+              <View key={m} style={styles.moodTag}>
+                <Text style={styles.moodText}>{m}</Text>
+              </View>
+            ))}
           </View>
         </View>
+
+        {/* LISTENING SECTION */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Listen</Text>
+          <AudioCard
+            example={makam.listening.sarki}
+            label="ICONIC RECORDING"
+            color={makam.color}
+          />
+          <AudioCard
+            example={makam.listening.taksim}
+            label="TAKSIM — PURE IMPROVISATION"
+            color={makam.color}
+            showTaksimExplainer
+          />
+        </View>
+
+        {/* SCALE DEGREES */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Scale Degrees</Text>
+          <TouchableOpacity
+            style={[styles.playButton, { borderColor: makam.color }, isPlaying && { backgroundColor: makam.color }]}
+            onPress={handlePlayStop}
+          >
+            <Text style={[styles.playButtonText, isPlaying && { color: '#fff' }]}>
+              {isPlaying ? '■  Stop' : '▶  Play Scale on Ney'}
+            </Text>
+          </TouchableOpacity>
           <View style={styles.degreeGrid}>
             {(makam.scale || []).map((d, i) => {
               const nearest = Math.round(d.cents / 100) * 100;
@@ -113,9 +216,11 @@ export default function MakamDetailScreen() {
                 <View key={i} style={[
                   styles.degreeItem,
                   d.isCharacteristic && { borderColor: makam.color, borderWidth: 2 },
-                  isActive && { backgroundColor: makam.color + '33', borderColor: makam.color, borderWidth: 2 }
+                  isActive && { backgroundColor: makam.color + '33', borderColor: makam.color, borderWidth: 2 },
                 ]}>
-                  <Text style={[styles.degreeNote, (d.isCharacteristic || isActive) && { color: makam.color }]}>{d.westernNearest}</Text>
+                  <Text style={[styles.degreeNote, (d.isCharacteristic || isActive) && { color: makam.color }]}>
+                    {d.westernNearest}
+                  </Text>
                   {interp ? <Text style={[styles.degreeInterp, d.isCharacteristic && { color: makam.color + 'cc' }]}>{interp}</Text> : null}
                   {centsLabel && !interp ? <Text style={styles.degreeDev}>{centsLabel}</Text> : null}
                   {centsLabel && interp ? <Text style={styles.degreeCentsSmall}>{centsLabel}</Text> : null}
@@ -124,54 +229,88 @@ export default function MakamDetailScreen() {
             })}
           </View>
           {makam.characterNote ? <Text style={styles.characterNote}>{makam.characterNote}</Text> : null}
-          <Text style={styles.scaleHint}>Highlighted notes are where this makam lives — they can't be swapped for standard tuning.</Text>
+          <Text style={styles.scaleHint}>Highlighted notes are where this makam lives — they cannot be swapped for standard tuning.</Text>
         </View>
+
+        {/* CHARACTERISTIC MOVEMENT */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Characteristic Movement</Text>
-          <View style={styles.phraseCard}><Text style={styles.phraseText}>"{makam.characteristicPhrase}"</Text></View>
+          <View style={styles.phraseCard}>
+            <Text style={styles.phraseText}>"{makam.characteristicPhrase}"</Text>
+          </View>
         </View>
+
+        {/* SEYIR */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Seyir</Text>
           <View style={styles.seyirCard}>
             <Text style={styles.seyirType}>{SEYIR_LABELS[makam.seyir]}</Text>
           </View>
         </View>
+
+        {/* RELATED MAKAMS */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Related Makams</Text>
           <View style={styles.relatedRow}>
             {(makam.relatedMakams || []).map((name) => (
-              <TouchableOpacity key={name} style={styles.relatedTag} onPress={() => router.push('/makam/' + name.toLowerCase())}>
+              <TouchableOpacity
+                key={name}
+                style={styles.relatedTag}
+                onPress={() => router.push('/makam/' + name.toLowerCase())}
+              >
                 <Text style={styles.relatedText}>{name}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
+
+        {/* USUL PAIRINGS */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Common Usul Pairings</Text>
           <View style={styles.usulRow}>
             {(makam.commonUsuls || []).map((usul) => {
-              const idMap = {'Düyek':'duyek','Sofyan':'sofyan','Aksak':'aksak','Semai':'semai','Curcuna':'curcuna','Muhammes':'muhammes','Devr-i Hindi':'devr-i-hindi','Yürük Semai':'yuruk-semai'};
+              const idMap: Record<string, string> = {
+                'Duyek': 'duyek',
+                'Sofyan': 'sofyan',
+                'Aksak': 'aksak',
+                'Semai': 'semai',
+                'Curcuna': 'curcuna',
+                'Muhammes': 'muhammes',
+                'Devr-i Hindi': 'devr-i-hindi',
+                'Yuruk Semai': 'yuruk-semai',
+              };
               const usulId = idMap[usul] || usul.toLowerCase().replace(/ /g, '-');
               return (
-                <TouchableOpacity key={usul} style={styles.usulTag} onPress={() => router.push('/usul/' + usulId)}>
+                <TouchableOpacity
+                  key={usul}
+                  style={styles.usulTag}
+                  onPress={() => router.push('/usul/' + usulId)}
+                >
                   <Text style={styles.usulTagText}>{usul}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
         </View>
+
+        {/* NOTABLE PIECES */}
         <View style={{ marginBottom: 80 }}>
           <Text style={styles.sectionLabel}>Notable Pieces</Text>
           {(makam.notablePieces || []).map((piece, i) => (
             <View key={i} style={styles.pieceRow}>
               <View style={styles.pieceTitleRow}>
                 <Text style={styles.pieceTitle}>{piece.title}</Text>
-                {piece.usul && <View style={styles.pieceUsulBadge}><Text style={styles.pieceUsulText}>{piece.usul}</Text></View>}
+                {piece.usul && (
+                  <View style={styles.pieceUsulBadge}>
+                    <Text style={styles.pieceUsulText}>{piece.usul}</Text>
+                  </View>
+                )}
               </View>
               <Text style={styles.pieceComposer}>{piece.composer}</Text>
             </View>
           ))}
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -188,13 +327,11 @@ const styles = StyleSheet.create({
   colorBar: { width: 32, height: 3, borderRadius: 999, marginBottom: SPACING.md },
   makamName: { fontSize: 52, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -2, marginBottom: 4 },
   pronunciation: { fontSize: 15, color: COLORS.textSecondary, fontStyle: 'italic', marginBottom: SPACING.md },
-  tagRow: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.lg },
+  tagRow: { flexDirection: 'row', gap: SPACING.sm },
   tag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   tagAccent: { borderColor: COLORS.accent + '55' },
   tagText: { fontSize: 12, color: COLORS.textSecondary },
   tagTextAccent: { color: COLORS.accent },
-  playButton: { alignSelf: 'flex-start', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 999, borderWidth: 1.5, marginTop: SPACING.sm },
-  playButtonText: { fontSize: 14, fontWeight: '500', color: COLORS.textPrimary },
   section: { marginBottom: SPACING.xl },
   sectionLabel: { fontSize: 11, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md },
   description: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 24 },
@@ -208,6 +345,16 @@ const styles = StyleSheet.create({
   moodRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   moodTag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: COLORS.surfaceRaised, borderWidth: 1, borderColor: COLORS.border },
   moodText: { fontSize: 13, color: COLORS.textSecondary },
+  audioCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, marginBottom: SPACING.lg },
+  audioCardLabel: { fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.sm, fontWeight: '600' },
+  explainerBox: { backgroundColor: COLORS.background, borderRadius: 8, padding: SPACING.sm, marginBottom: SPACING.md, borderWidth: 1, borderColor: COLORS.border },
+  explainerText: { fontSize: 12, color: COLORS.textTertiary, lineHeight: 18, fontStyle: 'italic' },
+  audioTitle: { fontSize: 16, fontWeight: '600', color: COLORS.textPrimary, marginBottom: 4 },
+  audioMeta: { fontSize: 12, color: COLORS.textSecondary, marginBottom: SPACING.sm },
+  audioDescription: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 20, marginBottom: SPACING.md },
+  playerWrapper: { borderRadius: 8, overflow: 'hidden' },
+  playButton: { alignSelf: 'flex-start', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 999, borderWidth: 1.5, marginBottom: SPACING.md },
+  playButtonText: { fontSize: 14, fontWeight: '500', color: COLORS.textPrimary },
   degreeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   degreeItem: { width: '22%', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.sm, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
   degreeNote: { fontSize: 15, color: COLORS.textPrimary, fontWeight: '600', textAlign: 'center' },
