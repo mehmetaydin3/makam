@@ -45,11 +45,14 @@ export default function ExploreScreen() {
   };
 
   const filtered = MAKAMS.filter((m) => {
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
+    const terms = expandQuery(q);
     const matchesQuery = q === '' ||
       m.name.toLowerCase().includes(q) ||
-      m.mood.some((mood) => mood.toLowerCase().includes(q)) ||
-      m.description.toLowerCase().includes(q);
+      m.mood.some((mood) => terms.some(t => mood.toLowerCase().includes(t))) ||
+      m.description.toLowerCase().includes(q) ||
+      m.timeOfDay.toLowerCase().includes(q) ||
+      m.season.toLowerCase().includes(q);
     const matchesSeyir = seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
     const matchesFamily = familyFilter === 'All' || m.family.toLowerCase().replace(/[^a-z]/g, '') === familyFilter.toLowerCase().replace(/[^a-z]/g, '');
     return matchesQuery && matchesSeyir && matchesFamily;
