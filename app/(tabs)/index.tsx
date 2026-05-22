@@ -121,7 +121,7 @@ export default function ExploreScreen() {
               key={makam.id}
               style={styles.card}
               activeOpacity={0.75}
-              onPress={() => router.push('/makam/' + makam.id)}
+              onPress={() => router.push(('/makam/' + makam.id) as any)}
             >
               <View style={[styles.colorStrip, { backgroundColor: makam.color }]} />
               <View style={styles.cardBody}>

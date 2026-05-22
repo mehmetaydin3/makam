@@ -256,7 +256,7 @@ export default function MakamDetailScreen() {
               <TouchableOpacity
                 key={name}
                 style={styles.relatedTag}
-                onPress={() => router.push('/makam/' + name.toLowerCase())}
+                onPress={() => router.push(('/makam/' + name.toLowerCase()) as any)}
               >
                 <Text style={styles.relatedText}>{name}</Text>
               </TouchableOpacity>
@@ -284,7 +284,7 @@ export default function MakamDetailScreen() {
                 <TouchableOpacity
                   key={usul}
                   style={styles.usulTag}
-                  onPress={() => router.push('/usul/' + usulId)}
+                  onPress={() => router.push(('/usul/' + usulId) as any)}
                 >
                   <Text style={styles.usulTagText}>{usul}</Text>
                 </TouchableOpacity>

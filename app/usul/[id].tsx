@@ -72,7 +72,7 @@ export default function UsulDetailScreen() {
           {usul.commonMakams.map((m) => {
             const n: Record<string, string> = {'rast':'Rast','ussak':'Uşşak','hicaz':'Hicaz','huseyni':'Hüseyní','saba':'Saba','segah':'Segah','kurd':'Kurd','neva':'Neva','buselik':'Buselik','cargah':'Çargah','nihavend':'Nihavend','kurdilihicazkar':'Kürdilihicazkar'};
             return (
-              <TouchableOpacity key={m} style={[styles.tag, { borderColor: usul.color + '55' }]} onPress={() => router.push('/makam/' + m)}>
+              <TouchableOpacity key={m} style={[styles.tag, { borderColor: usul.color + '55' }]} onPress={() => router.push(('/makam/' + m) as any)}>
                 <Text style={[styles.tagText, { color: usul.color }]}>{n[m] || m}</Text>
               </TouchableOpacity>
             );
