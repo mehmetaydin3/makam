@@ -46,7 +46,7 @@ export default function ExploreScreen() {
             <Text style={styles.eyebrow}>TURKISH MAKAM</Text>
             <Text style={styles.heading}>Makam</Text>
           </View>
-          <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+          <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/settings')}>
             <Ionicons name="settings-outline" size={20} color={COLORS.textTertiary} />
           </TouchableOpacity>
         </View>
