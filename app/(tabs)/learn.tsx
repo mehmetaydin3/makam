@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { LESSONS } from '../../data/education';
 import { COLORS, SPACING } from '../../data/constants';
 
-function LessonReader({ lesson, onClose }) {
+function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.readerHeader}>
@@ -16,7 +16,7 @@ function LessonReader({ lesson, onClose }) {
         <Text style={styles.lessonTitle}>{lesson.title}</Text>
         <Text style={styles.lessonTime}>{lesson.estimatedMinutes} min read</Text>
         <View style={styles.lessonDivider} />
-        {lesson.sections && lesson.sections.map((section, i) => (
+        {lesson.sections && lesson.sections.map((section: any, i: number) => (
           <View key={i} style={styles.section}>
             <Text style={styles.sectionHeading}>{section.heading}</Text>
             <Text style={styles.sectionBody}>{section.body}</Text>
@@ -34,7 +34,7 @@ function LessonReader({ lesson, onClose }) {
 }
 
 export default function LearnScreen() {
-  const [selectedLesson, setSelectedLesson] = useState(null);
+  const [selectedLesson, setSelectedLesson] = useState<any>(null);
 
   if (selectedLesson) {
     return <LessonReader lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />;

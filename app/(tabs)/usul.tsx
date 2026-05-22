@@ -85,7 +85,7 @@ function UsulDetail({ usul, onClose }: { usul: any; onClose: () => void }) {
 }
 
 export default function UsulScreen() {
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState<any>(null);
 
   if (selected) {
     return <UsulDetail usul={selected} onClose={() => setSelected(null)} />;
