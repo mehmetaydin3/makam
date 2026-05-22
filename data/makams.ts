@@ -64,10 +64,10 @@ export const MAKAMS: Makam[] = [
     scale: [
       { degree: 1, name: 'Sol', cents: 0, westernNearest: 'G', isCharacteristic: false },
       { degree: 2, name: 'La', cents: 204, westernNearest: 'A' },
-      { degree: 3, name: 'Si Koma b', cents: 350, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 3, name: 'Si Koma♭', cents: 350, westernNearest: 'B♭', isCharacteristic: true },
       { degree: 4, name: 'Do', cents: 498, westernNearest: 'C' },
       { degree: 5, name: 'Re', cents: 702, westernNearest: 'D' },
-      { degree: 6, name: 'Mi Koma b', cents: 851, westernNearest: 'E♭', isCharacteristic: true },
+      { degree: 6, name: 'Mi Koma♭', cents: 851, westernNearest: 'E♭', isCharacteristic: true },
       { degree: 7, name: 'Fa#', cents: 1088, westernNearest: 'F#' },
       { degree: 8, name: 'Sol', cents: 1200, westernNearest: 'G' },
     ],
@@ -128,7 +128,7 @@ export const MAKAMS: Makam[] = [
     description: 'Ussak is one of the oldest and most beloved makams in Turkish music. Its defining feature is the neutral second — the second degree sits between a minor and major second, producing an ache that is impossible to achieve on a Western piano. It descends naturally, as if sighing. It is the makam of longing and unresolved emotion.',
     characteristicPhrase: 'Opens on the root and immediately droops to the characteristic neutral second before settling on the third — this falling gesture is the emotional signature of Ussak.',
     westernAnalogy: 'The neutral second of Ussak sits exactly between a minor 2nd and a major 2nd — a sound no piano key can produce. If you know Phrygian mode, Ussak is its more emotional, sighing Turkish cousin.',
-    relatedMakams: ['Bayati', 'Huseyni', 'Muhayyer'],
+    relatedMakams: ['Bayati', 'Hüseyni', 'Muhayyer'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: {
@@ -230,7 +230,7 @@ export const MAKAMS: Makam[] = [
     description: 'Huseyni shares its lower tetrachord with Ussak but differs in its seyir — it climbs purposefully toward the fifth as its dominant, giving it a more resolved, noble character compared to Ussak\'s sighing descent. It is one of the most structurally important makams and serves as a gateway to understanding the Ussak family.',
     characteristicPhrase: 'Rises with intention from the root through the neutral second and third, landing with confidence on the dominant fifth — the opposite emotional arc from Ussak.',
     westernAnalogy: 'Huseyni shares its structure with the Dorian mode, but its neutral second gives it a weight and longing that Dorian never quite achieves. If Dorian is reflective, Huseyni is quietly heartbroken.',
-    relatedMakams: ['Ussak', 'Muhayyer', 'Beyati'],
+    relatedMakams: ['Uşşak', 'Muhayyer', 'Beyati'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: {
@@ -315,17 +315,17 @@ export const MAKAMS: Makam[] = [
     family: 'Segah',
     commonUsuls: ['Aksak', 'Muhammes', 'Semai'],
     seyir: 'ascending',
-    durak: 'Mi Koma b (Eb+)',
-    guclu: 'Si♭ koma+ (Bb+)',
+    durak: 'Mi Koma♭ (Eb+)',
+    guclu: 'Si♭ koma+ (B♭+)',
     scale: [
-      { degree: 1, name: 'Mi Koma b', cents: 0, westernNearest: 'E♭', isCharacteristic: false },
+      { degree: 1, name: 'Mi Koma♭', cents: 0, westernNearest: 'E♭', isCharacteristic: false },
       { degree: 2, name: 'Fa#', cents: 204, westernNearest: 'F#' },
       { degree: 3, name: 'Sol#', cents: 386, westernNearest: 'G#' },
       { degree: 4, name: 'La', cents: 498, westernNearest: 'A' },
       { degree: 5, name: 'Si♭ koma+', cents: 702, westernNearest: 'B♭', isCharacteristic: false },
       { degree: 6, name: 'Do', cents: 906, westernNearest: 'C' },
       { degree: 7, name: 'Re', cents: 1088, westernNearest: 'D' },
-      { degree: 8, name: 'Mi Koma b', cents: 1200, westernNearest: 'E♭' },
+      { degree: 8, name: 'Mi Koma♭', cents: 1200, westernNearest: 'E♭' },
     ],
     mood: ['Mystical', 'Devotional', 'Elevated', 'Transcendent'],
     timeOfDay: 'Night',
@@ -435,7 +435,7 @@ export const MAKAMS: Makam[] = [
     description: 'Neva is an elegant, well-balanced makam from the Rast family. It shares much of Rast\'s warmth but sits a fifth higher, giving it a slightly brighter, more open character. It is considered one of the most complete makams — its melodic movement covers the full range gracefully in both directions.',
     characteristicPhrase: 'Moves through its range with a natural elegance, neither lingering too long below nor reaching too dramatically upward — a balanced, flowing melodic personality.',
     westernAnalogy: 'Neva is Rast transposed up a fifth, sharing its warmth and the same characteristic neutral intervals. For Western musicians, think of it as a major scale where the third and sixth are consistently a quarter-tone flat.',
-    relatedMakams: ['Rast', 'Mahur', 'Huseyni'],
+    relatedMakams: ['Rast', 'Mahur', 'Hüseyni'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: {
@@ -486,7 +486,7 @@ export const MAKAMS: Makam[] = [
     description: 'Buselik is the makam that feels most familiar to Western ears — it closely resembles a natural minor scale. This makes it a gentle entry point for musicians transitioning from Western theory. Yet within the Turkish tradition it carries its own distinct identity and movement rules. Its character is strong and direct, without the melancholy of Ussak or the drama of Hicaz.',
     characteristicPhrase: 'Climbs steadily and purposefully from root to dominant, with little ornamentation — Buselik states its intention directly, without ambiguity.',
     westernAnalogy: 'Buselik is the closest makam to the natural minor scale. Its third is slightly flat of the Western minor third — giving it a darkness that natural minor almost reaches, but never quite does.',
-    relatedMakams: ['Huseyni', 'Ussak', 'Acem Buselik'],
+    relatedMakams: ['Hüseyni', 'Uşşak', 'Acem Buselik'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: {
@@ -515,7 +515,7 @@ export const MAKAMS: Makam[] = [
   {
     id: 'cargah',
     name: 'Çargah',
-    characterNote: 'Cargah uses no microtones by design. Its brightness comes from pure, open intervals — the closest Turkish makam to the Western major scale.',
+    characterNote: 'Çargah uses no microtones by design. Its brightness comes from pure, open intervals — the closest Turkish makam to the Western major scale.',
     pronunciation: 'char-GAH',
     family: 'Çargah',
     commonUsuls: ['Duyek', 'Aksak', 'Devr-i Hindi'],
@@ -588,7 +588,7 @@ export const MAKAMS: Makam[] = [
     mood: ['Melancholic', 'Resigned', 'Tender', 'Longing'],
     seyir: 'descending',
     family: 'Nihavend',
-    relatedMakams: ['Ussak', 'Buselik', 'Huseyni'],
+    relatedMakams: ['Uşşak', 'Buselik', 'Hüseyni'],
     commonUsuls: ['Duyek', 'Sofyan', 'Semai'],
     westernAnalogy: 'Nihavend is natural minor with a raised seventh in ascent — almost identical to the Western harmonic minor scale. Of all the makams, it will sound most immediately familiar to Western-trained ears.',
     audio: { toneFile: null, sampleFile: null },
