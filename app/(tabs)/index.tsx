@@ -165,7 +165,6 @@ export default function ExploreScreen() {
                       </View>
                     ))}
                   </View>
-                  <Text style={[styles.seyirBadge, { color: makam.color }]}>{makam.seyir} ›</Text>
                 </View>
               </View>
             </TouchableOpacity>
