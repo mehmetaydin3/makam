@@ -159,4 +159,167 @@ export const LESSONS: Lesson[] = [
       },
     ],
   },
+
+  {
+    id: 'what-is-taksim',
+    title: 'What is Taksim?',
+    subtitle: 'The art of improvisation in Turkish music',
+    estimatedMinutes: 4,
+    sections: [
+      {
+        heading: 'No sheet music, no fixed rhythm',
+        body: 'A taksim is a free-form improvisation performed without a fixed rhythm or composed melody. The musician explores a makam spontaneously, moving through its characteristic phrases, testing its emotional range, and revealing its personality in real time. There is no sheet music. There is no conductor. There is only the musician and the makam.',
+        callout: 'A taksim is a conversation between the musician and the makam.',
+      },
+      {
+        heading: 'The structure within freedom',
+        body: 'Though taksim sounds free, it follows deep rules. The musician must respect the makam\'s seyir — its characteristic direction of movement. They must visit the makam\'s important degrees in the right order, establish its identity clearly, then explore its upper and lower registers before returning to rest on the finalis. Freedom within form is the essence of taksim.',
+      },
+      {
+        heading: 'Why taksim matters',
+        body: 'In Turkish classical music, taksim is considered the highest form of musical expression. A composed piece shows what a musician has learned; a taksim shows who they are. The greatest musicians — Tanburi Cemil Bey, Münir Nurettin Selçuk, Niyazi Sayın — are remembered as much for their taksim as for any composed work.',
+        callout: 'Listen to a taksim before listening to a composed piece in the same makam. It will open your ears.',
+      },
+      {
+        heading: 'How to listen to a taksim',
+        body: 'When listening to a taksim, follow the journey rather than waiting for a melody. Notice when the musician lingers on a note — that note matters. Notice when the music rises with urgency and when it settles into stillness. A great taksim has the architecture of a short story: exposition, development, climax, resolution.',
+      },
+    ],
+  },
+  {
+    id: 'how-to-listen',
+    title: 'How to Listen to Turkish Music',
+    subtitle: 'A guide for Western ears',
+    estimatedMinutes: 5,
+    sections: [
+      {
+        heading: 'Your ears are not broken',
+        body: 'When Western listeners first hear Turkish classical music, they often feel disoriented. The melodies seem to go nowhere familiar. The tuning sounds slightly "off." The rhythms are irregular. This is not a deficiency in the music or in your ears — it is the sound of a completely different musical logic, one that has been refined over centuries to express things that Western music cannot.',
+        callout: 'The notes that sound "out of tune" are the most important notes in the music.',
+      },
+      {
+        heading: 'Stop waiting for the beat',
+        body: 'Western popular music trains us to expect a regular pulse. Turkish classical music — especially taksim — does not provide this. The rhythm is shaped by the phrase, not the other way around. A note is held as long as it needs to be held. Let go of your expectation of pulse and follow the breath of the melody instead.',
+      },
+      {
+        heading: 'Learn one makam at a time',
+        body: 'The fastest way to understand Turkish music is to pick one makam — Rast is a good start — and listen to multiple recordings in that makam before moving on. Your ear will begin to recognize the characteristic phrases, the emotional signature, the way the melody moves. Once you know Rast in your body, Hicaz will teach itself by contrast.',
+      },
+      {
+        heading: 'The microtones are the message',
+        body: 'The notes that sit between the piano keys are not ornaments or accidents. They are the emotional core of Turkish music. The neutral third of Uşşak — not quite minor, not quite major — carries a quality of longing that neither Western scale can achieve. Train yourself to hear these intervals as deliberate choices, not approximations.',
+        callout: 'What Western ears hear as "between the notes" is exactly where Turkish music lives.',
+      },
+      {
+        heading: 'Start with the masters',
+        body: 'Begin with Tanburi Cemil Bey\'s recordings from the early 1900s. They are scratchy and ancient-sounding, but they are the clearest possible expression of what this music is. Then move to Münir Nurettin Selçuk for the vocal tradition. Then Niyazi Sayın for the ney. Each reveals a different dimension of the same world.',
+      },
+    ],
+  },
+  {
+    id: 'the-instruments',
+    title: 'The Instruments',
+    subtitle: 'The voices of Turkish classical music',
+    estimatedMinutes: 5,
+    sections: [
+      {
+        heading: 'The Ney',
+        body: 'The ney is an end-blown flute made from a hollow reed. It is one of the oldest instruments in human history, depicted in Egyptian carvings over 5,000 years old. In Turkish and Sufi music, the ney carries a special spiritual weight — its breathy, slightly raw tone is heard as the sound of longing itself. Rumi opens the Masnavi with the ney\'s cry as a metaphor for the soul\'s separation from its origin.',
+        callout: 'The ney does not produce a note — it releases one.',
+      },
+      {
+        heading: 'The Tanbur',
+        body: 'The tanbur is a long-necked lute with a deep, pear-shaped body. It is the primary melodic instrument of Ottoman classical music and the instrument most associated with makam theory. Its frets are movable, allowing it to be tuned to the microtonal intervals of the 53-comma system. Tanburi Cemil Bey, who essentially defined Turkish classical music on recording, played the tanbur.',
+      },
+      {
+        heading: 'The Oud',
+        body: 'The oud (ud in Turkish) is the fretless short-necked lute that gave its name to the European lute. Without frets, the oud player has complete freedom to produce any microtonal interval. This makes it both the most expressive and the most demanding instrument in the tradition — every note must be found by ear, every time. The oud is the heart of Arabic, Turkish, and Persian classical music.',
+      },
+      {
+        heading: 'The Kemençe',
+        body: 'The kemençe is a small bowed instrument held vertically on the knee. Its sound is nasal, intense, and immediately recognizable — somewhere between a fiddle and a human voice at its most strained. Tanburi Cemil Bey also recorded on kemençe, and those recordings remain among the most emotionally raw in the entire tradition.',
+      },
+      {
+        heading: 'The Kanun',
+        body: 'The kanun (qanun) is a large zither with 72 or more strings, played flat on the lap. Levers under each course of strings allow the player to make microtonal adjustments mid-performance. A skilled kanun player can adjust a string\'s pitch by a comma between phrases — producing the precise tuning that makam requires in real time.',
+      },
+    ],
+  },
+  {
+    id: 'makam-and-emotion',
+    title: 'Makam and Emotion',
+    subtitle: 'Why music makes you feel what it makes you feel',
+    estimatedMinutes: 4,
+    sections: [
+      {
+        heading: 'Emotion is not subjective in makam',
+        body: 'In Western music theory, the emotional quality of music is considered largely subjective. In the Turkish makam tradition, it is not. Each makam has a documented emotional character — a hal — that has been refined and agreed upon over centuries. Hicaz produces longing and drama. Saba produces grief that is specific, not general. Rast produces calm joy. These are not suggestions; they are the makam\'s identity.',
+        callout: 'A makam without its characteristic emotion is like a word without its meaning.',
+      },
+      {
+        heading: 'The science behind the feeling',
+        body: 'The emotional quality of a makam comes from the interaction of several factors: the specific tuning of its characteristic intervals (especially the microtonal ones), the tension and resolution created by its seyir, and the accumulated cultural memory of how the makam has been used. When you hear Saba, you are hearing centuries of funeral music, laments, and expressions of loss — even if you don\'t know it consciously.',
+      },
+      {
+        heading: 'Time, place, and mood',
+        body: 'Traditionally, different makams were considered appropriate for different times of day and seasons. Rast was a morning makam. Uşşak was played at dusk. This was not arbitrary — it reflected an understanding that human emotional states shift through the day, and certain interval relationships resonate more deeply at certain times. Whether or not you believe this system, it reveals how seriously the tradition took the relationship between music and human experience.',
+      },
+      {
+        heading: 'Using this in your own music',
+        body: 'If you are a composer or producer, understanding makam emotion gives you a precise emotional vocabulary. Instead of "I want this to feel sad," you can ask: "Do I want the resigned sadness of Uşşak, the grief-stricken depth of Saba, or the anguished cry of Huzzam?" Each produces a different kind of sadness — and the difference is audible.',
+        callout: 'Turkish music has more words for sadness than English does — and each one sounds different.',
+      },
+    ],
+  },
+  {
+    id: 'ottoman-to-republic',
+    title: 'Ottoman to Republic',
+    subtitle: 'The great rupture in Turkish musical history',
+    estimatedMinutes: 4,
+    sections: [
+      {
+        heading: 'The Ottoman tradition',
+        body: 'For five centuries, the Ottoman Empire maintained one of the most sophisticated classical music traditions in the world. Centered in Istanbul, it blended Persian, Arabic, Byzantine, and Central Asian influences into a unique synthesis. The makam system we use today is largely Ottoman in origin — refined in the imperial courts, performed in the great mosques, and transmitted through a rigorous apprenticeship tradition.',
+      },
+      {
+        heading: 'The Republic and Western music',
+        body: 'When Mustafa Kemal Atatürk founded the Turkish Republic in 1923, he pursued a radical modernization program that included music. Western classical music was promoted as the music of civilization. Turkish radio banned traditional makam music at various points. Music conservatories were reorganized along European lines. The rupture was deliberate and profound.',
+        callout: 'For a period, you could not hear traditional Turkish music on Turkish radio.',
+      },
+      {
+        heading: 'What survived',
+        body: 'Despite official suppression, the tradition survived — in private homes, in coffeehouses, in the recordings of Tanburi Cemil Bey made before 1915, in the voice of Münir Nurettin Selçuk who continued performing throughout. The tradition proved more resilient than the policy that tried to erase it. By the 1970s, there was a significant revival, and today Turkish classical music is studied, performed, and celebrated worldwide.',
+      },
+      {
+        heading: 'The living tradition',
+        body: 'Turkish classical music today exists in a complex relationship with its own past. It is simultaneously ancient and contemporary — the makams are centuries old, but they are performed by living musicians who bring their own voice to them. The tradition is not a museum piece. It is a living system capable of producing new music, new interpretations, and new emotional territories.',
+      },
+    ],
+  },
+  {
+    id: 'usul-and-rhythm',
+    title: 'Usul and Rhythm',
+    subtitle: 'The heartbeat beneath the melody',
+    estimatedMinutes: 4,
+    sections: [
+      {
+        heading: 'What is usul?',
+        body: 'Usul (pronounced "oo-SOOL") is the rhythmic cycle that underlies Turkish classical music. Like the tala in Indian classical music or the iqa in Arabic music, usul is not simply a time signature — it is a named pattern of strong and weak beats with a specific character. Each usul has a personality that interacts with the makam it accompanies.',
+        callout: 'A makam without its usul is like a poem without its meter.',
+      },
+      {
+        heading: 'Simple and complex usuls',
+        body: 'Some usuls are simple: Sofyan is 4 beats, Düyek is 8. Others are complex: Devr-i Hindi is 14 beats, Muhammes is 32. The complex usuls create a sense of suspended time — the listener cannot easily predict when the cycle will complete, which creates a particular kind of tension and release that simpler rhythms cannot achieve.',
+      },
+      {
+        heading: 'The darbuka and kudüm',
+        body: 'The primary rhythmic instruments in Turkish classical music are the darbuka (a goblet drum played with the fingers) and the kudüm (a pair of small kettledrums used in Sufi ceremonies). The darbuka produces sharp, precise strokes that articulate the usul pattern. In the best performances, the rhythm and melody breathe together — the usul is not a cage but a conversation partner.',
+      },
+      {
+        heading: 'Usul and makam together',
+        body: 'Certain usuls are traditionally paired with certain makams. Hicaz is often paired with Aksak (9 beats). Rast frequently uses Düyek (8 beats). These pairings are not rules but accumulated wisdom — over centuries, musicians discovered which rhythmic cycles brought out the best in each makam. Learning these pairings is part of understanding the tradition at its deepest level.',
+        callout: 'When the right usul meets the right makam, the music seems to play itself.',
+      },
+    ],
+  },
 ];
