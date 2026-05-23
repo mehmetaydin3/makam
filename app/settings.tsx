@@ -67,7 +67,6 @@ function Divider() {
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const [autoplay, setAutoplay] = useState(false);
   const { language, setLanguage, t } = useLanguage();
   const [showWestern, setShowWestern] = useState(true);
   const [showCents, setShowCents] = useState(true);
@@ -100,33 +99,9 @@ export default function SettingsScreen() {
             value={showCents}
             onToggle={setShowCents}
           />
-          <Divider />
-          <ToggleRow
-            icon="play-circle-outline"
-            label={t('autoplayTaksim')}
-            sublabel={t('autoplaySublabel')}
-            value={autoplay}
-            onToggle={setAutoplay}
-          />
+
         </View>
 
-
-            <View style={styles.languageSelector}>
-              <TouchableOpacity
-                style={[styles.langOption, language === 'en' && styles.langOptionActive]}
-                onPress={() => setLanguage('en')}
-              >
-                <Text style={[styles.langText, language === 'en' && styles.langTextActive]}>English</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.langOption, language === 'tr' && styles.langOptionActive]}
-                onPress={() => setLanguage('tr')}
-              >
-                <Text style={[styles.langText, language === 'tr' && styles.langTextActive]}>Türkçe</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
 
         <SectionHeader title={t('app')} />
         <View style={styles.group}>
