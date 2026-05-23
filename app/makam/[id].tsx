@@ -2,11 +2,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getUsulById } from '../../data/usuls';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, AudioExample } from '../../data/makams';
 import { COLORS, SPACING } from '../../data/constants';
 import { audioEngine, PlaybackState } from '../../audio/audioEngine';
+import Sound from 'react-native-sound';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
@@ -74,6 +75,8 @@ export default function MakamDetailScreen() {
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
   const [selectedUsul, setSelectedUsul] = useState<string | null>(null);
   const selectedUsulData = selectedUsul ? getUsulById(selectedUsul) : null;
+  const [usulPlaying, setUsulPlaying] = useState(false);
+  const usulSoundRef = useRef<Sound | null>(null);
 
   useEffect(() => {
     return () => { audioEngine.stop(); };
@@ -108,6 +111,27 @@ export default function MakamDetailScreen() {
   );
 
   const isPlaying = playbackState === 'playing';
+
+  const closeUsulModal = () => {
+    if (usulSoundRef.current) { usulSoundRef.current.stop(); usulSoundRef.current.release(); usulSoundRef.current = null; }
+    setUsulPlaying(false);
+    setSelectedUsul(null);
+  };
+
+  const playUsul = () => {
+    if (usulPlaying) {
+      if (usulSoundRef.current) { usulSoundRef.current.stop(); usulSoundRef.current.release(); usulSoundRef.current = null; }
+      setUsulPlaying(false);
+      return;
+    }
+    const filename = `usul_${selectedUsul}.wav`;
+    const s = new Sound(filename, Sound.MAIN_BUNDLE, (error: any) => {
+      if (error) { console.error('Usul audio error:', error); return; }
+      usulSoundRef.current = s;
+      setUsulPlaying(true);
+      s.play(() => { s.release(); usulSoundRef.current = null; setUsulPlaying(false); });
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -244,6 +268,36 @@ export default function MakamDetailScreen() {
           </View>
         </View>
 
+        {/* USUL PAIRINGS */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Rhythmic Cycles (Usul)</Text>
+          <Text style={{ fontSize: 13, color: COLORS.textTertiary, marginBottom: SPACING.md, lineHeight: 20 }}>Every piece in this makam is carried by a rhythmic cycle. Tap to hear it.</Text>
+          <View style={styles.usulRow}>
+            {(makam.commonUsuls || []).map((usul) => {
+              const idMap: Record<string, string> = {
+                'Duyek': 'duyek', 'Düyek': 'duyek',
+                'Sofyan': 'sofyan',
+                'Aksak': 'aksak',
+                'Semai': 'semai', 'Semâi': 'semai',
+                'Curcuna': 'curcuna', 'Curcûna': 'curcuna',
+                'Muhammes': 'muhammes',
+                'Devr-i Hindi': 'devr-i-hindi',
+                'Yuruk Semai': 'yuruk-semai', 'Yürük Semai': 'yuruk-semai',
+              };
+              const usulId = idMap[usul] || usul.toLowerCase().replace(/ /g, '-');
+              return (
+                <TouchableOpacity
+                  key={usul}
+                  style={styles.usulTag}
+                  onPress={() => setSelectedUsul(usulId)}
+                >
+                  <Text style={styles.usulTagText}>{usul}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
         {/* SEYIR */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Seyir</Text>
@@ -265,35 +319,6 @@ export default function MakamDetailScreen() {
                 <Text style={styles.relatedText}>{name}</Text>
               </TouchableOpacity>
             ))}
-          </View>
-        </View>
-
-        {/* USUL PAIRINGS */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Common Usul Pairings</Text>
-          <View style={styles.usulRow}>
-            {(makam.commonUsuls || []).map((usul) => {
-              const idMap: Record<string, string> = {
-                'Duyek': 'duyek',
-                'Sofyan': 'sofyan',
-                'Aksak': 'aksak',
-                'Semai': 'semai',
-                'Curcuna': 'curcuna',
-                'Muhammes': 'muhammes',
-                'Devr-i Hindi': 'devr-i-hindi',
-                'Yuruk Semai': 'yuruk-semai',
-              };
-              const usulId = idMap[usul] || usul.toLowerCase().replace(/ /g, '-');
-              return (
-                <TouchableOpacity
-                  key={usul}
-                  style={styles.usulTag}
-                  onPress={() => setSelectedUsul(usulId)}
-                >
-                  <Text style={styles.usulTagText}>{usul}</Text>
-                </TouchableOpacity>
-              );
-            })}
           </View>
         </View>
 
@@ -322,29 +347,42 @@ export default function MakamDetailScreen() {
           visible={!!selectedUsul}
           transparent
           animationType="slide"
-          onRequestClose={() => setSelectedUsul(null)}
+          onRequestClose={closeUsulModal}
         >
-          <TouchableOpacity
-            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' }}
-            activeOpacity={1}
-            onPress={() => setSelectedUsul(null)}
-          >
-            <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#1A1A1C', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24, paddingBottom: 40 }}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}>
+            <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={closeUsulModal} />
+            <View style={{ backgroundColor: '#1A1A1C', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24, paddingBottom: 48 }}>
               {selectedUsulData && (
                 <>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                     <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase' }}>Usul</Text>
-                    <TouchableOpacity onPress={() => setSelectedUsul(null)}>
+                    <TouchableOpacity onPress={closeUsulModal}>
                       <Text style={{ color: COLORS.textTertiary, fontSize: 20 }}>✕</Text>
                     </TouchableOpacity>
                   </View>
-                  <Text style={{ color: COLORS.textPrimary, fontSize: 28, fontWeight: '300', marginBottom: 4 }}>{selectedUsulData.name}</Text>
-                  <Text style={{ color: COLORS.textTertiary, fontSize: 13, marginBottom: 16 }}>{selectedUsulData.totalBeats} beats • {selectedUsulData.feel}</Text>
-                  <Text style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 24 }}>{selectedUsulData.description}</Text>
+                  <Text style={{ color: COLORS.textPrimary, fontSize: 28, fontWeight: '300', marginBottom: 2 }}>{selectedUsulData.name}</Text>
+                  <Text style={{ color: COLORS.textTertiary, fontSize: 13, marginBottom: 20 }}>/{selectedUsulData.pronunciation}/ • {selectedUsulData.timeSignature} • {selectedUsulData.tempo}</Text>
+                  <View style={{ flexDirection: 'row', gap: 6, marginBottom: 20 }}>
+                    {selectedUsulData.pattern.map((beat, i) => (
+                      <View key={i} style={{
+                        flex: 1, height: 32, borderRadius: 4,
+                        backgroundColor: beat === 'strong' ? COLORS.accent : beat === 'medium' ? COLORS.accent + '55' : beat === 'weak' ? '#2A2A2C' : 'transparent',
+                        borderWidth: beat === 'rest' ? 1 : 0, borderColor: COLORS.border,
+                      }} />
+                    ))}
+                  </View>
+                  <Text style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 24, marginBottom: 20 }}>{selectedUsulData.description}</Text>
+                  <TouchableOpacity
+                    onPress={playUsul}
+                    style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55', borderRadius: 12, padding: 14 }}
+                  >
+                    <Text style={{ fontSize: 18 }}>{usulPlaying ? '⏹' : '▶'}</Text>
+                    <Text style={{ color: COLORS.accent, fontSize: 14, fontWeight: '600' }}>{usulPlaying ? 'Stop' : 'Hear this usul'}</Text>
+                  </TouchableOpacity>
                 </>
               )}
             </View>
-          </TouchableOpacity>
+          </View>
         </Modal>
 
     </SafeAreaView>
