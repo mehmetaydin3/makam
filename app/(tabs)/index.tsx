@@ -16,10 +16,15 @@ export default function ExploreScreen() {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [seyirFilter, setSeyirFilter] = useState('All');
-  const [familyFilter, setFamilyFilter] = useState('All');
+  const [moodFilter, setMoodFilter] = useState<string[]>([]);
+  const [timeFilter, setTimeFilter] = useState('All');
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const activeFilterCount = (seyirFilter !== 'All' ? 1 : 0) + (familyFilter !== 'All' ? 1 : 0);
+  const activeFilterCount = (seyirFilter !== 'All' ? 1 : 0) + moodFilter.length + (timeFilter !== 'All' ? 1 : 0);
+
+  const toggleMood = (mood: string) => {
+    setMoodFilter(prev => prev.includes(mood) ? prev.filter(m => m !== mood) : [...prev, mood]);
+  };
 
   const SYNONYMS: Record<string, string[]> = {
     happy: ["joyful", "bright", "clear"],
@@ -59,16 +64,57 @@ export default function ExploreScreen() {
       m.listening.taksim.title.toLowerCase().includes(q) ||
       (m.commonUsuls || []).some(u => u.toLowerCase().includes(q)) ||
       m.family.toLowerCase().includes(q) ||
-      SONGS.some(s => s.makamId === m.id && s.title.toLowerCase().includes(q)) ||
       SONGS.some(s => s.makamId === m.id && s.title.toLowerCase().includes(q));
     const matchesSeyir = seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
-    const matchesFamily = familyFilter === 'All' || m.family.toLowerCase().replace(/[^a-z]/g, '') === familyFilter.toLowerCase().replace(/[^a-z]/g, '');
-    return matchesQuery && matchesSeyir && matchesFamily;
+    const matchesMood = moodFilter.length === 0 || moodFilter.some(f => m.mood.some(mm => mm.toLowerCase().includes(f.toLowerCase())));
+    const matchesTime = timeFilter === 'All' || m.timeOfDay.toLowerCase() === timeFilter.toLowerCase();
+    return matchesQuery && matchesSeyir && matchesMood && matchesTime;
   });
 
   const clearFilters = () => {
     setSeyirFilter('All');
-    setFamilyFilter('All');
+    setMoodFilter([]);
+    setTimeFilter('All');
+  };
+
+  // Family ordering — accessibility first for western audiences
+  const FAMILY_ORDER = ['Rast', 'Uşşak', 'Nihavend', 'Hicaz', 'Saba', 'Neva', 'Hüseyni', 'Buselik', 'Kurd', 'Cargah', 'Segah', 'Hicazkar'];
+  const FAMILY_DESC: Record<string, string> = {
+    'Rast':       'Bright & balanced — the closest to Western major',
+    'Uşşak':      'The most widespread — folk, classical, arabesk',
+    'Nihavend':   'Warm minor — familiar to Western ears',
+    'Hicaz':      'Exotic & intense — the augmented second',
+    'Saba':       'Profound grief — unlike any Western scale',
+    'Neva':       'Elegant & balanced — evening music',
+    'Hüseyni':    'Noble & ancient — one of the oldest',
+    'Buselik':    'Strong & direct — Ottoman martial spirit',
+    'Kurd':       'Plain & folk — simple descending lines',
+    'Cargah':     'Pure natural — all whole tones',
+    'Segah':      'Microtonal & spiritual — Sufi devotion',
+    'Hicazkar':   'Grand compound — layered complexity',
+  };
+  const START_HERE = ['rast', 'ussak', 'hicaz'];
+
+  // Group filtered makams by family when not searching
+  const isSearching = query.trim() !== '' || seyirFilter !== 'All' || moodFilter.length > 0 || timeFilter !== 'All';
+  
+  const groupedMakams = () => {
+    if (isSearching) return [{ family: null, makams: filtered }];
+    const groups: { family: string | null; desc?: string; makams: typeof filtered }[] = [];
+    const seen = new Set<string>();
+    // Add in family order first
+    FAMILY_ORDER.forEach(fam => {
+      const ms = filtered.filter(m => m.family === fam || 
+        (fam === 'Hicazkar' && ['Hicazkar', 'Kurdilihicazkar', 'Uzzal'].includes(m.family)));
+      if (ms.length > 0) {
+        groups.push({ family: fam, desc: FAMILY_DESC[fam], makams: ms });
+        ms.forEach(m => seen.add(m.id));
+      }
+    });
+    // Add any remaining
+    const rest = filtered.filter(m => !seen.has(m.id));
+    if (rest.length > 0) groups.push({ family: 'Other', makams: rest });
+    return groups;
   };
 
   return (
@@ -134,48 +180,62 @@ export default function ExploreScreen() {
               <Ionicons name="close" size={11} color={COLORS.accent} style={{ marginLeft: 4 }} />
             </TouchableOpacity>
           )}
-          {familyFilter !== 'All' && (
-            <TouchableOpacity style={styles.activePill} onPress={() => setFamilyFilter('All')}>
-              <Text style={styles.activePillText}>{familyFilter}</Text>
-              <Ionicons name="close" size={11} color={COLORS.accent} style={{ marginLeft: 4 }} />
-            </TouchableOpacity>
-          )}
+
         </View>
       )}
 
       {/* LIST */}
-      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false} stickyHeaderIndices={[]}>
         {filtered.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>No makams found</Text>
             <Text style={styles.emptySubtext}>Try a different search or filter</Text>
           </View>
         ) : (
-          filtered.map((makam) => (
-            <TouchableOpacity
-              key={makam.id}
-              style={styles.card}
-              activeOpacity={0.75}
-              onPress={() => router.push(('/makam/' + makam.id) as any)}
-            >
-              <View style={[styles.colorStrip, { backgroundColor: makam.color }]} />
-              <View style={styles.cardBody}>
-                <View style={styles.cardTop}>
-                  <Text style={styles.makamName}>{makam.name}</Text>
-                  <Text style={styles.makamPronunciation}>/{makam.pronunciation}/</Text>
+          groupedMakams().map((group, gi) => (
+            <View key={gi}>
+              {group.family && (
+                <View style={styles.familyHeader}>
+                  <Text style={styles.familyName}>{group.family} FAMILY</Text>
+                  {group.desc && <Text style={styles.familyDesc}>{group.desc}</Text>}
                 </View>
-                <Text style={styles.makamDesc} numberOfLines={2}>{makam.description}</Text>
-                <View style={styles.cardFooter}>
-                  <View style={styles.moodRow}>
-                    {makam.mood.slice(0, 2).map((m) => (
-                      <View key={m} style={styles.moodTag}>
-                        <Text style={styles.moodText}>{m}</Text>
+              )}
+              {group.makams.map((makam) => (
+                <TouchableOpacity
+                  key={makam.id}
+                  style={styles.card}
+                  activeOpacity={0.75}
+                  onPress={() => router.push(('/makam/' + makam.id) as any)}
+                >
+                  <View style={[styles.colorStrip, { backgroundColor: makam.color }]} />
+                  <View style={styles.cardBody}>
+                    <View style={styles.cardTop}>
+                      <View style={{ flex: 1 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                          <Text style={styles.makamName}>{makam.name}</Text>
+                          {START_HERE.includes(makam.id) && (
+                            <View style={styles.startHereBadge}>
+                              <Text style={styles.startHereText}>Start here</Text>
+                            </View>
+                          )}
+                        </View>
+                        <Text style={styles.makamPronunciation}>/{makam.pronunciation}/</Text>
                       </View>
-                    ))}
+                    </View>
+                    <Text style={styles.makamDesc} numberOfLines={2}>{makam.description}</Text>
+                    <View style={styles.cardFooter}>
+                      <View style={styles.moodRow}>
+                        {makam.mood.slice(0, 2).map((m) => (
+                          <View key={m} style={styles.moodTag}>
+                            <Text style={styles.moodText}>{m}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
                   </View>
-                </View>
-              </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
+            </View>
           ))
         )}
         <View style={{ height: 100 }} />
@@ -201,38 +261,26 @@ export default function ExploreScreen() {
             )}
           </View>
 
-          <Text style={styles.filterGroupLabel}>SEYIR</Text>
+          {/* MOOD */}
+          <Text style={styles.filterLabel}>MOOD</Text>
           <View style={styles.chipRow}>
-            {SEYIR_OPTIONS.map((f) => (
+            {['Joyful', 'Melancholic', 'Intense', 'Spiritual', 'Exotic', 'Calm', 'Longing', 'Dramatic'].map(m => (
               <TouchableOpacity
-                key={f}
-                style={[styles.chip, seyirFilter === f && styles.chipActive]}
-                onPress={() => setSeyirFilter(f)}
+                key={m}
+                style={[styles.chip, moodFilter.includes(m) && styles.chipActive]}
+                onPress={() => toggleMood(m)}
               >
-                <Text style={[styles.chipText, seyirFilter === f && styles.chipTextActive]}>{f}</Text>
+                <Text style={[styles.chipText, moodFilter.includes(m) && styles.chipTextActive]}>{m}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <Text style={styles.filterGroupLabel}>FAMILY</Text>
-          <View style={styles.chipRow}>
-            {FAMILY_OPTIONS.map((f) => (
-              <TouchableOpacity
-                key={f}
-                style={[styles.chip, familyFilter === f && styles.chipActive]}
-                onPress={() => setFamilyFilter(f)}
-              >
-                <Text style={[styles.chipText, familyFilter === f && styles.chipTextActive]}>{f}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
 
-          <TouchableOpacity style={styles.doneButton} onPress={() => setSheetOpen(false)}>
-            <Text style={styles.doneButtonText}>
-              Show {filtered.length} makam{filtered.length !== 1 ? 's' : ''}
-            </Text>
+
+          <TouchableOpacity style={styles.applyButton} onPress={() => setSheetOpen(false)}>
+            <Text style={styles.applyButtonText}>Show {filtered.length} makam{filtered.length !== 1 ? 's' : ''}</Text>
           </TouchableOpacity>
-        </View>
+                </View>
       </Modal>
 
     </SafeAreaView>
@@ -258,7 +306,7 @@ const styles = StyleSheet.create({
   activePill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, borderWidth: 1, borderColor: COLORS.accent + '55', backgroundColor: COLORS.accentMuted },
   activePillText: { fontSize: 12, color: COLORS.accent, fontWeight: '500' },
   grid: { paddingHorizontal: SPACING.lg, gap: SPACING.sm, paddingTop: SPACING.sm },
-  card: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', flexDirection: 'row' },
+  card: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, overflow: 'hidden', flexDirection: 'row', marginBottom: 12 },
   colorStrip: { width: 4 },
   cardBody: { flex: 1, padding: SPACING.md, gap: SPACING.sm },
   cardTop: { flexDirection: 'row', alignItems: 'baseline', gap: SPACING.sm },
@@ -270,6 +318,62 @@ const styles = StyleSheet.create({
   moodTag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: COLORS.surfaceRaised, borderWidth: 1, borderColor: COLORS.border },
   moodText: { fontSize: 11, color: COLORS.textSecondary },
   seyirBadge: { fontSize: 12, textTransform: 'capitalize', fontWeight: '500' },
+  familyHeader: {
+    paddingHorizontal: 4,
+    paddingTop: 24,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border || '#2A2A2A',
+    marginBottom: 12,
+  },
+  familyName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.accent,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  familyDesc: {
+    fontSize: 12,
+    color: COLORS.textTertiary,
+    marginTop: 3,
+    fontStyle: 'italic',
+  },
+  startHereBadge: {
+    backgroundColor: COLORS.accent + '18',
+    borderRadius: 3,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  startHereText: {
+    fontSize: 9,
+    color: COLORS.accent,
+    fontWeight: '500',
+    letterSpacing: 0.3,
+    opacity: 0.8,
+  },
+  filterLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: COLORS.textTertiary,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase' as const,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  applyButton: {
+    backgroundColor: COLORS.accent,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  applyButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.background,
+  },
   empty: { alignItems: 'center', paddingTop: 60, gap: SPACING.sm },
   emptyText: { fontSize: 16, color: COLORS.textSecondary },
   emptySubtext: { fontSize: 13, color: COLORS.textTertiary },
