@@ -15,7 +15,23 @@ const FAMILY_OPTIONS = ['All', 'Rast', 'Ussak', 'Hicaz', 'Saba', 'Segah', 'Kurd'
 
 export default function ExploreScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const moodMap: Record<string, string> = language === 'tr' ? {
+    'Joyful': 'Neşeli', 'Serene': 'Sakin', 'Balanced': 'Dengeli',
+    'Calm': 'Sakin', 'Melancholic': 'Melankolik', 'Longing': 'Özlem',
+    'Resigned': 'Kabullenmiş', 'Intense': 'Yoğun', 'Dramatic': 'Dramatik',
+    'Heroic': 'Kahraman', 'Spiritual': 'Manevi', 'Mystical': 'Mistik',
+    'Devotional': 'Dini', 'Grief': 'Yas', 'Weeping': 'Ağlayan',
+    'Exotic': 'Egzotik', 'Rugged': 'Sert', 'Introspective': 'İçe Dönük',
+    'Tender': 'Nazik', 'Intimate': 'Samimi', 'Nostalgic': 'Nostaljik',
+    'Warm': 'Sıcak', 'Bright': 'Parlak', 'Clear': 'Net',
+    'Noble': 'Asil', 'Ancient': 'Kadim', 'Strong': 'Güçlü',
+    'Direct': 'Doğrudan', 'Elegant': 'Zarif', 'Wandering': 'Gezgin',
+    'Free': 'Özgür', 'Passionate': 'Tutkulu', 'Restless': 'Huzursuz',
+    'Searching': 'Arayan', 'Grand': 'Görkemli', 'Majestic': 'Heybetli',
+    'Solemn': 'Ciddi', 'Deep': 'Derin', 'Anguish': 'Acı',
+    'Formal': 'Resmi', 'Confident': 'Kendinden Emin',
+  } : {};
   const [query, setQuery] = useState('');
   const [seyirFilter, setSeyirFilter] = useState('All');
   const [moodFilter, setMoodFilter] = useState<string[]>([]);
@@ -217,7 +233,7 @@ export default function ExploreScreen() {
                           <Text style={styles.makamName}>{makam.name}</Text>
                           {START_HERE.includes(makam.id) && (
                             <View style={styles.startHereBadge}>
-                              <Text style={styles.startHereText}>Start here</Text>
+                              <Text style={styles.startHereText}>{t('startHere')}</Text>
                             </View>
                           )}
                         </View>
@@ -229,7 +245,7 @@ export default function ExploreScreen() {
                       <View style={styles.moodRow}>
                         {makam.mood.slice(0, 2).map((m) => (
                           <View key={m} style={styles.moodTag}>
-                            <Text style={styles.moodText}>{m}</Text>
+                            <Text style={styles.moodText}>{moodMap[m] || m}</Text>
                           </View>
                         ))}
                       </View>
