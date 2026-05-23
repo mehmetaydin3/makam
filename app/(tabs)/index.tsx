@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { MAKAMS } from '../../data/makams';
+import { SONGS } from '../../data/songs';
 import { COLORS, SPACING } from '../../data/constants';
 
 const SEYIR_OPTIONS = ['All', 'Ascending', 'Descending', 'Undulating'];
@@ -52,7 +53,13 @@ export default function ExploreScreen() {
       m.mood.some((mood) => terms.some(t => mood.toLowerCase().includes(t))) ||
       m.description.toLowerCase().includes(q) ||
       m.timeOfDay.toLowerCase().includes(q) ||
-      m.season.toLowerCase().includes(q);
+      m.season.toLowerCase().includes(q) ||
+      (m.notablePieces || []).some(p => p.title.toLowerCase().includes(q)) ||
+      m.listening.sarki.title.toLowerCase().includes(q) ||
+      m.listening.taksim.title.toLowerCase().includes(q) ||
+      (m.commonUsuls || []).some(u => u.toLowerCase().includes(q)) ||
+      m.family.toLowerCase().includes(q) ||
+      SONGS.some(s => s.makamId === m.id && s.title.toLowerCase().includes(q));
     const matchesSeyir = seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
     const matchesFamily = familyFilter === 'All' || m.family.toLowerCase().replace(/[^a-z]/g, '') === familyFilter.toLowerCase().replace(/[^a-z]/g, '');
     return matchesQuery && matchesSeyir && matchesFamily;
@@ -86,7 +93,7 @@ export default function ExploreScreen() {
           <Ionicons name="search-outline" size={16} color={COLORS.textTertiary} style={{ marginRight: 6 }} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name, mood..."
+            placeholder="Search by name, mood, song..."
             placeholderTextColor={COLORS.textTertiary}
             value={query}
             onChangeText={setQuery}
