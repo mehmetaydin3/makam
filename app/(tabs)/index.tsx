@@ -340,8 +340,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingTop: 24,
     paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border || '#2A2A2A',
     marginBottom: 12,
   },
   familyName: {
