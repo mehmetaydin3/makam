@@ -99,9 +99,31 @@ export default function SettingsScreen() {
             value={showCents}
             onToggle={setShowCents}
           />
-
+          <Divider />
+          <View style={styles.row}>
+            <View style={styles.rowLeft}>
+              <Ionicons name="musical-notes-outline" size={18} color={COLORS.accent} style={styles.rowIcon} />
+              <View>
+                <Text style={styles.rowLabel}>Note Names</Text>
+                <Text style={styles.rowSublabel}>Scale degree display format</Text>
+              </View>
+            </View>
+            <View style={styles.languageSelector}>
+              <TouchableOpacity
+                style={[styles.langOption, noteNames === 'solfege' && styles.langOptionActive]}
+                onPress={() => setNoteNames('solfege')}
+              >
+                <Text style={[styles.langText, noteNames === 'solfege' && styles.langTextActive]}>Solfège</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.langOption, noteNames === 'letter' && styles.langOptionActive]}
+                onPress={() => setNoteNames('letter')}
+              >
+                <Text style={[styles.langText, noteNames === 'letter' && styles.langTextActive]}>Letter</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-
 
         <SectionHeader title={t('app')} />
         <View style={styles.group}>
