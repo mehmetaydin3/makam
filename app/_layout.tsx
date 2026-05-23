@@ -14,12 +14,10 @@ export default function RootLayout() {
 
   return (
     <LanguageProvider>
-    <>
       <Stack screenOptions={{ headerShown: false }} />
       {showOnboarding && (
         <Onboarding onComplete={() => setShowOnboarding(false)} />
       )}
-    </>
-      </LanguageProvider>
+    </LanguageProvider>
   );
 }

@@ -5,6 +5,7 @@ import { getUsulById } from '../../data/usuls';
 import { useState, useEffect, useRef } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, AudioExample } from '../../data/makams';
+import { useLanguage } from '../../context/LanguageContext';
 import { COLORS, SPACING } from '../../data/constants';
 import { audioEngine, PlaybackState } from '../../audio/audioEngine';
 import Sound from 'react-native-sound';
@@ -12,7 +13,7 @@ import Sound from 'react-native-sound';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
 
-const SEYIR_LABELS = {
+const SEYIR_LABELS_EN = {
   ascending: 'Ascending ↗',
   descending: 'Descending ↘',
   undulating: 'Undulating ↗↘',
@@ -70,6 +71,12 @@ function AudioCard({
 export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { t, language } = useLanguage();
+  const SEYIR_LABELS = language === 'tr' ? {
+    ascending: 'Çıkıcı ↗',
+    descending: 'İnici ↘',
+    undulating: 'İnici-Çıkıcı ↗↘',
+  } : SEYIR_LABELS_EN;
   const makam = getMakamById(id as string);
   const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
