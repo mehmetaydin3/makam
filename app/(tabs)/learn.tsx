@@ -82,7 +82,7 @@ export default function LearnScreen() {
         <Text style={styles.heading}>Learn</Text>
         <Text style={styles.subheading}>Deepen your understanding of the Turkish makam tradition.</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
         {LESSONS.map((lesson, i) => (
           <TouchableOpacity key={lesson.id} style={styles.card} activeOpacity={0.75} onPress={() => setSelectedLesson(lesson)}>
             <View style={styles.cardLeft}>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   eyebrow: { fontSize: 12, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 },
   heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
-  list: { paddingHorizontal: SPACING.lg, gap: SPACING.sm, paddingBottom: 40 },
+  list: { paddingHorizontal: SPACING.lg, gap: SPACING.sm, paddingBottom: 120 },
   card: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, flexDirection: 'row', alignItems: 'center', padding: SPACING.md, gap: SPACING.md },
   cardLeft: { width: 36, alignItems: 'center' },
   lessonNumber: { fontSize: 20, fontWeight: '200', color: COLORS.accent, letterSpacing: -1 },
