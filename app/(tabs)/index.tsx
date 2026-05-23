@@ -343,10 +343,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   familyName: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.accent,
-    letterSpacing: 1.5,
+    fontSize: 11,
+    fontWeight: '400',
+    color: COLORS.textTertiary,
+    letterSpacing: 2,
     textTransform: 'uppercase',
   },
   familyDesc: {
