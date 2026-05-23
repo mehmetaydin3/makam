@@ -67,6 +67,7 @@ function Divider() {
 export default function SettingsScreen() {
   const router = useRouter();
   const [autoplay, setAutoplay] = useState(false);
+  const [turkishMode, setTurkishMode] = useState(false);
   const [showWestern, setShowWestern] = useState(true);
   const [showCents, setShowCents] = useState(true);
 
@@ -108,20 +109,14 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <SectionHeader title="ABOUT" />
+        <SectionHeader title="LANGUAGE" />
         <View style={styles.group}>
-          <SettingsRow
-            icon="globe-outline"
-            label="Turkish Music Foundation"
-            value="tmdk.msu.edu.tr"
-            onPress={() => Linking.openURL('https://tmdk.msu.edu.tr')}
-          />
-          <Divider />
-          <SettingsRow
-            icon="logo-github"
-            label="Source Code"
-            value="github.com"
-            onPress={() => Linking.openURL('https://github.com/mehmetaydin3/makam')}
+          <ToggleRow
+            icon="language-outline"
+            label="Türkçe"
+            sublabel="Show Turkish names and descriptions"
+            value={turkishMode}
+            onToggle={setTurkishMode}
           />
         </View>
 
