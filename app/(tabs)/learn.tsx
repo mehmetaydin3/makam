@@ -6,7 +6,7 @@ import { COLORS, SPACING } from '../../data/constants';
 
 function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void }) {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.readerHeader}>
         <TouchableOpacity onPress={onClose} style={styles.backButton}>
           <Text style={styles.backText}>← Learn</Text>
@@ -76,7 +76,7 @@ export default function LearnScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.eyebrow}>TURKISH MAKAM</Text>
         <Text style={styles.heading}>Learn</Text>
