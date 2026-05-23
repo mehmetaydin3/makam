@@ -255,13 +255,13 @@ export const LESSONS: Lesson[] = [
     sections: [
       {
         heading: 'The Ney',
-        image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/KizNey.jpg/120px-KizNey.jpg', caption: 'A Turkish ney — made from hollow reed' },
+        image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/KizNey.jpg', caption: 'A Turkish ney — made from hollow reed' },
         body: 'The ney is an end-blown flute made from a hollow reed. It is one of the oldest instruments in human history, depicted in Egyptian carvings over 5,000 years old. In Turkish and Sufi music, the ney carries a special spiritual weight — its breathy, slightly raw tone is heard as the sound of longing itself. Rumi opens the Masnavi with the ney\'s cry as a metaphor for the soul\'s separation from its origin.',
         callout: 'The ney does not produce a note — it releases one.',
       },
       {
         heading: 'The Tanbur',
-        image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Tanbur_2.jpg/120px-Tanbur_2.jpg', caption: 'The tanbur — primary instrument of Ottoman classical music' },
+        image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Turkish_tanbur.jpg', caption: 'The tanbur — primary instrument of Ottoman classical music' },
         body: 'The tanbur is a long-necked lute with a deep, pear-shaped body. It is the primary melodic instrument of Ottoman classical music and the instrument most associated with makam theory. Its frets are movable, allowing it to be tuned to the microtonal intervals of the 53-comma system. Tanburi Cemil Bey, who essentially defined Turkish classical music on recording, played the tanbur.',
       },
       {
@@ -312,7 +312,7 @@ export const LESSONS: Lesson[] = [
     sections: [
       {
         heading: 'The Ottoman tradition',
-        image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Cemil.jpg/150px-Cemil.jpg', caption: 'Tanburi Cemil Bey (1873–1916) — the defining voice of Ottoman classical music on record' },
+        image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Cemil.jpg', caption: 'Tanburi Cemil Bey (1873–1916) — the defining voice of Ottoman classical music on record' },
         body: 'For five centuries, the Ottoman Empire maintained one of the most sophisticated classical music traditions in the world. Centered in Istanbul, it blended Persian, Arabic, Byzantine, and Central Asian influences into a unique synthesis. The makam system we use today is largely Ottoman in origin — refined in the imperial courts, performed in the great mosques, and transmitted through a rigorous apprenticeship tradition.',
       },
       {
