@@ -1,6 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { getUsulById } from '../../data/usuls';
 import { useState, useEffect } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, AudioExample } from '../../data/makams';
@@ -71,6 +72,8 @@ export default function MakamDetailScreen() {
   const makam = getMakamById(id as string);
   const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
+  const [selectedUsul, setSelectedUsul] = useState<string | null>(null);
+  const selectedUsulData = selectedUsul ? getUsulById(selectedUsul) : null;
 
   useEffect(() => {
     return () => { audioEngine.stop(); };
@@ -285,7 +288,7 @@ export default function MakamDetailScreen() {
                 <TouchableOpacity
                   key={usul}
                   style={styles.usulTag}
-                  onPress={() => router.push(('/usul/' + usulId) as any)}
+                  onPress={() => setSelectedUsul(usulId)}
                 >
                   <Text style={styles.usulTagText}>{usul}</Text>
                 </TouchableOpacity>
@@ -313,6 +316,37 @@ export default function MakamDetailScreen() {
         </View>
 
       </ScrollView>
+
+        {/* USUL MODAL */}
+        <Modal
+          visible={!!selectedUsul}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setSelectedUsul(null)}
+        >
+          <TouchableOpacity
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' }}
+            activeOpacity={1}
+            onPress={() => setSelectedUsul(null)}
+          >
+            <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#1A1A1C', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24, paddingBottom: 40 }}>
+              {selectedUsulData && (
+                <>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase' }}>Usul</Text>
+                    <TouchableOpacity onPress={() => setSelectedUsul(null)}>
+                      <Text style={{ color: COLORS.textTertiary, fontSize: 20 }}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={{ color: COLORS.textPrimary, fontSize: 28, fontWeight: '300', marginBottom: 4 }}>{selectedUsulData.name}</Text>
+                  <Text style={{ color: COLORS.textTertiary, fontSize: 13, marginBottom: 16 }}>{selectedUsulData.totalBeats} beats • {selectedUsulData.feel}</Text>
+                  <Text style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 24 }}>{selectedUsulData.description}</Text>
+                </>
+              )}
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
     </SafeAreaView>
   );
 }
