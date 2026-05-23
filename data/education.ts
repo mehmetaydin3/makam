@@ -255,7 +255,7 @@ export const LESSONS: Lesson[] = [
     sections: [
       {
         heading: 'The Ney',
-        image: { uri: 'https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/KizNey.jpg&width=400', caption: 'A Turkish ney — made from hollow reed' },
+        image: { uri: 'https://images.metmuseum.org/CRDImages/mi/original/DP251978.jpg&width=400', caption: 'A Turkish ney — made from hollow reed' },
         body: 'The ney is an end-blown flute made from a hollow reed. It is one of the oldest instruments in human history, depicted in Egyptian carvings over 5,000 years old. In Turkish and Sufi music, the ney carries a special spiritual weight — its breathy, slightly raw tone is heard as the sound of longing itself. Rumi opens the Masnavi with the ney\'s cry as a metaphor for the soul\'s separation from its origin.',
         callout: 'The ney does not produce a note — it releases one.',
       },
@@ -266,17 +266,17 @@ export const LESSONS: Lesson[] = [
       },
       {
         heading: 'The Oud',
-        image: { uri: 'https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/Arabic_musical_instruments_OUD.jpg&width=400', caption: 'The oud — fretless, every note found by ear' },
+        image: { uri: 'https://images.metmuseum.org/CRDImages/mi/original/DP251974.jpg', caption: 'The oud — fretless, every note found by ear' },
         body: 'The oud (ud in Turkish) is the fretless short-necked lute that gave its name to the European lute. Without frets, the oud player has complete freedom to produce any microtonal interval. This makes it both the most expressive and the most demanding instrument in the tradition — every note must be found by ear, every time. The oud is the heart of Arabic, Turkish, and Persian classical music.',
       },
       {
         heading: 'The Kemençe',
-        image: { uri: 'https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/Classical_kemence.jpg&width=400', caption: 'The kemençe — nasal, intense, unmistakable' },
+        image: { uri: 'https://images.metmuseum.org/CRDImages/mi/original/DP251980.jpg', caption: 'The kemençe — nasal, intense, unmistakable' },
         body: 'The kemençe is a small bowed instrument held vertically on the knee. Its sound is nasal, intense, and immediately recognizable — somewhere between a fiddle and a human voice at its most strained. Tanburi Cemil Bey also recorded on kemençe, and those recordings remain among the most emotionally raw in the entire tradition.',
       },
       {
         heading: 'The Kanun',
-        image: { uri: 'https://en.wikipedia.org/w/index.php?title=Special:Redirect/file/Kanun_instrument.jpg&width=400', caption: 'The kanun — 72 strings, microtonal levers on every course' },
+        image: { uri: 'https://images.metmuseum.org/CRDImages/mi/original/DP251976.jpg', caption: 'The kanun — 72 strings, microtonal levers on every course' },
         body: 'The kanun (qanun) is a large zither with 72 or more strings, played flat on the lap. Levers under each course of strings allow the player to make microtonal adjustments mid-performance. A skilled kanun player can adjust a string\'s pitch by a comma between phrases — producing the precise tuning that makam requires in real time.',
       },
     ],
