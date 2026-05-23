@@ -83,7 +83,7 @@ export default function MakamDetailScreen() {
     } else {
       const cents = makam?.scale.map(d => d.cents) ?? [];
       await audioEngine.playScale(
-        makam?.durak ?? '',
+        makam?.id ?? '',
         cents,
         (state, degreeIndex) => {
           setPlaybackState(state === 'stopped' ? 'idle' : state);
