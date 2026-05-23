@@ -100,7 +100,7 @@ export default function SettingsScreen() {
             onToggle={setShowCents}
           />
           <Divider />
-          <View style={styles.row}>
+          <View style={[styles.row, { flexDirection: 'column', alignItems: 'flex-start', gap: 12 }]}>
             <View style={styles.rowLeft}>
               <Ionicons name="musical-notes-outline" size={18} color={COLORS.accent} style={styles.rowIcon} />
               <View>
@@ -108,7 +108,7 @@ export default function SettingsScreen() {
                 <Text style={styles.rowSublabel}>Scale degree display format</Text>
               </View>
             </View>
-            <View style={styles.languageSelector}>
+            <View style={[styles.languageSelector, { marginLeft: 34 }]}>
               <TouchableOpacity
                 style={[styles.langOption, noteNames === 'solfege' && styles.langOptionActive]}
                 onPress={() => setNoteNames('solfege')}
