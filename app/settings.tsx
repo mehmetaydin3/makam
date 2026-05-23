@@ -110,13 +110,7 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <SectionHeader title={t('language')} />
-        <View style={styles.group}>
-          <View style={styles.row}>
-            <View style={styles.rowLeft}>
-              <Ionicons name="language-outline" size={18} color={COLORS.accent} style={styles.rowIcon} />
-              <Text style={styles.rowLabel}>{t('languageLabel')}</Text>
-            </View>
+
             <View style={styles.languageSelector}>
               <TouchableOpacity
                 style={[styles.langOption, language === 'en' && styles.langOptionActive]}
