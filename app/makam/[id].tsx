@@ -271,8 +271,12 @@ export default function MakamDetailScreen() {
         {/* USUL PAIRINGS */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Rhythmic Cycles (Usul)</Text>
-          <Text style={{ fontSize: 13, color: COLORS.textTertiary, marginBottom: SPACING.md, lineHeight: 20 }}>Every piece in this makam is carried by a rhythmic cycle. Tap to hear it.</Text>
-          <View style={styles.usulRow}>
+          <View style={{ backgroundColor: COLORS.accent + '11', borderRadius: 12, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: COLORS.accent + '33' }}>
+            <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
+              A makam without its usul is just a scale. The rhythmic cycle gives it life — pulse, momentum, and form. Tap any usul below to hear how it sounds and feel how it moves.
+            </Text>
+          </View>
+          <View style={{ gap: SPACING.sm }}>
             {(makam.commonUsuls || []).map((usul) => {
               const idMap: Record<string, string> = {
                 'Duyek': 'duyek', 'Düyek': 'duyek',
@@ -285,13 +289,21 @@ export default function MakamDetailScreen() {
                 'Yuruk Semai': 'yuruk-semai', 'Yürük Semai': 'yuruk-semai',
               };
               const usulId = idMap[usul] || usul.toLowerCase().replace(/ /g, '-');
+              const usulData = getUsulById(usulId);
               return (
                 <TouchableOpacity
                   key={usul}
-                  style={styles.usulTag}
                   onPress={() => setSelectedUsul(usulId)}
+                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, gap: SPACING.md }}
                 >
-                  <Text style={styles.usulTagText}>{usul}</Text>
+                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ color: COLORS.accent, fontSize: 16 }}>▶</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: COLORS.textPrimary, fontSize: 16, fontWeight: '500', marginBottom: 2 }}>{usul}</Text>
+                    {usulData && <Text style={{ color: COLORS.textTertiary, fontSize: 12 }}>{usulData.timeSignature} • {usulData.totalBeats} beats • {usulData.tempo}</Text>}
+                  </View>
+                  <Text style={{ color: COLORS.textTertiary, fontSize: 18 }}>›</Text>
                 </TouchableOpacity>
               );
             })}
@@ -307,14 +319,24 @@ export default function MakamDetailScreen() {
         </View>
 
         {/* RELATED MAKAMS */}
-        <View style={styles.section}>
+        <View style={{ marginBottom: 80 }}>
           <Text style={styles.sectionLabel}>Related Makams</Text>
           <View style={styles.relatedRow}>
             {(makam.relatedMakams || []).map((name) => (
               <TouchableOpacity
                 key={name}
                 style={styles.relatedTag}
-                onPress={() => router.push(('/makam/' + name.toLowerCase()) as any)}
+                onPress={() => {
+                const nameToId: Record<string, string> = {
+                  'Rast': 'rast', 'Uşşak': 'ussak', 'Ussak': 'ussak',
+                  'Hicaz': 'hicaz', 'Hüseyni': 'huseyni', 'Huseyni': 'huseyni',
+                  'Saba': 'saba', 'Segah': 'segah', 'Kurd': 'kurd',
+                  'Neva': 'neva', 'Buselik': 'buselik', 'Çargah': 'cargah',
+                  'Nihavend': 'nihavend',
+                };
+                const targetId = nameToId[name] || name.toLowerCase();
+                router.push(('/makam/' + targetId) as any);
+              }}
               >
                 <Text style={styles.relatedText}>{name}</Text>
               </TouchableOpacity>
@@ -322,23 +344,7 @@ export default function MakamDetailScreen() {
           </View>
         </View>
 
-        {/* NOTABLE PIECES */}
-        <View style={{ marginBottom: 80 }}>
-          <Text style={styles.sectionLabel}>Notable Pieces</Text>
-          {(makam.notablePieces || []).map((piece, i) => (
-            <View key={i} style={styles.pieceRow}>
-              <View style={styles.pieceTitleRow}>
-                <Text style={styles.pieceTitle}>{piece.title}</Text>
-                {piece.usul && (
-                  <View style={styles.pieceUsulBadge}>
-                    <Text style={styles.pieceUsulText}>{piece.usul}</Text>
-                  </View>
-                )}
-              </View>
-              <Text style={styles.pieceComposer}>{piece.composer}</Text>
-            </View>
-          ))}
-        </View>
+
 
       </ScrollView>
 
