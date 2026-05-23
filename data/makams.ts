@@ -780,7 +780,7 @@ export const MAKAMS: Makam[] = [
     relatedMakams: ['Segah', 'Uşşak', 'Hicaz'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
-      sarki: { youtubeId: null, title: 'Huzzam Sarki', composer: 'Sadettin Kaynak', performer: 'Zeki Muren', year: '1960s', description: 'A searing Huzzam şarkı — the augmented second in the upper register giving each phrase a desperate quality.' },
+      sarki: { youtubeId: 'mT9pinQT_TE', title: 'Aliverin Baglamami Calayim', composer: 'Anonymous', performer: 'Zeki Muren', year: '1960s', description: 'Zeki Müren sings this classic Hüzzam folk şarkı — the makam\'s anguished microtones evident in every phrase.' },
       taksim: { youtubeId: 'XPDyTOUI6t4', title: 'Huzzam Taksim', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1906', description: 'One of Cemil Bey\'s most emotionally raw improvisations.' },
     },
     notablePieces: [{ title: 'Huzzam Beste', composer: 'Dede Efendi', usul: 'Devr-i Hindi' }],
@@ -814,7 +814,7 @@ export const MAKAMS: Makam[] = [
     relatedMakams: ['Rast', 'Neva', 'Buselik'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
-      sarki: { youtubeId: null, title: 'Mahur Sarki', composer: 'Hammamizade Ismail Dede Efendi', performer: 'Munir Nurettin Selcuk', year: '1940s', description: 'A stately Mahur şarkı — the clean major intervals give the melody a formal brightness.' },
+      sarki: { youtubeId: 'saW_HIdDSPE', title: 'Asika Bagdat Sorulmaz', composer: 'Munir Nurettin Selcuk', performer: 'Munir Nurettin Selcuk', year: '1950s', description: 'Münir Nurettin\'s own Mahur composition — the makam\'s formal brightness perfectly suited to his clear, classical delivery.' },
       taksim: { youtubeId: 'IKYMc6qP3lU', title: 'Mahur Taksim', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1907', description: 'Mahur maintains its formal clarity even in improvisation.' },
     },
     notablePieces: [{ title: 'Mahur Beste', composer: 'Dede Efendi', usul: 'Devr-i Hindi' }],
