@@ -1,5 +1,5 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useState } from 'react';
 import { LESSONS } from '../../data/education';
 import { COLORS, SPACING } from '../../data/constants';
@@ -20,6 +20,12 @@ function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void })
         {lesson.sections && lesson.sections.map((section: any, i: number) => (
           <View key={i} style={styles.section}>
             <Text style={styles.sectionHeading}>{section.heading}</Text>
+            {section.image ? (
+              <View style={styles.imageContainer}>
+                <Image source={{ uri: section.image.uri }} style={styles.lessonImage} resizeMode="cover" />
+                <Text style={styles.imageCaption}>{section.image.caption}</Text>
+              </View>
+            ) : null}
             <Text style={styles.sectionBody}>{section.body}</Text>
             {section.callout ? (
               <View style={styles.calloutCard}>
@@ -135,6 +141,9 @@ const styles = StyleSheet.create({
   stepNote: { fontSize: 13, fontWeight: '500', color: COLORS.textSecondary },
   stepNoteHighlight: { color: COLORS.accent, fontWeight: '700' },
   stepArrow: { fontSize: 11, color: COLORS.textTertiary },
+  imageContainer: { borderRadius: 12, overflow: 'hidden', marginVertical: 8 },
+  lessonImage: { width: '100%', height: 200, borderRadius: 12 },
+  imageCaption: { fontSize: 11, color: COLORS.textTertiary, marginTop: 6, fontStyle: 'italic', textAlign: 'center' },
   calloutCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderLeftWidth: 3, borderLeftColor: COLORS.accent, borderWidth: 1, borderColor: COLORS.border },
   calloutText: { fontSize: 14, color: COLORS.accent, lineHeight: 22, fontStyle: 'italic' },
 });
