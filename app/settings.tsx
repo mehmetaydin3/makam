@@ -67,7 +67,7 @@ function Divider() {
 export default function SettingsScreen() {
   const router = useRouter();
   const [autoplay, setAutoplay] = useState(false);
-  const [turkishMode, setTurkishMode] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'tr'>('en');
   const [showWestern, setShowWestern] = useState(true);
   const [showCents, setShowCents] = useState(true);
 
@@ -111,13 +111,26 @@ export default function SettingsScreen() {
 
         <SectionHeader title="LANGUAGE" />
         <View style={styles.group}>
-          <ToggleRow
-            icon="language-outline"
-            label="Türkçe"
-            sublabel="Show Turkish names and descriptions"
-            value={turkishMode}
-            onToggle={setTurkishMode}
-          />
+          <View style={styles.row}>
+            <View style={styles.rowLeft}>
+              <Ionicons name="language-outline" size={18} color={COLORS.accent} style={styles.rowIcon} />
+              <Text style={styles.rowLabel}>Language</Text>
+            </View>
+            <View style={styles.languageSelector}>
+              <TouchableOpacity
+                style={[styles.langOption, language === 'en' && styles.langOptionActive]}
+                onPress={() => setLanguage('en')}
+              >
+                <Text style={[styles.langText, language === 'en' && styles.langTextActive]}>English</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.langOption, language === 'tr' && styles.langOptionActive]}
+                onPress={() => setLanguage('tr')}
+              >
+                <Text style={[styles.langText, language === 'tr' && styles.langTextActive]}>Türkçe</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         <SectionHeader title="APP" />
@@ -162,6 +175,31 @@ const styles = StyleSheet.create({
   rowSublabel: { fontSize: 12, color: COLORS.textTertiary, marginTop: 2, maxWidth: 240 },
   rowRight: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   rowValue: { fontSize: 13, color: COLORS.textTertiary },
+  languageSelector: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  langOption: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: 'transparent',
+  },
+  langOptionActive: {
+    backgroundColor: COLORS.accent,
+    borderColor: COLORS.accent,
+  },
+  langText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    fontWeight: '500',
+  },
+  langTextActive: {
+    color: COLORS.background,
+    fontWeight: '600',
+  },
   divider: { height: 1, backgroundColor: COLORS.border, marginLeft: SPACING.md + 24 + SPACING.md },
   versionRow: { alignItems: 'center', marginTop: SPACING.xxl, gap: 4 },
   versionText: { fontSize: 13, color: COLORS.textTertiary },
