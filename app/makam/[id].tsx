@@ -156,7 +156,7 @@ export default function MakamDetailScreen() {
           <Text style={styles.pronunciation}>/{makam.pronunciation}/</Text>
           <View style={styles.tagRow}>
             <View style={styles.tag}>
-              <Text style={styles.tagText}>{makam.family} family</Text>
+              <Text style={styles.tagText}>{makam.family} {language === 'tr' ? ' ailesi' : ' family'}</Text>
             </View>
             <View style={[styles.tag, styles.tagAccent]}>
               <Text style={[styles.tagText, styles.tagTextAccent]}>
@@ -168,14 +168,14 @@ export default function MakamDetailScreen() {
 
         {/* ABOUT */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>About</Text>
+          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Hakkında' : 'About'}</Text>
           <Text style={styles.description}>{makam.description}</Text>
         </View>
 
         {/* WESTERN ANALOGY */}
         {makam.westernAnalogy ? (
           <View style={styles.analogyCard}>
-            <Text style={styles.analogyLabel}>FOR WESTERN MUSICIANS</Text>
+            <Text style={styles.analogyLabel}>{language === 'tr' ? 'BATI MÜZİSYENLERİ İÇİN' : 'FOR WESTERN MUSICIANS'}</Text>
             <Text style={styles.analogyText}>{makam.westernAnalogy}</Text>
           </View>
         ) : null}
@@ -198,7 +198,7 @@ export default function MakamDetailScreen() {
 
         {/* MOOD */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Mood</Text>
+          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Duygu' : 'Mood'}</Text>
           <View style={styles.moodRow}>
             {(makam.mood || []).map((m) => (
               <View key={m} style={styles.moodTag}>
@@ -210,7 +210,7 @@ export default function MakamDetailScreen() {
 
         {/* LISTENING SECTION */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Listen</Text>
+          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Dinle' : 'Listen'}</Text>
           {makam.listening.sarki.youtubeId && (
             <AudioCard
               example={makam.listening.sarki}
@@ -230,7 +230,7 @@ export default function MakamDetailScreen() {
 
         {/* SCALE DEGREES */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Scale Degrees</Text>
+          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Dizi Dereceleri' : 'Scale Degrees'}</Text>
           <TouchableOpacity
             style={[styles.playButton, { borderColor: makam.color }, isPlaying && { backgroundColor: makam.color }]}
             onPress={handlePlayStop}
@@ -331,7 +331,7 @@ export default function MakamDetailScreen() {
 
         {/* RELATED MAKAMS */}
         <View style={{ marginBottom: 80 }}>
-          <Text style={styles.sectionLabel}>Related Makams</Text>
+          <Text style={styles.sectionLabel}>{language === 'tr' ? 'İlgili Makamlar' : 'Related Makams'}</Text>
           <View style={styles.relatedRow}>
             {(makam.relatedMakams || []).map((name) => (
               <TouchableOpacity
