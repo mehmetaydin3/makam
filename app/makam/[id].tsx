@@ -258,7 +258,7 @@ export default function MakamDetailScreen() {
                   isActive && { backgroundColor: makam.color + '33', borderColor: makam.color, borderWidth: 2 },
                 ]}>
                   <Text style={[styles.degreeNote, (d.isCharacteristic || isActive) && { color: makam.color }]}>
-                    {d.westernNearest}
+                    {noteNames === 'solfege' ? d.name : (d.westernNearest || d.name)}
                   </Text>
                   {interp ? <Text style={[styles.degreeInterp, d.isCharacteristic && { color: makam.color + 'cc' }]}>{interp}</Text> : null}
                   {centsLabel && !interp ? <Text style={styles.degreeDev}>{centsLabel}</Text> : null}
