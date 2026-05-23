@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING } from '../data/constants';
+import { useLanguage } from '../context/LanguageContext';
 
 type RowProps = {
   icon: string;
@@ -67,7 +68,7 @@ function Divider() {
 export default function SettingsScreen() {
   const router = useRouter();
   const [autoplay, setAutoplay] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'tr'>('en');
+  const { language, setLanguage, t } = useLanguage();
   const [showWestern, setShowWestern] = useState(true);
   const [showCents, setShowCents] = useState(true);
 
@@ -80,41 +81,41 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>{t('settings')}</Text>
 
-        <SectionHeader title="LEARNING" />
+        <SectionHeader title={t('learning')} />
         <View style={styles.group}>
           <ToggleRow
             icon="musical-note-outline"
-            label="Show Western Analogies"
-            sublabel="Display Western scale comparisons on makam pages"
+            label={t('showWesternAnalogies')}
+            sublabel={t('showWesternSublabel')}
             value={showWestern}
             onToggle={setShowWestern}
           />
           <Divider />
           <ToggleRow
             icon="pulse-outline"
-            label="Show Cent Deviations"
-            sublabel="Display microtonal measurements on scale degrees"
+            label={t('showCentDeviations')}
+            sublabel={t('showCentSublabel')}
             value={showCents}
             onToggle={setShowCents}
           />
           <Divider />
           <ToggleRow
             icon="play-circle-outline"
-            label="Autoplay Taksim"
-            sublabel="Start taksim video when opening a makam"
+            label={t('autoplayTaksim')}
+            sublabel={t('autoplaySublabel')}
             value={autoplay}
             onToggle={setAutoplay}
           />
         </View>
 
-        <SectionHeader title="LANGUAGE" />
+        <SectionHeader title={t('language')} />
         <View style={styles.group}>
           <View style={styles.row}>
             <View style={styles.rowLeft}>
               <Ionicons name="language-outline" size={18} color={COLORS.accent} style={styles.rowIcon} />
-              <Text style={styles.rowLabel}>Language</Text>
+              <Text style={styles.rowLabel}>{t('languageLabel')}</Text>
             </View>
             <View style={styles.languageSelector}>
               <TouchableOpacity
@@ -133,17 +134,17 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <SectionHeader title="APP" />
+        <SectionHeader title={t('app')} />
         <View style={styles.group}>
           <SettingsRow
             icon="star-outline"
-            label="Rate the App"
+            label={t('rateApp')}
             onPress={() => { }}
           />
           <Divider />
           <SettingsRow
             icon="chatbubble-outline"
-            label="Send Feedback"
+            label={t('sendFeedback')}
             onPress={() => Linking.openURL('mailto:mehmetaydin3@gmail.com?subject=Makam App Feedback')}
           />
         </View>

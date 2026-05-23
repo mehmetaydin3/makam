@@ -1,3 +1,4 @@
+import { LanguageProvider } from '../context/LanguageContext';
 import { Stack } from 'expo-router';
 import { useState, useEffect } from 'react';
 import Onboarding, { hasSeenOnboarding } from '../components/Onboarding';
@@ -12,11 +13,13 @@ export default function RootLayout() {
   if (showOnboarding === null) return null;
 
   return (
+    <LanguageProvider>
     <>
       <Stack screenOptions={{ headerShown: false }} />
       {showOnboarding && (
         <Onboarding onComplete={() => setShowOnboarding(false)} />
       )}
     </>
+      </LanguageProvider>
   );
 }

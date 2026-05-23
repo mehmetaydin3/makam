@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { MAKAMS } from '../../data/makams';
+import { useLanguage } from '../../context/LanguageContext';
 import { SONGS } from '../../data/songs';
 import { COLORS, SPACING } from '../../data/constants';
 
@@ -14,6 +15,7 @@ const FAMILY_OPTIONS = ['All', 'Rast', 'Ussak', 'Hicaz', 'Saba', 'Segah', 'Kurd'
 
 export default function ExploreScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [seyirFilter, setSeyirFilter] = useState('All');
   const [moodFilter, setMoodFilter] = useState<string[]>([]);
@@ -80,18 +82,18 @@ export default function ExploreScreen() {
   // Family ordering — accessibility first for western audiences
   const FAMILY_ORDER = ['Rast', 'Uşşak', 'Nihavend', 'Hicaz', 'Saba', 'Neva', 'Hüseyni', 'Buselik', 'Kurd', 'Cargah', 'Segah', 'Hicazkar'];
   const FAMILY_DESC: Record<string, string> = {
-    'Rast':       'Bright & balanced — the closest to Western major',
-    'Uşşak':      'The most widespread — folk, classical, arabesk',
-    'Nihavend':   'Warm minor — familiar to Western ears',
-    'Hicaz':      'Exotic & intense — the augmented second',
-    'Saba':       'Profound grief — unlike any Western scale',
-    'Neva':       'Elegant & balanced — evening music',
-    'Hüseyni':    'Noble & ancient — one of the oldest',
-    'Buselik':    'Strong & direct — Ottoman martial spirit',
-    'Kurd':       'Plain & folk — simple descending lines',
-    'Cargah':     'Pure natural — all whole tones',
-    'Segah':      'Microtonal & spiritual — Sufi devotion',
-    'Hicazkar':   'Grand compound — layered complexity',
+    'Rast':       t('familyRast'),
+    'Uşşak':      t('familyUssak'),
+    'Nihavend':   t('familyNihavend'),
+    'Hicaz':      t('familyHicaz'),
+    'Saba':       t('familySaba'),
+    'Neva':       t('familyNeva'),
+    'Hüseyni':    t('familyHuseyni'),
+    'Buselik':    t('familyBuselik'),
+    'Kurd':       t('familyKurd'),
+    'Cargah':     t('familyCargah'),
+    'Segah':      t('familySegah'),
+    'Hicazkar':   t('familyHicazkar'),
   };
   const START_HERE = ['rast', 'ussak', 'hicaz'];
 
@@ -140,7 +142,7 @@ export default function ExploreScreen() {
           <Ionicons name="search-outline" size={16} color={COLORS.textTertiary} style={{ marginRight: 6 }} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name, mood, song..."
+            placeholder={t('searchPlaceholder')}
             placeholderTextColor={COLORS.textTertiary}
             value={query}
             onChangeText={setQuery}
@@ -264,7 +266,7 @@ export default function ExploreScreen() {
           {/* MOOD */}
           <Text style={styles.filterLabel}>MOOD</Text>
           <View style={styles.chipRow}>
-            {['Joyful', 'Melancholic', 'Intense', 'Spiritual', 'Exotic', 'Calm', 'Longing', 'Dramatic'].map(m => (
+            {[t('joyful'), t('melancholic'), t('intense'), t('spiritual'), t('exotic'), t('calm'), t('longing'), t('dramatic')].map(m => (
               <TouchableOpacity
                 key={m}
                 style={[styles.chip, moodFilter.includes(m) && styles.chipActive]}
