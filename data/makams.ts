@@ -542,7 +542,7 @@ export const MAKAMS: Makam[] = [
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: {
-        youtubeId: '6sh4iRble1E',
+        youtubeId: null,
         title: 'Cargah Sirto',
         composer: 'Traditional',
         performer: 'Baha Yetkin Trio',
@@ -678,7 +678,7 @@ export const MAKAMS: Makam[] = [
     relatedMakams: ['Kurd', 'Hicazkar', 'Hicaz'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
-      sarki: { youtubeId: '1RDE9OIlG8Y', title: 'Kurdilihicazkar Sarki', composer: 'Sadettin Kaynak', performer: 'Munir Nurettin Selcuk', year: '1940s', description: 'A definitive Kurdilihicazkar şarkı — the melody traces the makam\'s characteristic arc from the plaintive lower register to its rich, dramatic upper range.' },
+      sarki: { youtubeId: '1RDE9OIlG8Y', title: 'Beni Kor Kuyularda Merdivensiz Biraktin', composer: 'Munir Nurettin Selcuk', performer: 'Munir Nurettin Selcuk', year: '1940s', description: 'A definitive Kurdilihicazkar şarkı — the melody traces the makam\'s characteristic arc from the plaintive lower register to its rich, dramatic upper range.' },
       taksim: { youtubeId: '7yH6o7YGG4c', title: 'Kurdilihicazkar Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s distinctive style brings out the emotional depth of Kurdilihicazkar.' },
     },
     notablePieces: [{ title: 'Kurdilihicazkar Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
@@ -853,7 +853,7 @@ export const MAKAMS: Makam[] = [
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: { youtubeId: null, title: 'Uzzal Sarki', composer: 'Sadettin Kaynak', performer: 'Zeki Muren', year: '1960s', description: 'A passionate Uzzal şarkı — the double augmented seconds give the melody a restless, searching quality.' },
-      taksim: { youtubeId: 'sT7bI80EvD8', title: 'Hicazkar Saz Semai', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s oud captures Uzzal\'s restless energy.' },
+      taksim: { youtubeId: null, title: 'Uzzal Taksim', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s oud captures Uzzal\'s restless energy.' },
     },
       },
     notablePieces: [{ title: 'Uzzal Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
