@@ -9,7 +9,9 @@ export type Lesson = {
 export type LessonSection = {
   heading: string;
   body: string;
-  callout?: string; // highlighted pull quote or key concept
+  callout?: string;
+  table?: { headers: [string, string]; rows: string[][] };
+  steps?: { note: string; size: string; highlight?: boolean }[];
 };
 
 export const LESSONS: Lesson[] = [
@@ -55,6 +57,20 @@ export const LESSONS: Lesson[] = [
         callout: 'Seyir is the difference between asking a question and answering one.',
       },
       {
+        heading: 'Hicaz scale — ascending seyir',
+        body: 'Notice the augmented second between the 2nd and 3rd degrees — the most characteristic interval:',
+        steps: [
+          { note: 'La', size: 'half' },
+          { note: 'Si♭', size: 'aug', highlight: true },
+          { note: 'Do#', size: 'half', highlight: true },
+          { note: 'Re', size: 'whole' },
+          { note: 'Mi', size: 'half' },
+          { note: 'Fa', size: 'whole' },
+          { note: 'Sol', size: 'whole' },
+          { note: 'La', size: 'whole' },
+        ],
+      },
+      {
         heading: 'Why seyir matters for your playing',
         body: 'When you improvise or compose in a makam, you must honor its seyir. An ascending makam should feel like it is climbing toward something. A descending makam should feel like it is arriving, settling, concluding. Ignoring seyir produces technically correct notes in emotionally wrong order — like speaking grammatically correct sentences in the wrong sequence.',
       },
@@ -74,6 +90,20 @@ export const LESSONS: Lesson[] = [
         heading: 'The Turkish system: 53 commas',
         body: 'Turkish classical music divides the octave into 53 equal parts called "commas" (koma). This allows for far greater precision in tuning. Where Western music has one B♭, Turkish music has multiple versions of that pitch — each a comma or two apart, each with a different emotional quality.',
         callout: 'A comma is approximately 22.6 cents — about one quarter of a Western semitone.',
+      },
+      {
+        heading: 'Western vs Turkish: the key differences',
+        body: 'The two systems approach pitch, rhythm, and emotion differently:',
+        table: {
+          headers: ['Western Music', 'Turkish Makam'],
+          rows: [
+            ['12 equal semitones', '53 unequal commas'],
+            ['Major / Minor scales', 'Makams with seyir'],
+            ['Fixed pitch (A=440Hz)', 'Flexible microtonal pitch'],
+            ['Harmony-centred', 'Melody-centred'],
+            ['Emotion is subjective', 'Emotion is defined by makam'],
+          ],
+        },
       },
       {
         heading: 'The neutral intervals',
