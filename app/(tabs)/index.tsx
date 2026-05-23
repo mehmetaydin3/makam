@@ -142,14 +142,14 @@ export default function ExploreScreen() {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-            <Text style={styles.eyebrow}>TURKISH MAKAM</Text>
+            <Text style={styles.eyebrow}>{t('turkishMakam')}</Text>
             <Text style={styles.heading}>Makam</Text>
           </View>
           <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/settings')}>
             <Ionicons name="settings-outline" size={20} color={COLORS.accent} />
           </TouchableOpacity>
         </View>
-        <Text style={styles.subheading}>A melodic framework — scale, mood, and movement combined.</Text>
+        <Text style={styles.subheading}>{t('homeSubtitle')}</Text>
       </View>
 
       {/* SEARCH + FILTER */}
