@@ -59,6 +59,7 @@ export default function ExploreScreen() {
       m.listening.taksim.title.toLowerCase().includes(q) ||
       (m.commonUsuls || []).some(u => u.toLowerCase().includes(q)) ||
       m.family.toLowerCase().includes(q) ||
+      SONGS.some(s => s.makamId === m.id && s.title.toLowerCase().includes(q)) ||
       SONGS.some(s => s.makamId === m.id && s.title.toLowerCase().includes(q));
     const matchesSeyir = seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
     const matchesFamily = familyFilter === 'All' || m.family.toLowerCase().replace(/[^a-z]/g, '') === familyFilter.toLowerCase().replace(/[^a-z]/g, '');

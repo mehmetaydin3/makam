@@ -204,17 +204,21 @@ export default function MakamDetailScreen() {
         {/* LISTENING SECTION */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Listen</Text>
-          <AudioCard
-            example={makam.listening.sarki}
-            label="ICONIC RECORDING"
-            color={makam.color}
-          />
-          <AudioCard
-            example={makam.listening.taksim}
-            label="TAKSIM — PURE IMPROVISATION"
-            color={makam.color}
-            showTaksimExplainer
-          />
+          {makam.listening.sarki.youtubeId && (
+            <AudioCard
+              example={makam.listening.sarki}
+              label="ICONIC RECORDING"
+              color={makam.color}
+            />
+          )}
+          {makam.listening.taksim.youtubeId && (
+            <AudioCard
+              example={makam.listening.taksim}
+              label="TAKSIM — PURE IMPROVISATION"
+              color={makam.color}
+              showTaksimExplainer
+            />
+          )}
         </View>
 
         {/* SCALE DEGREES */}
