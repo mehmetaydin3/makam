@@ -71,7 +71,7 @@ function AudioCard({
 export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { t, language } = useLanguage();
+  const { t, language, noteNames } = useLanguage();
   const SEYIR_LABELS = language === 'tr' ? {
     ascending: 'Çıkıcı ↗',
     descending: 'İnici ↘',

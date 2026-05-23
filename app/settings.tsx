@@ -67,7 +67,7 @@ function Divider() {
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, noteNames, setNoteNames } = useLanguage();
   const [showWestern, setShowWestern] = useState(true);
   const [showCents, setShowCents] = useState(true);
 
