@@ -89,7 +89,20 @@ export default function ExploreScreen() {
       m.family.toLowerCase().includes(q) ||
       SONGS.some(s => s.makamId === m.id && s.title.toLowerCase().includes(q));
     const matchesSeyir = seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
-    const matchesMood = moodFilter.length === 0 || moodFilter.some(f => m.mood.some(mm => mm.toLowerCase().includes(f.toLowerCase())));
+    const MOOD_CLUSTERS: Record<string, string[]> = {
+      'Joyful': ['joyful', 'bright', 'clear', 'hopeful', 'uncomplicated', 'serene', 'uplifting'],
+      'Melancholic': ['melancholic', 'grief', 'weeping', 'resigned', 'profound sadness', 'anguish', 'sorrowful'],
+      'Intense': ['intense', 'dramatic', 'passionate', 'restless', 'searching', 'rugged', 'heroic', 'strong', 'earnest'],
+      'Spiritual': ['spiritual', 'mystical', 'devotional', 'transcendent', 'elevated', 'spiritual depth', 'sacred'],
+      'Exotic': ['exotic', 'ancient', 'grand', 'majestic', 'rich', 'deeply emotional'],
+      'Calm': ['calm', 'balanced', 'elegant', 'warm', 'tender', 'serene', 'dignified', 'formal', 'confident'],
+      'Longing': ['longing', 'yearning', 'nostalgic', 'intimate', 'wandering', 'free', 'introspective'],
+      'Dramatic': ['dramatic', 'dark', 'solemn', 'deep', 'noble', 'masculine', 'direct', 'resolved'],
+    };
+    const matchesMood = moodFilter.length === 0 || moodFilter.some(f => {
+      const cluster = MOOD_CLUSTERS[f] || [f.toLowerCase()];
+      return m.mood.some(mm => cluster.some(c => mm.toLowerCase().includes(c)));
+    });
     const matchesTime = timeFilter === 'All' || m.timeOfDay.toLowerCase() === timeFilter.toLowerCase();
     const matchesTimeSig = timeSigFilter.length === 0 || timeSigFilter.some(ts => {
       const matchingUsuls = USULS.filter(u => u.timeSignature === ts).map(u => u.name);
