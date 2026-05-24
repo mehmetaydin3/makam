@@ -25,8 +25,8 @@ function Card({ makam }: { makam: Makam }) {
         </View>
         <View style={styles.footer}>
           <View>
-            <Text style={styles.ctaText}>Discover Turkish makam</Text>
-            <Text style={styles.ctaLink}>makam.app</Text>
+            <Text style={styles.ctaText}>MAKAM</Text>
+            <Text style={styles.ctaSubtext}>Turkish classical music</Text>
           </View>
           <View style={[styles.dot, { backgroundColor: makam.color }]} />
         </View>
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
   moodTag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
   moodText: { fontSize: 11, fontWeight: '500' },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#1A1A1A' },
-  ctaText: { fontSize: 10, color: '#444', letterSpacing: 0.5 },
-  ctaLink: { fontSize: 12, color: '#666', fontWeight: '600', letterSpacing: 0.5 },
+  ctaText: { fontSize: 13, color: '#666', fontWeight: '300', letterSpacing: 3 },
+  ctaSubtext: { fontSize: 10, color: '#444', letterSpacing: 1, marginTop: 2 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   hint: { fontSize: 12, color: COLORS.textTertiary, textAlign: 'center', marginBottom: SPACING.md },
   shareBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16, borderRadius: 14 },
