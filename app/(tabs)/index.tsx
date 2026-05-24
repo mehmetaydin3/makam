@@ -30,10 +30,10 @@ export default function ExploreScreen() {
         const diff = currentY - lastScrollY.current;
         if (diff > 5 && currentY > 60) {
           // Scrolling down — hide search
-          Animated.timing(searchBarAnim, { toValue: 0, duration: 200, useNativeDriver: false }).start();
+          Animated.timing(searchBarAnim, { toValue: 0, duration: 120, useNativeDriver: false }).start();
         } else if (diff < -5) {
           // Scrolling up — show search
-          Animated.timing(searchBarAnim, { toValue: 1, duration: 200, useNativeDriver: false }).start();
+          Animated.timing(searchBarAnim, { toValue: 1, duration: 120, useNativeDriver: false }).start();
         }
         lastScrollY.current = currentY;
       },
