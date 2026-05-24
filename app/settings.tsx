@@ -135,6 +135,16 @@ export default function SettingsScreen() {
           />
         </View>
 
+        <SectionHeader title="SUPPORT" />
+        <View style={styles.group}>
+          <SettingsRow
+            icon="heart-outline"
+            label="Support Development"
+            value="ko-fi.com"
+            onPress={() => Linking.openURL('https://ko-fi.com/mehmetaydin')}
+          />
+        </View>
+
         <SectionHeader title={t('app')} />
         <View style={styles.group}>
           <SettingsRow
