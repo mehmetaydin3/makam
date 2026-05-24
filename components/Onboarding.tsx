@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { COLORS, SPACING } from '../data/constants';
 
 const { width } = Dimensions.get('window');
-const KEY = 'makam_onboarding_v1';
+const KEY = 'makam_onboarding_v2';
 
 const slides = [
   {

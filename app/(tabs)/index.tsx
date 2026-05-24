@@ -253,11 +253,6 @@ export default function ExploreScreen() {
                       <View style={{ flex: 1 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                           <Text style={styles.makamName}>{makam.name}</Text>
-                          {START_HERE.includes(makam.id) && (
-                            <View style={styles.startHereBadge}>
-                              <Text style={styles.startHereText}>{t('startHere')}</Text>
-                            </View>
-                          )}
                         </View>
                         <Text style={styles.makamPronunciation}>/{makam.pronunciation}/</Text>
                       </View>
