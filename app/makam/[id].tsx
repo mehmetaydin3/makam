@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, AudioExample } from '../../data/makams';
 import { useLanguage } from '../../context/LanguageContext';
+import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../components/ShareableCard';
 import { COLORS, SPACING } from '../../data/constants';
 import { audioEngine, PlaybackState } from '../../audio/audioEngine';
