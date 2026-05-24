@@ -23,9 +23,9 @@ function MoodCard({ makam }: { makam: Makam }) {
           ))}
         </View>
         <Text style={styles.phrase}>"{makam.characteristicPhrase}"</Text>
-        <View style={styles.footer}>
-          <Text style={styles.brand}>makam.app</Text>
-          <View style={[styles.dot, { backgroundColor: makam.color }]} />
+        <View style={styles.footerCta}>
+          <Text style={styles.ctaText}>Explore this makam</Text>
+          <Text style={styles.ctaLink}>makam.app</Text>
         </View>
       </View>
     </View>
@@ -40,9 +40,9 @@ function WesternCard({ makam }: { makam: Makam }) {
         <Text style={[styles.makamName, { color: makam.color }]}>{makam.name}</Text>
         <View style={[styles.divider, { backgroundColor: makam.color }]} />
         <Text style={styles.westernText}>"{makam.westernAnalogy}"</Text>
-        <View style={styles.footer}>
-          <Text style={styles.brand}>makam.app</Text>
-          <View style={[styles.dot, { backgroundColor: makam.color }]} />
+        <View style={styles.footerCta}>
+          <Text style={styles.ctaText}>Explore this makam</Text>
+          <Text style={styles.ctaLink}>makam.app</Text>
         </View>
       </View>
     </View>
@@ -70,9 +70,9 @@ function ScaleCard({ makam }: { makam: Makam }) {
             </View>
           ))}
         </View>
-        <View style={styles.footer}>
-          <Text style={styles.brand}>makam.app</Text>
-          <View style={[styles.dot, { backgroundColor: makam.color }]} />
+        <View style={styles.footerCta}>
+          <Text style={styles.ctaText}>Explore this makam</Text>
+          <Text style={styles.ctaLink}>makam.app</Text>
         </View>
       </View>
     </View>
@@ -167,9 +167,9 @@ const styles = StyleSheet.create({
   moodRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   moodWord: { fontSize: 15, color: '#888', fontWeight: '300' },
   phrase: { fontSize: 12, color: '#555', lineHeight: 18, fontStyle: 'italic' },
-  footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 },
-  brand: { fontSize: 10, color: '#333', letterSpacing: 1 },
-  dot: { width: 6, height: 6, borderRadius: 3 },
+  footerCta: { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#1A1A1A' },
+  ctaText: { fontSize: 11, color: '#555', letterSpacing: 0.5 },
+  ctaLink: { fontSize: 12, color: '#888', fontWeight: '600', letterSpacing: 0.5, marginTop: 2 },
   westernText: { fontSize: 14, color: '#999', lineHeight: 22, fontStyle: 'italic' },
   scaleRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
   scaleDeg: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 8, borderWidth: 1, alignItems: 'center' },
