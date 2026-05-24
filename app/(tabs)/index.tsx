@@ -4,7 +4,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { Animated } from 'react-native';
 import { MAKAMS } from '../../data/makams';
 import { useLanguage } from '../../context/LanguageContext';
 import { SONGS } from '../../data/songs';
@@ -16,6 +17,28 @@ const FAMILY_OPTIONS = ['All', 'Rast', 'Ussak', 'Hicaz', 'Saba', 'Segah', 'Kurd'
 
 export default function ExploreScreen() {
   const router = useRouter();
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const lastScrollY = useRef(0);
+  const searchBarAnim = useRef(new Animated.Value(1)).current;
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: false,
+      listener: (event: any) => {
+        const currentY = event.nativeEvent.contentOffset.y;
+        const diff = currentY - lastScrollY.current;
+        if (diff > 5 && currentY > 60) {
+          // Scrolling down — hide search
+          Animated.timing(searchBarAnim, { toValue: 0, duration: 200, useNativeDriver: false }).start();
+        } else if (diff < -5) {
+          // Scrolling up — show search
+          Animated.timing(searchBarAnim, { toValue: 1, duration: 200, useNativeDriver: false }).start();
+        }
+        lastScrollY.current = currentY;
+      },
+    }
+  );
   const { t, language } = useLanguage();
   const moodMap: Record<string, string> = language === 'tr' ? {
     'Joyful': 'Neşeli', 'Serene': 'Sakin', 'Balanced': 'Dengeli',
@@ -175,7 +198,11 @@ export default function ExploreScreen() {
       </View>
 
       {/* SEARCH + FILTER */}
-      <View style={styles.searchRow}>
+      <Animated.View style={[styles.searchRow, {
+        opacity: searchBarAnim,
+        maxHeight: searchBarAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 60] }),
+        overflow: 'hidden',
+      }]}>
         <View style={styles.searchBox}>
           <Ionicons name="search-outline" size={16} color={COLORS.textTertiary} style={{ marginRight: 6 }} />
           <TextInput
@@ -209,7 +236,7 @@ export default function ExploreScreen() {
             </View>
           )}
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {/* ACTIVE FILTER PILLS */}
       {activeFilterCount > 0 && (
@@ -225,7 +252,7 @@ export default function ExploreScreen() {
       )}
 
       {/* LIST */}
-      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false} stickyHeaderIndices={[]}>
+      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false} onScroll={handleScroll} scrollEventThrottle={16}>
         {filtered.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyText}>No makams found</Text>
