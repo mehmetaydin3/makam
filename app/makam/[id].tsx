@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, AudioExample } from '../../data/makams';
 import { useLanguage } from '../../context/LanguageContext';
+import ShareableCard from '../../components/ShareableCard';
 import { COLORS, SPACING } from '../../data/constants';
 import { audioEngine, PlaybackState } from '../../audio/audioEngine';
 import Sound from 'react-native-sound';
@@ -72,6 +73,7 @@ export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { t, language, noteNames } = useLanguage();
+  const [showShare, setShowShare] = useState(false);
   const SEYIR_LABELS = language === 'tr' ? {
     ascending: 'Çıkıcı ↗',
     descending: 'İnici ↘',
@@ -145,6 +147,9 @@ export default function MakamDetailScreen() {
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Text style={styles.backText}>← Makams</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowShare(true)} style={styles.shareButton}>
+          <Ionicons name="share-outline" size={20} color={COLORS.accent} />
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -402,6 +407,7 @@ export default function MakamDetailScreen() {
           </View>
         </Modal>
 
+      <ShareableCard makam={makam} visible={showShare} onClose={() => setShowShare(false)} />
     </SafeAreaView>
   );
 }
@@ -409,7 +415,8 @@ export default function MakamDetailScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   errorText: { color: COLORS.textSecondary, padding: SPACING.lg },
-  header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
+  header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  shareButton: { padding: 4 },
   backButton: { alignSelf: 'flex-start' },
   backText: { color: COLORS.accent, fontSize: 15 },
   scroll: { paddingHorizontal: SPACING.lg },

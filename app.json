@@ -30,7 +30,8 @@
       "package": "com.makam.app"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true
