@@ -5,6 +5,7 @@ export type Usul = {
   name: string;
   pronunciation: string;
   timeSignature: string;
+  grouping: string;
   totalBeats: number;
   pattern: UsulBeat[];
   tempo: 'slow' | 'moderate' | 'fast' | 'variable';
@@ -19,6 +20,7 @@ export const USULS: Usul[] = [
   {
     id: 'duyek',
     name: 'Düyek',
+    grouping: '2+2+2+2',
     pronunciation: 'doo-YEK',
     timeSignature: '8/8',
     totalBeats: 8,
@@ -36,6 +38,7 @@ export const USULS: Usul[] = [
   {
     id: 'sofyan',
     name: 'Sofyan',
+    grouping: '2+2',
     pronunciation: 'sof-YAN',
     timeSignature: '4/4',
     totalBeats: 4,
@@ -53,6 +56,7 @@ export const USULS: Usul[] = [
   {
     id: 'aksak',
     name: 'Aksak',
+    grouping: '2+2+2+3',
     pronunciation: 'ak-SAK',
     timeSignature: '9/8',
     totalBeats: 9,
@@ -70,6 +74,7 @@ export const USULS: Usul[] = [
   {
     id: 'semai',
     name: 'Semai',
+    grouping: '3',
     pronunciation: 'se-MA-ee',
     timeSignature: '3/4',
     totalBeats: 3,
@@ -87,6 +92,7 @@ export const USULS: Usul[] = [
   {
     id: 'curcuna',
     name: 'Curcuna',
+    grouping: '3+2+2+3',
     pronunciation: 'jur-JU-na',
     timeSignature: '10/8',
     totalBeats: 10,
@@ -104,6 +110,7 @@ export const USULS: Usul[] = [
   {
     id: 'muhammes',
     name: 'Muhammes',
+    grouping: '2+3',
     pronunciation: 'mu-HAM-mes',
     timeSignature: '5/4',
     totalBeats: 5,
@@ -121,6 +128,7 @@ export const USULS: Usul[] = [
   {
     id: 'devr-i-hindi',
     name: 'Devr-i Hindi',
+    grouping: '3+2+2',
     pronunciation: 'dev-ri HIN-di',
     timeSignature: '7/8',
     totalBeats: 7,
@@ -138,6 +146,7 @@ export const USULS: Usul[] = [
   {
     id: 'yuruk-semai',
     name: 'Yürük Semai',
+    grouping: '3+3',
     pronunciation: 'yoo-ROOK se-MA-ee',
     timeSignature: '6/8',
     totalBeats: 6,

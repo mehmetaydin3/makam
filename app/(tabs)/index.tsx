@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { MAKAMS } from '../../data/makams';
 import { useLanguage } from '../../context/LanguageContext';
 import { SONGS } from '../../data/songs';
+import { USULS } from '../../data/usuls';
 import { COLORS, SPACING } from '../../data/constants';
 
 const SEYIR_OPTIONS = ['All', 'Ascending', 'Descending', 'Undulating'];
@@ -35,11 +36,15 @@ export default function ExploreScreen() {
   const [query, setQuery] = useState('');
   const [seyirFilter, setSeyirFilter] = useState('All');
   const [moodFilter, setMoodFilter] = useState<string[]>([]);
+  const [timeSigFilter, setTimeSigFilter] = useState<string[]>([]);
   const [timeFilter, setTimeFilter] = useState('All');
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const activeFilterCount = (seyirFilter !== 'All' ? 1 : 0) + moodFilter.length + (timeFilter !== 'All' ? 1 : 0);
+  const activeFilterCount = (seyirFilter !== 'All' ? 1 : 0) + moodFilter.length + timeSigFilter.length;
 
+  const toggleTimeSig = (ts: string) => {
+    setTimeSigFilter(prev => prev.includes(ts) ? prev.filter(t => t !== ts) : [...prev, ts]);
+  };
   const toggleMood = (mood: string) => {
     setMoodFilter(prev => prev.includes(mood) ? prev.filter(m => m !== mood) : [...prev, mood]);
   };
@@ -86,13 +91,17 @@ export default function ExploreScreen() {
     const matchesSeyir = seyirFilter === 'All' || m.seyir.toLowerCase() === seyirFilter.toLowerCase();
     const matchesMood = moodFilter.length === 0 || moodFilter.some(f => m.mood.some(mm => mm.toLowerCase().includes(f.toLowerCase())));
     const matchesTime = timeFilter === 'All' || m.timeOfDay.toLowerCase() === timeFilter.toLowerCase();
-    return matchesQuery && matchesSeyir && matchesMood && matchesTime;
+    const matchesTimeSig = timeSigFilter.length === 0 || timeSigFilter.some(ts => {
+      const matchingUsuls = USULS.filter(u => u.timeSignature === ts).map(u => u.name);
+      return (m.commonUsuls || []).some(cu => matchingUsuls.some(mu => cu.includes(mu.split(' ')[0])));
+    });
+    return matchesQuery && matchesSeyir && matchesMood && matchesTimeSig;
   });
 
   const clearFilters = () => {
     setSeyirFilter('All');
     setMoodFilter([]);
-    setTimeFilter('All');
+    setTimeSigFilter([]);
   };
 
   // Family ordering — accessibility first for western audiences
@@ -114,7 +123,7 @@ export default function ExploreScreen() {
   const START_HERE = ['rast', 'ussak', 'hicaz'];
 
   // Group filtered makams by family when not searching
-  const isSearching = query.trim() !== '' || seyirFilter !== 'All' || moodFilter.length > 0 || timeFilter !== 'All';
+  const isSearching = query.trim() !== '' || seyirFilter !== 'All' || moodFilter.length > 0 || timeSigFilter.length > 0;
   
   const groupedMakams = () => {
     if (isSearching) return [{ family: null, makams: filtered }];
@@ -294,6 +303,22 @@ export default function ExploreScreen() {
           </View>
 
 
+
+          {/* TIME SIGNATURE */}
+          <Text style={styles.filterLabel}>RHYTHM</Text>
+          <View style={styles.chipRow}>
+            {USULS.map(u => (
+              <TouchableOpacity
+                key={u.id}
+                style={[styles.chip, timeSigFilter.includes(u.timeSignature) && styles.chipActive]}
+                onPress={() => toggleTimeSig(u.timeSignature)}
+              >
+                <Text style={[styles.chipText, timeSigFilter.includes(u.timeSignature) && styles.chipTextActive]}>
+                  {u.grouping} ({u.timeSignature})
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
           <TouchableOpacity style={styles.applyButton} onPress={() => setSheetOpen(false)}>
             <Text style={styles.applyButtonText}>Show {filtered.length} makam{filtered.length !== 1 ? 's' : ''}</Text>
