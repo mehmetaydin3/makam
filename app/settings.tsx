@@ -135,16 +135,6 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <SectionHeader title="SUPPORT" />
-        <View style={styles.group}>
-          <SettingsRow
-            icon="heart-outline"
-            label="Support Development"
-            value="ko-fi.com"
-            onPress={() => Linking.openURL('https://ko-fi.com/mehmetaydin')}
-          />
-        </View>
-
         <SectionHeader title={t('app')} />
         <View style={styles.group}>
           <SettingsRow
@@ -156,13 +146,55 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="chatbubble-outline"
             label={t('sendFeedback')}
-            onPress={() => Linking.openURL('mailto:mehmetaydin3@gmail.com?subject=Makam App Feedback')}
+            onPress={() => Linking.openURL('mailto:hello@themakam.com?subject=The Makam Feedback')}
           />
         </View>
 
+        <SectionHeader title="CREDITS & ACKNOWLEDGMENTS" />
+        <View style={styles.group}>
+          <View style={styles.creditBlock}>
+            <Text style={styles.creditHeading}>Audio Samples</Text>
+            <Text style={styles.creditBody}>
+              Usul (rhythmic cycle) recordings by Barış Bozkurt, recorded for the CompMusic research project at Universitat Pompeu Fabra. Used with explicit permission and attribution under Creative Commons.
+            </Text>
+          </View>
+          <Divider />
+          <SettingsRow
+            icon="musical-notes-outline"
+            label="Barış Bozkurt on Freesound"
+            onPress={() => Linking.openURL('https://freesound.org/people/barisbozkurt/')}
+          />
+          <Divider />
+          <View style={styles.creditBlock}>
+            <Text style={styles.creditBody}>
+              Ney phrase reference recording by yurci, used under Creative Commons Attribution license.
+            </Text>
+          </View>
+          <Divider />
+          <SettingsRow
+            icon="musical-note-outline"
+            label="yurci on Freesound"
+            onPress={() => Linking.openURL('https://freesound.org/people/yurci/')}
+          />
+          <Divider />
+          <View style={styles.creditBlock}>
+            <Text style={styles.creditHeading}>Reference Performances</Text>
+            <Text style={styles.creditBody}>
+              Curated YouTube embeds of master performances are linked from each makam detail screen. All rights remain with the original performers and uploaders.
+            </Text>
+          </View>
+          <Divider />
+          <View style={styles.creditBlock}>
+            <Text style={styles.creditBody}>
+              The Makam is grateful to the CompMusic project and the musicians who have made authentic Turkish music research accessible to the world.
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.versionRow}>
-          <Text style={styles.versionText}>Makam · v0.1.0</Text>
+          <Text style={styles.versionText}>The Makam · v1.0.0</Text>
           <Text style={styles.versionSubtext}>Built with love for Turkish classical music</Text>
+          <Text style={styles.versionSubtext}>hello@themakam.com</Text>
         </View>
 
         <View style={{ height: 80 }} />
@@ -187,6 +219,9 @@ const styles = StyleSheet.create({
   rowSublabel: { fontSize: 12, color: COLORS.textTertiary, marginTop: 2, maxWidth: 240 },
   rowRight: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   rowValue: { fontSize: 13, color: COLORS.textTertiary },
+  creditBlock: { paddingHorizontal: SPACING.md, paddingVertical: 14 },
+  creditHeading: { fontSize: 13, fontWeight: '600', color: COLORS.textPrimary, marginBottom: 6, letterSpacing: 0.3 },
+  creditBody: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
   languageSelector: {
     flexDirection: 'row',
     gap: 6,
