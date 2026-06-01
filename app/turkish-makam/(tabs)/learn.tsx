@@ -81,6 +81,7 @@ export default function LearnScreen() {
   if (selectedLesson) {
     return (
       <LessonReader
+        key={selectedLesson.id}
         lesson={selectedLesson}
         nextLesson={nextOf(selectedLesson)}
         isComplete={isLessonComplete(TRADITION_ID, selectedLesson.id)}
