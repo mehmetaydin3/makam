@@ -72,7 +72,7 @@ export default function JourneyScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={22} color={COLORS.accent} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push('/turkish-makam/settings' as any)} style={styles.settingsButton}>
+        <TouchableOpacity onPress={() => router.push('/journey/settings' as any)} style={styles.settingsButton}>
           <Ionicons name="settings-outline" size={20} color={COLORS.textSecondary} />
         </TouchableOpacity>
       </View>
