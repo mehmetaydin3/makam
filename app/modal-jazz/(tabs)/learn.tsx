@@ -2,13 +2,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { LESSONS, CATEGORY_ORDER, CATEGORY_LABELS, Lesson, LessonCategory } from '../../../data/education';
+import { Lesson } from '../../../data/education';
+import { LESSONS, JAZZ_CATEGORY_ORDER, JAZZ_CATEGORY_LABELS, JazzCategory } from '../../../data/traditions/modal-jazz/lessons';
 import { LessonReader } from '../../../components/lessons/LessonReader';
-import { COLORS, SPACING } from '../../../data/constants';
+import { JAZZ_COLORS as COLORS, SPACING } from '../../../data/traditions/modal-jazz/theme';
 import { Chrome } from '../../../components/chrome';
 import { useProgress } from '../../../hooks/useProgress';
 
-const TRADITION_ID = 'turkish-makam';
+const TRADITION_ID = 'modal-jazz';
 
 type CardProps = {
   lesson: Lesson;
@@ -99,20 +100,20 @@ export default function LearnScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <Chrome traditionName="Turkish Makam" accent={COLORS.accent} />
+      <Chrome traditionName="Modal Jazz" accent={COLORS.accent} />
       <View style={styles.header}>
         <Text style={styles.heading}>Learn</Text>
-        <Text style={styles.subheading}>Your path through the makam tradition.</Text>
+        <Text style={styles.subheading}>Your path through the modes.</Text>
       </View>
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-        {CATEGORY_ORDER.map((cat) => {
+        {JAZZ_CATEGORY_ORDER.map((cat) => {
           const lessonsInCat = LESSONS.filter((l) => l.category === cat);
           if (lessonsInCat.length === 0) return null;
-          const catUnlocked = isCategoryUnlocked(TRADITION_ID, cat, CATEGORY_ORDER, LESSONS);
+          const catUnlocked = isCategoryUnlocked(TRADITION_ID, cat, JAZZ_CATEGORY_ORDER, LESSONS);
           return (
             <View key={cat}>
               <View style={styles.categoryHeader}>
-                <Text style={styles.categoryLabel}>{CATEGORY_LABELS[cat as LessonCategory]}</Text>
+                <Text style={styles.categoryLabel}>{JAZZ_CATEGORY_LABELS[cat as JazzCategory]}</Text>
                 {!catUnlocked && <Ionicons name="lock-closed" size={12} color={COLORS.textTertiary} />}
               </View>
               {lessonsInCat.map((lesson) => {

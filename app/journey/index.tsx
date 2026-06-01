@@ -3,6 +3,10 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING } from '../../data/constants';
+import { useProgress } from '../../hooks/useProgress';
+import { MAKAMS } from '../../data/makams';
+import { LESSONS } from '../../data/education';
+import { MODES as JAZZ_MODES } from '../../data/traditions/modal-jazz/modes';
 
 /**
  * Journey — the meta-layer above traditions.
@@ -13,7 +17,6 @@ import { COLORS, SPACING } from '../../data/constants';
  *
  * 3c.2: renders the full shape with an honest empty state. Both traditions
  * ship this release, so both are live/enterable — Modal Jazz is 'available'
- * (not yet begun), never 'coming soon'. Everything reads from journeyState;
  * when progress tracking lands (3c.5) it's fed by progress.ts selectors with
  * no layout changes.
  */
@@ -29,31 +32,6 @@ type TraditionView = {
   narrative: string; // what we SAY about progress — never a number
 };
 
-const journeyState: {
-  traditions: TraditionView[];
-  crossroadsUnlocked: boolean;
-} = {
-  traditions: [
-    {
-      id: 'turkish-makam',
-      name: 'Turkish Makam',
-      tagline: 'The microtonal poetry of Anatolia.',
-      accent: COLORS.accent,
-      state: 'started',
-      narrative: 'You\u2019ve begun here.',
-    },
-    {
-      id: 'modal-jazz',
-      name: 'Modal Jazz',
-      tagline: 'The American conversation with the modes.',
-      accent: '#7CA89F',
-      state: 'available',
-      narrative: 'Waiting to be explored.',
-    },
-  ],
-  crossroadsUnlocked: false,
-};
-
 function stateLabel(state: TraditionState): string {
   switch (state) {
     case 'completed': return 'Explored fully';
@@ -65,6 +43,39 @@ function stateLabel(state: TraditionState): string {
 
 export default function JourneyScreen() {
   const router = useRouter();
+  const { traditionState, progress } = useProgress();
+
+  const makamState = traditionState('turkish-makam', MAKAMS.length, LESSONS.length);
+  const jazzState = traditionState('modal-jazz', JAZZ_MODES.length, 0);
+
+  const makamStarted = !!progress.traditions['turkish-makam'];
+  const jazzStarted = !!progress.traditions['modal-jazz'];
+  const crossroadsUnlocked = makamStarted && jazzStarted;
+
+  const makamNarrative =
+    makamState === 'completed' ? 'You\u2019ve explored this world fully.'
+    : makamState === 'exploring' ? 'You\u2019re finding your way through.'
+    : makamState === 'started' ? 'You\u2019ve begun here.'
+    : 'Waiting to be explored.';
+
+  const traditions: TraditionView[] = [
+    {
+      id: 'turkish-makam',
+      name: 'Turkish Makam',
+      tagline: 'The microtonal poetry of Anatolia.',
+      accent: COLORS.accent,
+      state: makamState,
+      narrative: makamNarrative,
+    },
+    {
+      id: 'modal-jazz',
+      name: 'Modal Jazz',
+      tagline: 'The American conversation with the modes.',
+      accent: '#7B8FFF',
+      state: jazzState,
+      narrative: jazzState === 'available' ? 'Waiting to be explored.' : 'You\u2019ve begun here.',
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -88,8 +99,13 @@ export default function JourneyScreen() {
 
         <Text style={styles.sectionLabel}>TRADITIONS</Text>
         <View style={styles.traditionList}>
-          {journeyState.traditions.map((tr) => (
-            <View key={tr.id} style={styles.traditionCard}>
+          {traditions.map((tr) => (
+            <TouchableOpacity
+              key={tr.id}
+              style={styles.traditionCard}
+              activeOpacity={0.8}
+              onPress={() => router.push((tr.id === 'turkish-makam' ? '/turkish-makam' : '/modal-jazz') as any)}
+            >
               <View style={[styles.traditionDiamond, { backgroundColor: tr.accent }]} />
               <View style={styles.traditionBody}>
                 <Text style={styles.traditionName}>{tr.name}</Text>
@@ -99,20 +115,20 @@ export default function JourneyScreen() {
               <View style={styles.statePill}>
                 <Text style={styles.statePillText}>{stateLabel(tr.state)}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
         <Text style={styles.sectionLabel}>CROSSROADS</Text>
         <View style={styles.crossroadsCard}>
           <Ionicons
-            name={journeyState.crossroadsUnlocked ? 'git-compare-outline' : 'lock-closed-outline'}
+            name={crossroadsUnlocked ? 'git-compare-outline' : 'lock-closed-outline'}
             size={20}
             color={COLORS.textTertiary}
             style={{ marginBottom: SPACING.sm }}
           />
           <Text style={styles.crossroadsText}>
-            {journeyState.crossroadsUnlocked
+            {crossroadsUnlocked
               ? 'A Crossroads has opened. Comparative essays await.'
               : 'Explore more than one tradition, and connections between them will open here \u2014 how a phrygian flatness echoes H\u00fcseyni, how ideas travel between worlds.'}
           </Text>
