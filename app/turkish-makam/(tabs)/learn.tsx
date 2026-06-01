@@ -78,7 +78,6 @@ export default function LearnScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>TURKISH MAKAM</Text>
         <Text style={styles.heading}>Learn</Text>
         <Text style={styles.subheading}>Deepen your understanding of the Turkish makam tradition.</Text>
       </View>

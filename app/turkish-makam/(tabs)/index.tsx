@@ -191,7 +191,6 @@ export default function ExploreScreen() {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-            <Text style={styles.eyebrow}>{t('turkishMakam')}</Text>
             <Text style={styles.heading}>Makam</Text>
           </View>
         </View>
