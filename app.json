@@ -7,11 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "scheme": "makam",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0E0E0F"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.mehmetaydin.makam",
@@ -30,7 +25,17 @@
     "plugins": [
       "expo-router",
       "expo-sharing",
-      "expo-font"
+      "expo-font",
+      "expo-secure-store",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0E0E0F"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
