@@ -1,10 +1,12 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Linking, Alert, Modal, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING } from '../../data/constants';
 import { useLanguage } from '../../context/LanguageContext';
+import { resetTraditionProgress } from '../../data/progress';
+import { resetEverything } from '../../lib/lastTradition';
 
 type RowProps = {
   icon: string;
@@ -70,6 +72,58 @@ export default function SettingsScreen() {
   const { language, setLanguage, t, noteNames, setNoteNames } = useLanguage();
   const [showWestern, setShowWestern] = useState(true);
   const [showCents, setShowCents] = useState(true);
+  const [resetSheetOpen, setResetSheetOpen] = useState(false);
+
+  const RESET_TARGETS = [
+    { id: 'turkish-makam', name: 'Turkish Makam', accent: '#C8975A' },
+    { id: 'modal-jazz', name: 'Modal Jazz', accent: '#7B8FFF' },
+  ];
+
+  const confirmResetTradition = (id: string, name: string) => {
+    setResetSheetOpen(false);
+    Alert.alert(
+      `Reset ${name} progress?`,
+      `This clears your explored ${name === 'Turkish Makam' ? 'makams' : 'modes'} and completed lessons in ${name}. Your other tradition is untouched. This cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Reset', style: 'destructive', onPress: () => resetTraditionProgress(id) },
+      ],
+    );
+  };
+
+  const confirmResetBoth = () => {
+    setResetSheetOpen(false);
+    Alert.alert(
+      'Reset all progress?',
+      'This clears explored makams/modes and completed lessons across both traditions. You stay in the app and keep your settings. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset both',
+          style: 'destructive',
+          onPress: async () => {
+            await resetTraditionProgress('turkish-makam');
+            await resetTraditionProgress('modal-jazz');
+          },
+        },
+      ],
+    );
+  };
+
+  const confirmResetEverything = () => {
+    Alert.alert(
+      'Reset everything?',
+      'This permanently clears all progress AND returns the app to its first-launch state — including your tradition choice and the welcome screens. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset everything',
+          style: 'destructive',
+          onPress: async () => { await resetEverything(); router.replace('/' as any); },
+        },
+      ],
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -191,6 +245,25 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <SectionHeader title="YOUR DATA" />
+        <View style={styles.group}>
+          <SettingsRow
+            icon="refresh-outline"
+            label="Reset progress"
+            onPress={() => setResetSheetOpen(true)}
+          />
+          <Divider />
+          <TouchableOpacity style={styles.row} onPress={confirmResetEverything} activeOpacity={0.7}>
+            <View style={styles.rowLeft}>
+              <Ionicons name="trash-outline" size={18} color={COLORS.error} style={styles.rowIcon} />
+              <View>
+                <Text style={[styles.rowLabel, { color: COLORS.error }]}>Reset everything</Text>
+                <Text style={styles.rowSublabel}>Erase all data and restart the app</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.versionRow}>
           <Text style={styles.versionText}>The Makam · v1.0.0</Text>
           <Text style={styles.versionSubtext}>Built with love for Turkish classical music</Text>
@@ -199,6 +272,28 @@ export default function SettingsScreen() {
 
         <View style={{ height: 80 }} />
       </ScrollView>
+
+      <Modal visible={resetSheetOpen} transparent animationType="fade" onRequestClose={() => setResetSheetOpen(false)}>
+        <Pressable style={styles.backdrop} onPress={() => setResetSheetOpen(false)}>
+          <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetLabel}>Reset progress for</Text>
+            {RESET_TARGETS.map((t) => (
+              <TouchableOpacity key={t.id} style={styles.sheetRow} activeOpacity={0.7} onPress={() => confirmResetTradition(t.id, t.name)}>
+                <View style={[styles.sheetDiamond, { backgroundColor: t.accent }]} />
+                <Text style={styles.sheetRowText}>{t.name}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity style={styles.sheetRow} activeOpacity={0.7} onPress={confirmResetBoth}>
+              <Ionicons name="albums-outline" size={16} color={COLORS.textSecondary} style={{ width: 16 }} />
+              <Text style={styles.sheetRowText}>Both traditions</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.sheetCancel} activeOpacity={0.7} onPress={() => setResetSheetOpen(false)}>
+              <Text style={styles.sheetCancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -248,6 +343,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   divider: { height: 1, backgroundColor: COLORS.border, marginLeft: SPACING.md + 24 + SPACING.md },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: COLORS.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: SPACING.xxl, borderTopWidth: 1, borderColor: COLORS.border },
+  sheetHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: COLORS.border, alignSelf: 'center', marginBottom: SPACING.lg },
+  sheetLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md },
+  sheetRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingVertical: SPACING.md, paddingHorizontal: SPACING.sm },
+  sheetDiamond: { width: 12, height: 12, borderRadius: 3, transform: [{ rotate: '45deg' }] },
+  sheetRowText: { fontSize: 16, color: COLORS.textPrimary },
+  sheetCancel: { alignItems: 'center', paddingVertical: SPACING.md, marginTop: SPACING.sm, borderTopWidth: 1, borderColor: COLORS.border },
+  sheetCancelText: { fontSize: 15, color: COLORS.textSecondary },
   versionRow: { alignItems: 'center', marginTop: SPACING.xxl, gap: 4 },
   versionText: { fontSize: 13, color: COLORS.textTertiary },
   versionSubtext: { fontSize: 12, color: COLORS.textTertiary, fontStyle: 'italic' },

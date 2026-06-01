@@ -74,6 +74,22 @@ export async function resetProgress(): Promise<void> {
   }
 }
 
+/**
+ * Reset a single tradition's progress, leaving other traditions intact.
+ * Used by the scoped "Reset progress" control in Settings.
+ */
+export async function resetTraditionProgress(traditionId: string): Promise<void> {
+  try {
+    const progress = await loadProgress();
+    if (progress.traditions[traditionId]) {
+      delete progress.traditions[traditionId];
+      await saveProgress(progress);
+    }
+  } catch {
+    // fail silently
+  }
+}
+
 // ── Internal helper: get-or-create a tradition bucket ────────────────────────
 
 function ensureTradition(p: UserProgress, traditionId: string): TraditionProgress {
