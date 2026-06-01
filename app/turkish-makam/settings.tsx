@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Linking }
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING } from '../data/constants';
-import { useLanguage } from '../context/LanguageContext';
+import { COLORS, SPACING } from '../../data/constants';
+import { useLanguage } from '../../context/LanguageContext';
 
 type RowProps = {
   icon: string;

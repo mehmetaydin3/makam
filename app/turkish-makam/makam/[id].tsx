@@ -1,15 +1,15 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getUsulById } from '../../data/usuls';
+import { getUsulById } from '../../../data/usuls';
 import { useState, useEffect, useRef } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { getMakamById, AudioExample } from '../../data/makams';
-import { useLanguage } from '../../context/LanguageContext';
+import { getMakamById, AudioExample } from '../../../data/makams';
+import { useLanguage } from '../../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
-import ShareableCard from '../../components/ShareableCard';
-import { COLORS, SPACING } from '../../data/constants';
-import { audioEngine, PlaybackState } from '../../audio/audioEngine';
+import ShareableCard from '../../../components/ShareableCard';
+import { COLORS, SPACING } from '../../../data/constants';
+import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
 import Sound from 'react-native-sound';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -352,7 +352,7 @@ export default function MakamDetailScreen() {
                   'Nihavend': 'nihavend',
                 };
                 const targetId = nameToId[name] || name.toLowerCase();
-                router.push(('/makam/' + targetId) as any);
+                router.push(('/turkish-makam/makam/' + targetId) as any);
               }}
               >
                 <Text style={styles.relatedText}>{name}</Text>

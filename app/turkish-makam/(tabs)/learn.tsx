@@ -1,8 +1,8 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useState } from 'react';
-import { LESSONS } from '../../data/education';
-import { COLORS, SPACING } from '../../data/constants';
+import { LESSONS } from '../../../data/education';
+import { COLORS, SPACING } from '../../../data/constants';
 
 function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void }) {
   return (

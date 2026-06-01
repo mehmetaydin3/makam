@@ -6,12 +6,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState, useRef } from 'react';
 import { Animated } from 'react-native';
-import { MAKAMS } from '../../data/makams';
-import { useLanguage } from '../../context/LanguageContext';
-import { SONGS } from '../../data/songs';
-import { USULS } from '../../data/usuls';
-import { COLORS, SPACING } from '../../data/constants';
-import { LibraryCard, SectionHeader } from '../../components/library';
+import { MAKAMS } from '../../../data/makams';
+import { useLanguage } from '../../../context/LanguageContext';
+import { SONGS } from '../../../data/songs';
+import { USULS } from '../../../data/usuls';
+import { COLORS, SPACING } from '../../../data/constants';
+import { LibraryCard, SectionHeader } from '../../../components/library';
 
 const SEYIR_OPTIONS = ['All', 'Ascending', 'Descending', 'Undulating'];
 const FAMILY_OPTIONS = ['All', 'Rast', 'Ussak', 'Hicaz', 'Saba', 'Segah', 'Kurd', 'Buselik', 'Cargah', 'Nihavend'];
@@ -191,7 +191,7 @@ export default function ExploreScreen() {
             <Text style={styles.eyebrow}>{t('turkishMakam')}</Text>
             <Text style={styles.heading}>Makam</Text>
           </View>
-          <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/settings')}>
+          <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/turkish-makam/settings' as any)}>
             <Ionicons name="settings-outline" size={20} color={COLORS.accent} />
           </TouchableOpacity>
         </View>
@@ -274,7 +274,7 @@ export default function ExploreScreen() {
                   description={makam.description}
                   mood={makam.mood}
                   moodMap={moodMap}
-                  onPress={() => router.push(('/makam/' + makam.id) as any)}
+                  onPress={() => router.push(('/turkish-makam/makam/' + makam.id) as any)}
                 />
               ))}
             </View>

@@ -1,8 +1,8 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { USULS } from '../../data/usuls';
-import { COLORS, SPACING } from '../../data/constants';
+import { USULS } from '../../../data/usuls';
+import { COLORS, SPACING } from '../../../data/constants';
 
 function BeatPattern({ pattern, color }: { pattern: string[]; color: string }) {
   return (
@@ -73,7 +73,7 @@ export default function UsulDetailScreen() {
           {usul.commonMakams.map((m) => {
             const n: Record<string, string> = {'rast':'Rast','ussak':'Uşşak','hicaz':'Hicaz','huseyni':'Hüseyní','saba':'Saba','segah':'Segah','kurd':'Kurd','neva':'Neva','buselik':'Buselik','cargah':'Çargah','nihavend':'Nihavend','kurdilihicazkar':'Kürdilihicazkar'};
             return (
-              <TouchableOpacity key={m} style={[styles.tag, { borderColor: usul.color + '55' }]} onPress={() => router.push(('/makam/' + m) as any)}>
+              <TouchableOpacity key={m} style={[styles.tag, { borderColor: usul.color + '55' }]} onPress={() => router.push(('/turkish-makam/makam/' + m) as any)}>
                 <Text style={[styles.tagText, { color: usul.color }]}>{n[m] || m}</Text>
               </TouchableOpacity>
             );
