@@ -57,6 +57,7 @@ export const JAZZ_COLORS = {
 
   // Status
   warning: '#FFB347',
+  success: '#4CAF84',
 
   // Utility — shared
   white: COLORS.white,
