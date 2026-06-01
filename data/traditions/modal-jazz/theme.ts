@@ -55,6 +55,9 @@ export const JAZZ_COLORS = {
   neutral: '#7B8FFF',
   dark: '#A855C8',
 
+  // Status
+  warning: '#FFB347',
+
   // Utility — shared
   white: COLORS.white,
   black: COLORS.black,
