@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Animated,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -37,6 +39,8 @@ export default function ModalJazzHome() {
   const [search, setSearch] = useState('');
   useEffect(() => { markTraditionStarted('modal-jazz'); }, []);
   const [filter, setFilter] = useState<BrightnessFilter>('all');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const activeFilterCount = filter !== 'all' ? 1 : 0;
   const searchBarAnim = useRef(new Animated.Value(1)).current;
   const lastScrollY = useRef(0);
 
@@ -103,23 +107,36 @@ export default function ModalJazzHome() {
               </TouchableOpacity>
             )}
           </View>
+
+          <TouchableOpacity
+            style={[styles.filterButton, activeFilterCount > 0 && styles.filterButtonActive]}
+            onPress={() => setSheetOpen(true)}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name="options-outline"
+              size={18}
+              color={activeFilterCount > 0 ? JAZZ_COLORS.background : JAZZ_COLORS.textSecondary}
+            />
+            {activeFilterCount > 0 && (
+              <View style={styles.filterBadge}>
+                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </Animated.View>
 
-        {/* Brightness filters */}
-        <View style={styles.filterRow}>
-          {FILTERS.map((f) => (
-            <TouchableOpacity
-              key={f.value}
-              style={[styles.filterPill, filter === f.value && styles.filterPillActive]}
-              onPress={() => setFilter(f.value)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.filterLabel, filter === f.value && styles.filterLabelActive]}>
-                {f.label}
+        {/* Active filter pill */}
+        {activeFilterCount > 0 && (
+          <View style={styles.activePillRow}>
+            <TouchableOpacity style={styles.activePill} onPress={() => setFilter('all')} activeOpacity={0.7}>
+              <Text style={styles.activePillText}>
+                {FILTERS.find((f) => f.value === filter)?.label}
               </Text>
+              <Ionicons name="close" size={11} color={JAZZ_COLORS.accent} style={{ marginLeft: 4 }} />
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
+        )}
 
         {/* Mode list */}
         <FlatList
@@ -140,6 +157,39 @@ export default function ModalJazzHome() {
           )}
         />
       </View>
+
+      <Modal visible={sheetOpen} transparent animationType="slide" onRequestClose={() => setSheetOpen(false)}>
+        <Pressable style={styles.backdrop} onPress={() => setSheetOpen(false)} />
+        <View style={styles.sheet}>
+          <View style={styles.sheetHandle} />
+          <View style={styles.sheetHeader}>
+            <Text style={styles.sheetTitle}>Filter</Text>
+            {activeFilterCount > 0 && (
+              <TouchableOpacity onPress={() => setFilter('all')}>
+                <Text style={styles.clearText}>Clear all</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <Text style={styles.sheetFilterLabel}>BRIGHTNESS</Text>
+          <View style={styles.chipRow}>
+            {FILTERS.map((f) => (
+              <TouchableOpacity
+                key={f.value}
+                style={[styles.chip, filter === f.value && styles.chipActive]}
+                onPress={() => setFilter(f.value)}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.chipText, filter === f.value && styles.chipTextActive]}>{f.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity style={styles.applyButton} onPress={() => setSheetOpen(false)}>
+            <Text style={styles.applyButtonText}>Show {filtered.length} mode{filtered.length !== 1 ? 's' : ''}</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -177,7 +227,7 @@ const styles = StyleSheet.create({
   subheading: { fontSize: 13, color: JAZZ_COLORS.textSecondary, lineHeight: 19 },
   searchRow: {
     flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: SPACING.lg, marginVertical: SPACING.sm,
+    marginHorizontal: SPACING.lg, marginVertical: SPACING.sm, gap: SPACING.sm,
   },
   searchBox: {
     flex: 1, flexDirection: 'row', alignItems: 'center',
@@ -185,15 +235,27 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: JAZZ_COLORS.border, paddingHorizontal: SPACING.md,
   },
   searchInput: { flex: 1, fontSize: 15, color: JAZZ_COLORS.textPrimary, paddingVertical: 12 },
-  filterRow: { flexDirection: 'row', paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md, gap: SPACING.sm },
-  filterPill: {
-    paddingHorizontal: SPACING.md, paddingVertical: 6,
-    borderRadius: RADIUS.full, borderWidth: 1,
-    borderColor: JAZZ_COLORS.border, backgroundColor: JAZZ_COLORS.surface,
-  },
-  filterPillActive: { backgroundColor: JAZZ_COLORS.accentMuted, borderColor: JAZZ_COLORS.accent },
-  filterLabel: { fontSize: 12, fontWeight: '500', color: JAZZ_COLORS.textTertiary },
-  filterLabelActive: { color: JAZZ_COLORS.accent },
+  filterButton: { width: 44, height: 44, borderRadius: 12, backgroundColor: JAZZ_COLORS.surface, borderWidth: 1, borderColor: JAZZ_COLORS.border, alignItems: 'center', justifyContent: 'center' },
+  filterButtonActive: { backgroundColor: JAZZ_COLORS.accent, borderColor: JAZZ_COLORS.accent },
+  filterBadge: { position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: JAZZ_COLORS.error, alignItems: 'center', justifyContent: 'center' },
+  filterBadgeText: { fontSize: 9, color: '#fff', fontWeight: '700' },
+  activePillRow: { flexDirection: 'row', paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md, gap: SPACING.sm },
+  activePill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: JAZZ_COLORS.accentMuted, borderWidth: 1, borderColor: JAZZ_COLORS.accent },
+  activePillText: { fontSize: 12, color: JAZZ_COLORS.accent, fontWeight: '500' },
+  backdrop: { flex: 1, backgroundColor: '#00000088' },
+  sheet: { backgroundColor: JAZZ_COLORS.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: SPACING.lg, paddingBottom: 48, borderWidth: 1, borderColor: JAZZ_COLORS.border },
+  sheetHandle: { width: 36, height: 4, borderRadius: 999, backgroundColor: JAZZ_COLORS.border, alignSelf: 'center', marginBottom: SPACING.lg },
+  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg },
+  sheetTitle: { fontSize: 18, fontWeight: '500', color: JAZZ_COLORS.textPrimary },
+  clearText: { fontSize: 13, color: JAZZ_COLORS.accent },
+  sheetFilterLabel: { fontSize: 11, color: JAZZ_COLORS.textTertiary, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: SPACING.md },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginBottom: SPACING.lg },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: JAZZ_COLORS.border, backgroundColor: JAZZ_COLORS.background },
+  chipActive: { backgroundColor: JAZZ_COLORS.accentMuted, borderColor: JAZZ_COLORS.accent },
+  chipText: { fontSize: 13, color: JAZZ_COLORS.textSecondary },
+  chipTextActive: { color: JAZZ_COLORS.accent, fontWeight: '500' },
+  applyButton: { backgroundColor: JAZZ_COLORS.accent, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  applyButtonText: { fontSize: 15, fontWeight: '600', color: JAZZ_COLORS.background },
   list: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xxl },
   empty: { fontSize: 15, color: JAZZ_COLORS.textSecondary, textAlign: 'center', marginTop: SPACING.xxl },
   card: {
