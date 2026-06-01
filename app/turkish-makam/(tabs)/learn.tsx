@@ -1,77 +1,14 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { LESSONS, CATEGORY_ORDER, CATEGORY_LABELS, Lesson, LessonCategory } from '../../../data/education';
+import { LessonReader } from '../../../components/lessons/LessonReader';
 import { COLORS, SPACING } from '../../../data/constants';
 import { Chrome } from '../../../components/chrome';
 import { useProgress } from '../../../hooks/useProgress';
 
 const TRADITION_ID = 'turkish-makam';
-
-function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void }) {
-  return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.readerHeader}>
-        <TouchableOpacity onPress={onClose} style={styles.backButton}>
-          <Text style={styles.backText}>← Learn</Text>
-        </TouchableOpacity>
-      </View>
-      <ScrollView contentContainerStyle={styles.readerScroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.lessonSubtitle}>{lesson.subtitle}</Text>
-        <Text style={styles.lessonTitle}>{lesson.title}</Text>
-        <Text style={styles.lessonTime}>{lesson.estimatedMinutes} min read</Text>
-        <View style={styles.lessonDivider} />
-        {lesson.sections && lesson.sections.map((section: any, i: number) => (
-          <View key={i} style={styles.section}>
-            <Text style={styles.sectionHeading}>{section.heading}</Text>
-            {section.image ? (
-              <View style={styles.imageContainer}>
-                <Image source={{ uri: section.image.uri }} style={styles.lessonImage} resizeMode="cover" />
-                <Text style={styles.imageCaption}>{section.image.caption}</Text>
-              </View>
-            ) : null}
-            <Text style={styles.sectionBody}>{section.body}</Text>
-            {section.callout ? (
-              <View style={styles.calloutCard}>
-                <Text style={styles.calloutText}>{section.callout}</Text>
-              </View>
-            ) : null}
-            {section.table ? (
-              <View style={styles.table}>
-                <View style={styles.tableHeader}>
-                  <Text style={styles.tableHeaderCell}>{section.table.headers[0]}</Text>
-                  <Text style={styles.tableHeaderCell}>{section.table.headers[1]}</Text>
-                </View>
-                {section.table.rows.map((row: string[], j: number) => (
-                  <View key={j} style={[styles.tableRow, j % 2 === 0 && styles.tableRowAlt]}>
-                    <Text style={styles.tableCell}>{row[0]}</Text>
-                    <Text style={styles.tableCell}>{row[1]}</Text>
-                  </View>
-                ))}
-              </View>
-            ) : null}
-            {section.steps ? (
-              <View style={styles.stepsRow}>
-                {section.steps.map((step: {note: string, size: string, highlight?: boolean}, j: number) => (
-                  <View key={j} style={styles.stepItem}>
-                    <View style={[styles.stepBox, step.highlight && styles.stepBoxHighlight]}>
-                      <Text style={[styles.stepNote, step.highlight && styles.stepNoteHighlight]}>{step.note}</Text>
-                    </View>
-                    {j < section.steps.length - 1 && (
-                      <Text style={styles.stepArrow}>{step.size === 'aug' ? '↑↑' : step.size === 'half' ? '½' : '→'}</Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-            ) : null}
-          </View>
-        ))}
-        <View style={{ height: 80 }} />
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
 
 type CardProps = {
   lesson: Lesson;
@@ -105,7 +42,7 @@ function LessonCard({ lesson, completed, unlocked, isLast, onPress }: CardProps)
       <View style={styles.cardContent}>
         <View style={styles.cardTop}>
           <Text style={[styles.title, !unlocked && styles.titleLocked]}>{lesson.title}</Text>
-          <Text style={styles.duration}>{lesson.estimatedMinutes} min</Text>
+          <Text style={styles.duration}>{lesson.pages.length} pages</Text>
         </View>
         <Text style={styles.subtitle}>{lesson.subtitle}</Text>
         <View style={styles.statusRow}>
@@ -134,10 +71,27 @@ function LessonCard({ lesson, completed, unlocked, isLast, onPress }: CardProps)
 
 export default function LearnScreen() {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  const { isLessonComplete, isLessonUnlocked, isCategoryUnlocked } = useProgress();
+  const { isLessonComplete, isLessonUnlocked, isCategoryUnlocked, markLessonComplete } = useProgress();
+
+  const nextOf = (l: Lesson): Lesson | null => {
+    const idx = LESSONS.findIndex((x) => x.id === l.id);
+    return idx >= 0 && idx < LESSONS.length - 1 ? LESSONS[idx + 1] : null;
+  };
 
   if (selectedLesson) {
-    return <LessonReader lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />;
+    return (
+      <LessonReader
+        lesson={selectedLesson}
+        nextLesson={nextOf(selectedLesson)}
+        isComplete={isLessonComplete(TRADITION_ID, selectedLesson.id)}
+        onClose={() => setSelectedLesson(null)}
+        onComplete={(id) => markLessonComplete(TRADITION_ID, id)}
+        onStartNext={(id) => {
+          const nl = LESSONS.find((x) => x.id === id) || null;
+          setSelectedLesson(nl);
+        }}
+      />
+    );
   }
 
   const lastLessonId = LESSONS[LESSONS.length - 1]?.id;
