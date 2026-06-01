@@ -1,8 +1,13 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { LESSONS } from '../../../data/education';
+import { LESSONS, CATEGORY_ORDER, CATEGORY_LABELS, Lesson, LessonCategory } from '../../../data/education';
 import { COLORS, SPACING } from '../../../data/constants';
+import { Chrome } from '../../../components/chrome';
+import { useProgress } from '../../../hooks/useProgress';
+
+const TRADITION_ID = 'turkish-makam';
 
 function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void }) {
   return (
@@ -68,33 +73,110 @@ function LessonReader({ lesson, onClose }: { lesson: any; onClose: () => void })
   );
 }
 
+type CardProps = {
+  lesson: Lesson;
+  completed: boolean;
+  unlocked: boolean;
+  isLast: boolean;       // last lesson in the entire flow (no connector after)
+  onPress: () => void;
+};
+
+function LessonCard({ lesson, completed, unlocked, isLast, onPress }: CardProps) {
+  return (
+    <TouchableOpacity
+      style={[styles.card, !unlocked && styles.cardLocked]}
+      onPress={onPress}
+      activeOpacity={unlocked ? 0.8 : 1}
+      disabled={!unlocked}
+    >
+      <View style={styles.numberCol}>
+        {completed ? (
+          <View style={styles.completedDot}>
+            <Ionicons name="checkmark" size={14} color={COLORS.background} />
+          </View>
+        ) : unlocked ? (
+          <Text style={styles.number}>{lesson.number}</Text>
+        ) : (
+          <Ionicons name="lock-closed" size={16} color={COLORS.textTertiary} />
+        )}
+        {!isLast && <View style={[styles.connector, completed && styles.connectorDone]} />}
+      </View>
+
+      <View style={styles.cardContent}>
+        <View style={styles.cardTop}>
+          <Text style={[styles.title, !unlocked && styles.titleLocked]}>{lesson.title}</Text>
+          <Text style={styles.duration}>{lesson.estimatedMinutes} min</Text>
+        </View>
+        <Text style={styles.subtitle}>{lesson.subtitle}</Text>
+        <View style={styles.statusRow}>
+          {completed ? (
+            <View style={[styles.statusPill, styles.statusCompleted]}>
+              <Text style={[styles.statusText, styles.statusTextCompleted]}>Explored</Text>
+            </View>
+          ) : unlocked ? (
+            <View style={[styles.statusPill, styles.statusReady]}>
+              <Text style={[styles.statusText, styles.statusTextReady]}>Start lesson</Text>
+            </View>
+          ) : (
+            <View style={[styles.statusPill, styles.statusLocked]}>
+              <Text style={[styles.statusText, styles.statusTextLocked]}>Locked</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      {unlocked && !completed && (
+        <Ionicons name="arrow-forward" size={16} color={COLORS.textTertiary} style={styles.cardArrow} />
+      )}
+    </TouchableOpacity>
+  );
+}
+
 export default function LearnScreen() {
-  const [selectedLesson, setSelectedLesson] = useState<any>(null);
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+  const { isLessonComplete, isLessonUnlocked, isCategoryUnlocked } = useProgress();
 
   if (selectedLesson) {
     return <LessonReader lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />;
   }
 
+  const lastLessonId = LESSONS[LESSONS.length - 1]?.id;
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <Chrome traditionName="Turkish Makam" accent={COLORS.accent} />
       <View style={styles.header}>
         <Text style={styles.heading}>Learn</Text>
-        <Text style={styles.subheading}>Deepen your understanding of the Turkish makam tradition.</Text>
+        <Text style={styles.subheading}>Your path through the makam tradition.</Text>
       </View>
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-        {LESSONS.map((lesson, i) => (
-          <TouchableOpacity key={lesson.id} style={styles.card} activeOpacity={0.75} onPress={() => setSelectedLesson(lesson)}>
-            <View style={styles.cardLeft}>
-              <Text style={styles.lessonNumber}>{String(i + 1).padStart(2, '0')}</Text>
+        {CATEGORY_ORDER.map((cat) => {
+          const lessonsInCat = LESSONS.filter((l) => l.category === cat);
+          if (lessonsInCat.length === 0) return null;
+          const catUnlocked = isCategoryUnlocked(TRADITION_ID, cat, CATEGORY_ORDER, LESSONS);
+          return (
+            <View key={cat}>
+              <View style={styles.categoryHeader}>
+                <Text style={styles.categoryLabel}>{CATEGORY_LABELS[cat as LessonCategory]}</Text>
+                {!catUnlocked && <Ionicons name="lock-closed" size={12} color={COLORS.textTertiary} />}
+              </View>
+              {lessonsInCat.map((lesson) => {
+                const completed = isLessonComplete(TRADITION_ID, lesson.id);
+                const unlocked = catUnlocked && isLessonUnlocked(TRADITION_ID, lesson);
+                return (
+                  <LessonCard
+                    key={lesson.id}
+                    lesson={lesson}
+                    completed={completed}
+                    unlocked={unlocked}
+                    isLast={lesson.id === lastLessonId}
+                    onPress={() => unlocked && setSelectedLesson(lesson)}
+                  />
+                );
+              })}
             </View>
-            <View style={styles.cardBody}>
-              <Text style={styles.cardTitle}>{lesson.title}</Text>
-              <Text style={styles.cardSummary} numberOfLines={2}>{lesson.subtitle}</Text>
-              <Text style={styles.cardTime}>{lesson.estimatedMinutes} min read</Text>
-            </View>
-            <Text style={styles.arrow}>›</Text>
-          </TouchableOpacity>
-        ))}
+          );
+        })}
         <View style={{ height: 80 }} />
       </ScrollView>
     </SafeAreaView>
@@ -103,19 +185,35 @@ export default function LearnScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, paddingBottom: SPACING.md },
-  eyebrow: { fontSize: 12, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 },
+  header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.md },
   heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
-  list: { paddingHorizontal: SPACING.lg, gap: SPACING.sm, paddingBottom: 120 },
-  card: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, flexDirection: 'row', alignItems: 'center', padding: SPACING.md, gap: SPACING.md },
-  cardLeft: { width: 36, alignItems: 'center' },
-  lessonNumber: { fontSize: 20, fontWeight: '200', color: COLORS.accent, letterSpacing: -1 },
-  cardBody: { flex: 1, gap: 3 },
-  cardTitle: { fontSize: 16, fontWeight: '400', color: COLORS.textPrimary },
-  cardSummary: { fontSize: 12, color: COLORS.textSecondary, lineHeight: 17 },
-  cardTime: { fontSize: 11, color: COLORS.textTertiary, marginTop: 2 },
-  arrow: { fontSize: 20, color: COLORS.textTertiary },
+  list: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
+  categoryHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingTop: SPACING.lg, paddingBottom: SPACING.sm },
+  categoryLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase' },
+  card: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: SPACING.md },
+  cardLocked: { opacity: 0.5 },
+  numberCol: { width: 40, alignItems: 'center', paddingTop: 2 },
+  number: { fontSize: 18, fontWeight: '300', color: COLORS.accent, letterSpacing: 0.5 },
+  completedDot: { width: 24, height: 24, borderRadius: 12, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center' },
+  connector: { width: 1, flex: 1, minHeight: 28, backgroundColor: COLORS.border, marginTop: 6 },
+  connectorDone: { backgroundColor: COLORS.accent },
+  cardContent: { flex: 1, paddingLeft: SPACING.sm, paddingBottom: SPACING.sm },
+  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 },
+  title: { fontSize: 17, fontWeight: '500', color: COLORS.textPrimary, flex: 1 },
+  titleLocked: { color: COLORS.textTertiary },
+  duration: { fontSize: 12, color: COLORS.textTertiary, marginLeft: SPACING.sm, marginTop: 2 },
+  subtitle: { fontSize: 13, color: COLORS.textSecondary, marginBottom: SPACING.sm },
+  statusRow: { flexDirection: 'row' },
+  statusPill: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999, borderWidth: 1 },
+  statusCompleted: { backgroundColor: COLORS.accent + '22', borderColor: COLORS.accent },
+  statusReady: { backgroundColor: COLORS.accentMuted, borderColor: COLORS.accent },
+  statusLocked: { backgroundColor: 'transparent', borderColor: COLORS.border },
+  statusText: { fontSize: 11, fontWeight: '600', letterSpacing: 0.5 },
+  statusTextCompleted: { color: COLORS.accent },
+  statusTextReady: { color: COLORS.accent },
+  statusTextLocked: { color: COLORS.textTertiary },
+  cardArrow: { alignSelf: 'center', marginLeft: SPACING.sm },
   readerHeader: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
   backButton: { alignSelf: 'flex-start' },
   backText: { color: COLORS.accent, fontSize: 15 },
