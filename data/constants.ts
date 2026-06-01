@@ -32,6 +32,11 @@ export const COLORS = {
   white: '#FFFFFF',
   black: '#000000',
   error: '#E05252',
+
+  // Quiz feedback + difficulty (Practice tab)
+  success: '#5A8A6A',
+  warning: '#C8975A',
+  dark: '#7A6E9E',
 };
 
 // ─── Spacing ──────────────────────────────────────────────────────────────────

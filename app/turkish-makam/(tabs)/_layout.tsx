@@ -25,6 +25,10 @@ export default function TabLayout() {
         name="learn"
         options={{ title: 'Learn', tabBarIcon: ({ color, size }) => <Ionicons name="school-outline" size={size} color={color} /> }}
       />
+      <Tabs.Screen
+        name="practice"
+        options={{ title: 'Practice', tabBarIcon: ({ color, size }) => <Ionicons name="bulb-outline" size={size} color={color} /> }}
+      />
       <Tabs.Screen name="library" options={{ href: null }} />
     </Tabs>
   );
