@@ -100,7 +100,12 @@ export default function JourneyScreen() {
         <Text style={styles.sectionLabel}>TRADITIONS</Text>
         <View style={styles.traditionList}>
           {traditions.map((tr) => (
-            <View key={tr.id} style={styles.traditionCard}>
+            <TouchableOpacity
+              key={tr.id}
+              style={styles.traditionCard}
+              activeOpacity={0.8}
+              onPress={() => router.push((tr.id === 'turkish-makam' ? '/turkish-makam' : '/modal-jazz') as any)}
+            >
               <View style={[styles.traditionDiamond, { backgroundColor: tr.accent }]} />
               <View style={styles.traditionBody}>
                 <Text style={styles.traditionName}>{tr.name}</Text>
@@ -110,7 +115,7 @@ export default function JourneyScreen() {
               <View style={styles.statePill}>
                 <Text style={styles.statePillText}>{stateLabel(tr.state)}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
