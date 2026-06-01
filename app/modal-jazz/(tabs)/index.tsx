@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { MODES, Mode } from '../../../data/traditions/modal-jazz/modes';
 import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
 import { useProgress } from '../../../hooks/useProgress';
+import { Chrome } from '../../../components/chrome';
 
 type BrightnessFilter = 'all' | 'bright' | 'neutral' | 'dark';
 
@@ -71,6 +72,7 @@ export default function ModalJazzHome() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
+        <Chrome traditionName="Modal Jazz" accent={JAZZ_COLORS.accent} />
 
         {/* Header */}
         <View style={styles.header}>
@@ -88,7 +90,7 @@ export default function ModalJazzHome() {
             <Ionicons name="search-outline" size={16} color={JAZZ_COLORS.textTertiary} style={{ marginRight: 6 }} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search modes\u2026"
+              placeholder="Search modes…"
               placeholderTextColor={JAZZ_COLORS.textTertiary}
               value={search}
               onChangeText={setSearch}
@@ -170,9 +172,9 @@ function ModeCard({ mode, onPress }: { mode: Mode; onPress: () => void }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: JAZZ_COLORS.background },
   container: { flex: 1, backgroundColor: JAZZ_COLORS.background },
-  header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, paddingBottom: SPACING.sm },
-  heading: { fontSize: 32, fontWeight: '300', color: JAZZ_COLORS.textPrimary, letterSpacing: 1.5 },
-  subheading: { fontSize: 14, color: JAZZ_COLORS.textSecondary, marginTop: 4 },
+  header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
+  heading: { fontSize: 40, fontWeight: '200', color: JAZZ_COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
+  subheading: { fontSize: 13, color: JAZZ_COLORS.textSecondary, lineHeight: 19 },
   searchRow: {
     flexDirection: 'row', alignItems: 'center',
     marginHorizontal: SPACING.lg, marginVertical: SPACING.sm,
