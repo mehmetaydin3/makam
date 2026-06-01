@@ -12,6 +12,7 @@ import { SONGS } from '../../../data/songs';
 import { USULS } from '../../../data/usuls';
 import { COLORS, SPACING } from '../../../data/constants';
 import { LibraryCard, SectionHeader } from '../../../components/library';
+import { Chrome } from '../../../components/chrome';
 
 const SEYIR_OPTIONS = ['All', 'Ascending', 'Descending', 'Undulating'];
 const FAMILY_OPTIONS = ['All', 'Rast', 'Ussak', 'Hicaz', 'Saba', 'Segah', 'Kurd', 'Buselik', 'Cargah', 'Nihavend'];
@@ -184,6 +185,8 @@ export default function ExploreScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
+      <Chrome traditionName="Turkish Makam" accent={COLORS.accent} />
+
       {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
@@ -191,9 +194,6 @@ export default function ExploreScreen() {
             <Text style={styles.eyebrow}>{t('turkishMakam')}</Text>
             <Text style={styles.heading}>Makam</Text>
           </View>
-          <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/turkish-makam/settings' as any)}>
-            <Ionicons name="settings-outline" size={20} color={COLORS.accent} />
-          </TouchableOpacity>
         </View>
         <Text style={styles.subheading}>{t('homeSubtitle')}</Text>
       </View>
