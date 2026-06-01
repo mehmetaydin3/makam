@@ -20,15 +20,19 @@ export type LessonPage = {
   table?: { headers: [string, string]; rows: string[][] };
   steps?: { note: string; size: string; highlight?: boolean }[];
   image?: { uri: string; caption: string };
+  // Optional fields used by some traditions (e.g. Modal Jazz listen pages)
+  modeId?: string;
+  audioUrl?: string;
 };
 
 export type Lesson = {
   id: string;
   title: string;
   subtitle: string;
-  category: LessonCategory;
+  category: string;          // tradition-agnostic; each tradition defines its own categories
   number: number;
   unlockedBy?: string;
+  durationMinutes?: number;  // optional (Modal Jazz carries this; Makam uses page count)
   pages: LessonPage[];
 };
 
