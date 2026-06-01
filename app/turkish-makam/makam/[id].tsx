@@ -9,6 +9,7 @@ import { useLanguage } from '../../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../../components/ShareableCard';
 import { COLORS, SPACING } from '../../../data/constants';
+import { useProgress } from '../../../hooks/useProgress';
 import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
 import Sound from 'react-native-sound';
 
@@ -91,6 +92,11 @@ export default function MakamDetailScreen() {
   useEffect(() => {
     return () => { audioEngine.stop(); };
   }, []);
+
+  const { markModeExplored } = useProgress();
+  useEffect(() => {
+    if (makam) markModeExplored('turkish-makam', makam.id);
+  }, [makam?.id]);
 
   const handlePlayStop = async () => {
     if (audioEngine.playing) {
