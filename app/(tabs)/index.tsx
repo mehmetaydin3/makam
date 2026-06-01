@@ -11,6 +11,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { SONGS } from '../../data/songs';
 import { USULS } from '../../data/usuls';
 import { COLORS, SPACING } from '../../data/constants';
+import { LibraryCard, SectionHeader } from '../../components/library';
 
 const SEYIR_OPTIONS = ['All', 'Ascending', 'Descending', 'Undulating'];
 const FAMILY_OPTIONS = ['All', 'Rast', 'Ussak', 'Hicaz', 'Saba', 'Segah', 'Kurd', 'Buselik', 'Cargah', 'Nihavend'];
@@ -262,40 +263,19 @@ export default function ExploreScreen() {
           groupedMakams().map((group, gi) => (
             <View key={gi}>
               {group.family && (
-                <View style={styles.familyHeader}>
-                  <Text style={styles.familyName}>{group.family} FAMILY</Text>
-                  {group.desc && <Text style={styles.familyDesc}>{group.desc}</Text>}
-                </View>
+                <SectionHeader family={group.family} desc={group.desc} />
               )}
               {group.makams.map((makam) => (
-                <TouchableOpacity
+                <LibraryCard
                   key={makam.id}
-                  style={styles.card}
-                  activeOpacity={0.75}
+                  color={makam.color}
+                  name={makam.name}
+                  pronunciation={makam.pronunciation}
+                  description={makam.description}
+                  mood={makam.mood}
+                  moodMap={moodMap}
                   onPress={() => router.push(('/makam/' + makam.id) as any)}
-                >
-                  <View style={[styles.colorStrip, { backgroundColor: makam.color }]} />
-                  <View style={styles.cardBody}>
-                    <View style={styles.cardTop}>
-                      <View style={{ flex: 1 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                          <Text style={styles.makamName}>{makam.name}</Text>
-                        </View>
-                        <Text style={styles.makamPronunciation}>/{makam.pronunciation}/</Text>
-                      </View>
-                    </View>
-                    <Text style={styles.makamDesc} numberOfLines={2}>{makam.description}</Text>
-                    <View style={styles.cardFooter}>
-                      <View style={styles.moodRow}>
-                        {makam.mood.slice(0, 2).map((m) => (
-                          <View key={m} style={styles.moodTag}>
-                            <Text style={styles.moodText}>{moodMap[m] || m}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                />
               ))}
             </View>
           ))
