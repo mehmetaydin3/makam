@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, Pressable } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING } from '../../data/constants';
+import { TRADITIONS, LIVE_TRADITIONS, traditionByName } from '../../data/traditions/registry';
 import { TraditionIntro, hasSeenIntro } from '../intro/TraditionIntro';
 
 type Props = {
@@ -20,13 +21,9 @@ type Props = {
  * select. Both traditions ship this release, so both are always selectable.
  */
 
-const TRADITIONS = [
-  { id: 'turkish-makam', name: 'Turkish Makam', tagline: 'The microtonal poetry of Anatolia.', accent: COLORS.accent, route: '/turkish-makam' },
-  { id: 'modal-jazz', name: 'Modal Jazz', tagline: 'The American conversation with the modes.', accent: '#7B8FFF', route: '/modal-jazz' },
-];
 
 export function Chrome({ traditionName, accent }: Props) {
-  const traditionId = TRADITIONS.find((t) => t.name === traditionName)?.id ?? 'turkish-makam';
+  const traditionId = traditionByName(traditionName)?.id ?? 'modal-jazz';
   const router = useRouter();
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [introOpen, setIntroOpen] = useState(false);
@@ -40,9 +37,9 @@ export function Chrome({ traditionName, accent }: Props) {
     return () => { cancelled = true; };
   }, [traditionId]);
 
-  const selectTradition = (route: string, name: string) => {
+  const selectTradition = (route: string | undefined, name: string) => {
     setSwitcherOpen(false);
-    if (name !== traditionName) {
+    if (route && name !== traditionName) {
       router.replace(route as any);
     }
   };
@@ -75,19 +72,22 @@ export function Chrome({ traditionName, accent }: Props) {
             <Text style={styles.sheetLabel}>Switch tradition</Text>
             {TRADITIONS.map((tr) => {
               const isCurrent = tr.name === traditionName;
+              const live = tr.status === 'live';
               return (
                 <TouchableOpacity
                   key={tr.id}
-                  style={[styles.sheetRow, isCurrent && styles.sheetRowCurrent]}
-                  activeOpacity={0.7}
+                  style={[styles.sheetRow, isCurrent && styles.sheetRowCurrent, !live && styles.sheetRowLocked]}
+                  activeOpacity={live ? 0.7 : 1}
+                  disabled={!live}
                   onPress={() => selectTradition(tr.route, tr.name)}
                 >
-                  <View style={[styles.diamond, { backgroundColor: tr.accent }]} />
+                  <View style={[styles.diamond, { backgroundColor: tr.accent }, !live && { opacity: 0.5 }]} />
                   <View style={styles.sheetRowBody}>
-                    <Text style={styles.sheetRowName}>{tr.name}</Text>
-                    <Text style={styles.sheetRowTagline}>{tr.tagline}</Text>
+                    <Text style={[styles.sheetRowName, !live && styles.lockedText]}>{tr.name}</Text>
+                    <Text style={styles.sheetRowTagline}>{live ? tr.tagline : 'Coming soon'}</Text>
                   </View>
                   {isCurrent && <Ionicons name="checkmark" size={18} color={tr.accent} />}
+                  {!live && <Ionicons name="lock-closed" size={14} color={COLORS.textTertiary} />}
                 </TouchableOpacity>
               );
             })}
@@ -150,6 +150,8 @@ const styles = StyleSheet.create({
   sheetLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md },
   sheetRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingVertical: SPACING.md, paddingHorizontal: SPACING.md, borderRadius: 16, borderWidth: 1, borderColor: 'transparent' },
   sheetRowCurrent: { backgroundColor: COLORS.surfaceRaised, borderColor: COLORS.border },
+  sheetRowLocked: { opacity: 0.6 },
+  lockedText: { color: COLORS.textSecondary },
   sheetRowBody: { flex: 1, gap: 2 },
   sheetRowName: { fontSize: 16, color: COLORS.textPrimary, fontWeight: '500' },
   sheetRowTagline: { fontSize: 12, color: COLORS.textSecondary, fontStyle: 'italic' },

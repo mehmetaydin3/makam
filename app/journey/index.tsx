@@ -7,6 +7,7 @@ import { useProgress } from '../../hooks/useProgress';
 import { MAKAMS } from '../../data/makams';
 import { LESSONS } from '../../data/education';
 import { MODES as JAZZ_MODES } from '../../data/traditions/modal-jazz/modes';
+import { COMING_SOON_TRADITIONS, LIVE_TRADITIONS } from '../../data/traditions/registry';
 import { Constellation, StarDatum } from '../../components/constellation/Constellation';
 
 /**
@@ -81,9 +82,10 @@ export default function JourneyScreen() {
     covered: isModeCovered('modal-jazz', m.id),
   }));
 
-  const makamStarted = !!progress.traditions['turkish-makam'];
-  const jazzStarted = !!progress.traditions['modal-jazz'];
-  const crossroadsUnlocked = makamStarted && jazzStarted;
+  // Crossroads opens once the user has begun at least two live traditions —
+  // generic over the registry, so it keeps working as more traditions go live.
+  const startedLiveCount = LIVE_TRADITIONS.filter((t) => !!progress.traditions[t.id]).length;
+  const crossroadsUnlocked = startedLiveCount >= 2;
 
   const makamNarrative =
     makamState === 'completed' ? 'You\u2019ve explored this world fully.'
@@ -193,6 +195,26 @@ export default function JourneyScreen() {
           ))}
         </View>
 
+        {COMING_SOON_TRADITIONS.length > 0 && (
+          <>
+            <Text style={styles.sectionLabel}>MORE TRADITIONS</Text>
+            <View style={styles.comingSoonWrap}>
+              {COMING_SOON_TRADITIONS.map((t) => (
+                <View key={t.id} style={styles.comingCard}>
+                  <View style={[styles.comingDiamond, { backgroundColor: t.accent }]} />
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.comingNameRow}>
+                      <Text style={styles.comingName}>{t.name}</Text>
+                      <Text style={styles.comingBadge}>SOON</Text>
+                    </View>
+                    <Text style={styles.comingBlurb}>{t.blurb}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
         <Text style={styles.sectionLabel}>CROSSROADS</Text>
         {crossroadsUnlocked ? (
           <TouchableOpacity
@@ -212,7 +234,7 @@ export default function JourneyScreen() {
           <View style={styles.crossroadsCard}>
             <Ionicons name="lock-closed-outline" size={20} color={COLORS.textTertiary} style={{ marginBottom: SPACING.sm }} />
             <Text style={styles.crossroadsText}>
-              Explore more than one tradition, and connections between them will open here \u2014 how Hicaz echoes a phrygian flatness, how ideas travel between worlds.
+              Explore more than one tradition, and connections between them will open here — how Hicaz and a Phrygian-dominant scale share one ancient interval, how a feeling travels between worlds.
             </Text>
           </View>
         )}
@@ -257,6 +279,13 @@ const styles = StyleSheet.create({
   statePill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: COLORS.surfaceRaised, borderWidth: 1, borderColor: COLORS.border },
   statePillText: { fontSize: 10, color: COLORS.textSecondary, letterSpacing: 0.5, textTransform: 'uppercase' },
   crossroadsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  comingSoonWrap: { gap: SPACING.sm, marginBottom: SPACING.sm },
+  comingCard: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md, backgroundColor: COLORS.surface, borderRadius: 14, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, opacity: 0.75 },
+  comingDiamond: { width: 10, height: 10, borderRadius: 3, transform: [{ rotate: '45deg' }], marginTop: 4, opacity: 0.6 },
+  comingNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  comingName: { fontSize: 16, fontWeight: '500', color: COLORS.textSecondary },
+  comingBadge: { fontSize: 9, fontWeight: '700', letterSpacing: 1, color: COLORS.textTertiary, borderWidth: 1, borderColor: COLORS.border, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 },
+  comingBlurb: { fontSize: 12, color: COLORS.textTertiary, lineHeight: 18, marginTop: 3 },
   crossroadsCard: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.lg },
   crossroadsText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22 },
 });

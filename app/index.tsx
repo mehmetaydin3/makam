@@ -4,6 +4,7 @@ import { Redirect, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { COLORS, SPACING } from '../data/constants';
 import { getLastTradition, setLastTradition, TraditionId } from '../lib/lastTradition';
+import { TRADITIONS } from '../data/traditions/registry';
 
 const { width } = Dimensions.get('window');
 
@@ -28,10 +29,10 @@ const SLIDES: Slide[] = [
   },
   {
     key: 'traditions',
-    eyebrow: 'TWO TRADITIONS',
-    title: 'Two ways\nof listening.',
+    eyebrow: 'MANY TRADITIONS',
+    title: 'Many ways\nof listening.',
     body:
-      "Turkish Makam divides sound into 53 microtones, finding feeling in the spaces a piano can't reach. Modal Jazz takes seven Western modes and turns them into a language of mood. Different worlds — the same idea: that a scale can be a state of mind.",
+      "Turkish Makam divides sound into 53 microtones, finding feeling in the spaces a piano can't reach. Modal Jazz hides seven moods inside one scale. And more are coming — raga, flamenco, maqam, and beyond. Different worlds, one idea: a scale can be a state of mind.",
   },
   {
     key: 'explore',
@@ -50,22 +51,6 @@ type Choice = {
   route: string;
 };
 
-const TRADITIONS: Choice[] = [
-  {
-    id: 'turkish-makam',
-    name: 'Turkish Makam',
-    tagline: 'The microtonal poetry of Anatolia — where the emotion lives between the notes.',
-    accent: '#C8975A',
-    route: '/turkish-makam',
-  },
-  {
-    id: 'modal-jazz',
-    name: 'Modal Jazz',
-    tagline: 'The American conversation with the modes — seven colors of feeling.',
-    accent: '#7B8FFF',
-    route: '/modal-jazz',
-  },
-];
 
 export default function Index() {
   const router = useRouter();
@@ -103,7 +88,8 @@ export default function Index() {
     if (i !== index) setIndex(i);
   };
 
-  const choose = async (c: Choice) => {
+  const choose = async (c: any) => {
+    if (c.status !== 'live' || !c.route) return; // coming-soon: not selectable
     await setLastTradition(c.id);
     if (c.id === 'modal-jazz') {
       try { await SecureStore.setItemAsync(MAKAM_INTRO_KEY, 'true'); } catch {}
@@ -143,20 +129,27 @@ export default function Index() {
             <Text style={styles.eyebrow}>BEGIN HERE</Text>
             <Text style={styles.pickerTitle}>Choose where{'\n'}to start.</Text>
             <View style={styles.cards}>
-              {TRADITIONS.map((c) => (
-                <TouchableOpacity
-                  key={c.id}
-                  activeOpacity={0.85}
-                  style={[styles.card, { borderColor: c.accent + '55' }]}
-                  onPress={() => choose(c)}
-                >
-                  <View style={[styles.cardAccent, { backgroundColor: c.accent }]} />
-                  <View style={styles.cardBody}>
-                    <Text style={[styles.cardName, { color: c.accent }]}>{c.name}</Text>
-                    <Text style={styles.cardTagline}>{c.tagline}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+              {TRADITIONS.map((c) => {
+                const live = c.status === 'live';
+                return (
+                  <TouchableOpacity
+                    key={c.id}
+                    activeOpacity={live ? 0.85 : 1}
+                    disabled={!live}
+                    style={[styles.card, { borderColor: c.accent + (live ? '55' : '22') }, !live && styles.cardLocked]}
+                    onPress={() => choose(c)}
+                  >
+                    <View style={[styles.cardAccent, { backgroundColor: c.accent, opacity: live ? 1 : 0.5 }]} />
+                    <View style={styles.cardBody}>
+                      <View style={styles.cardNameRow}>
+                        <Text style={[styles.cardName, { color: live ? c.accent : COLORS.textSecondary }]}>{c.name}</Text>
+                        {!live && <Text style={styles.comingSoon}>SOON</Text>}
+                      </View>
+                      <Text style={styles.cardTagline}>{live ? c.tagline : c.blurb}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
             <Text style={styles.footnote}>You can switch anytime from the chip at the top.</Text>
           </View>
@@ -208,6 +201,9 @@ const styles = StyleSheet.create({
   card: { flexDirection: 'row', alignItems: 'stretch', backgroundColor: COLORS.surface, borderRadius: 18, borderWidth: 1, overflow: 'hidden' },
   cardAccent: { width: 4 },
   cardBody: { flex: 1, padding: SPACING.lg, gap: 8 },
+  cardLocked: { opacity: 0.7 },
+  cardNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  comingSoon: { fontSize: 9, fontWeight: '700', letterSpacing: 1, color: COLORS.textTertiary, borderWidth: 1, borderColor: COLORS.border, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 },
   cardName: { fontSize: 22, fontWeight: '400', letterSpacing: -0.3 },
   cardTagline: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 21 },
   footnote: { fontSize: 12, color: COLORS.textTertiary, textAlign: 'center', marginTop: SPACING.lg },
