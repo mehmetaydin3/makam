@@ -1,8 +1,19 @@
-node_modules
-.git
+# .easignore — files NOT to send to EAS Build
+# (EAS regenerates these on their servers)
+
+node_modules/
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace/
+ios/.xcode.env.local
+
+android/build/
+android/.gradle/
+android/app/build/
+
+.git/
+.expo/
+dist/
 *.log
 .DS_Store
-ios/build
-android/build
-android/.gradle
-*.orig
