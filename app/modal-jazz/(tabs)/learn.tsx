@@ -87,7 +87,18 @@ export default function LearnScreen() {
         nextLesson={nextOf(selectedLesson)}
         isComplete={isLessonComplete(TRADITION_ID, selectedLesson.id)}
         onClose={() => setSelectedLesson(null)}
-        onComplete={(id) => markLessonComplete(TRADITION_ID, id)}
+        onComplete={(id) => {
+          // Harvest the modes this lesson teaches (page-level modeId tags) so
+          // completing it deepens those modes' mastery.
+          const taughtModes = Array.from(
+            new Set(
+              selectedLesson.pages
+                .map((pg) => pg.modeId)
+                .filter((m): m is string => !!m)
+            )
+          );
+          markLessonComplete(TRADITION_ID, id, taughtModes);
+        }}
         onStartNext={(id) => {
           const nl = LESSONS.find((x) => x.id === id) || null;
           setSelectedLesson(nl);

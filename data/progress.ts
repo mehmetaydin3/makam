@@ -29,6 +29,7 @@ export interface TraditionProgress {
   // Tracks which (mode, source) contributions have already been counted so a
   // one-time source (explore, a given lesson) can't be double-credited.
   masterySources?: Record<string, string[]>; // modeId -> source keys e.g. ['explore','lesson:l2']
+  quizLevelsUnlocked?: string[]; // ['beginner'] by default; grows as the user passes levels
 }
 
 export interface UserProgress {
@@ -88,6 +89,19 @@ export function pointsToNextLevel(points: number): { current: number; next: numb
   const floor = MASTERY_THRESHOLDS[lvl];
   const ceil = MASTERY_THRESHOLDS[lvl + 1];
   return { current: points - floor, next: ceil - floor };
+}
+
+// ── Quiz levels ──────────────────────────────────────────────────────────────
+// Three progressive difficulty tiers. Beginner is always unlocked; scoring at
+// or above the pass threshold on a tier unlocks the next. Unlocks persist.
+
+export type QuizLevel = 'beginner' | 'intermediate' | 'advanced';
+export const QUIZ_LEVEL_ORDER: QuizLevel[] = ['beginner', 'intermediate', 'advanced'];
+export const QUIZ_PASS_THRESHOLD = 0.7; // >= 70% to unlock the next level
+
+export function nextQuizLevel(level: QuizLevel): QuizLevel | null {
+  const i = QUIZ_LEVEL_ORDER.indexOf(level);
+  return i >= 0 && i < QUIZ_LEVEL_ORDER.length - 1 ? QUIZ_LEVEL_ORDER[i + 1] : null;
 }
 
 // ── Storage ──────────────────────────────────────────────────────────────────
@@ -153,11 +167,13 @@ function ensureTradition(p: UserProgress, traditionId: string): TraditionProgres
       startedAt: new Date().toISOString(),
       masteryPoints: {},
       masterySources: {},
+      quizLevelsUnlocked: ['beginner'],
     };
   }
   const t = p.traditions[traditionId];
   if (!t.masteryPoints) t.masteryPoints = {};
   if (!t.masterySources) t.masterySources = {};
+  if (!t.quizLevelsUnlocked) t.quizLevelsUnlocked = ['beginner'];
   return t;
 }
 
@@ -229,6 +245,19 @@ export async function recordQuizAnswer(
   await saveProgress(prog);
 }
 
+/**
+ * Unlock a quiz level (persists). Called when the user passes the prior tier.
+ * No-op if already unlocked.
+ */
+export async function unlockQuizLevel(traditionId: string, level: QuizLevel): Promise<void> {
+  const prog = await loadProgress();
+  const t = ensureTradition(prog, traditionId);
+  if (!t.quizLevelsUnlocked!.includes(level)) {
+    t.quizLevelsUnlocked!.push(level);
+    await saveProgress(prog);
+  }
+}
+
 // ── Selectors (operate on an already-loaded UserProgress) ────────────────────
 
 export function getTradition(p: UserProgress, traditionId: string): TraditionProgress | undefined {
@@ -286,6 +315,13 @@ export function countLessonsCompleted(p: UserProgress, traditionId: string): num
   return p.traditions[traditionId]?.lessonsCompleted.length ?? 0;
 }
 
+// ── Quiz level selectors ─────────────────────────────────────────────────────
+
+export function isQuizLevelUnlocked(p: UserProgress, traditionId: string, level: QuizLevel): boolean {
+  if (level === 'beginner') return true; // always open
+  return p.traditions[traditionId]?.quizLevelsUnlocked?.includes(level) ?? false;
+}
+
 // ── Mastery selectors ────────────────────────────────────────────────────────
 
 export function modeMasteryPoints(p: UserProgress, traditionId: string, modeId: string): number {
@@ -297,8 +333,12 @@ export function modeMasteryLevel(p: UserProgress, traditionId: string, modeId: s
 }
 
 // True once the user has touched a mode at all (explored, or earned any points).
+// Coverage = deliberate engagement (opened the mode's detail screen).
+// Quiz performance feeds MASTERY, not coverage — answering a question
+// correctly doesn't mean you've "explored" that mode. This keeps the two
+// axes honest: coverage = breadth (did you go there), mastery = depth.
 export function isModeCovered(p: UserProgress, traditionId: string, modeId: string): boolean {
-  return isModeExplored(p, traditionId, modeId) || modeMasteryPoints(p, traditionId, modeId) > 0;
+  return isModeExplored(p, traditionId, modeId);
 }
 
 /**

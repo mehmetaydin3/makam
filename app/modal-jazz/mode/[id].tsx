@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getModeById, getRelatedModes } from '../../../data/traditions/modal-jazz/modes';
 import { useProgress } from '../../../hooks/useProgress';
+import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
 import YouTubeEmbed from '../../../components/lessons/YouTubeEmbed';
 import { YOUTUBE_IDS } from '../../../data/traditions/modal-jazz/youtubeIds';
@@ -27,7 +28,7 @@ export default function ModalJazzModeDetail() {
   const { id } = useLocalSearchParams();
   const modeId = id as string;
   const router = useRouter();
-  const { markModeExplored } = useProgress();
+  const { markModeExplored, modeMasteryPoints } = useProgress();
   const mode = getModeById(modeId);
 
   useEffect(() => {
@@ -76,6 +77,16 @@ export default function ModalJazzModeDetail() {
             </Text>
           </View>
           <Text style={styles.character}>{mode.character}</Text>
+
+          <MasteryBar
+            points={modeMasteryPoints('modal-jazz', mode.id)}
+            accent={accentColor}
+            textPrimary={JAZZ_COLORS.textPrimary}
+            textSecondary={JAZZ_COLORS.textSecondary}
+            textTertiary={JAZZ_COLORS.textTertiary}
+            surface={JAZZ_COLORS.surface}
+            border={JAZZ_COLORS.border}
+          />
         </View>
 
         <Divider />

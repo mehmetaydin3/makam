@@ -483,6 +483,24 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+export type QuizLevel = 'beginner' | 'intermediate' | 'advanced';
+
+/**
+ * Build a quiz session for a specific difficulty level — only that level's
+ * questions, shuffled, with options shuffled too.
+ */
+export function buildLeveledQuizSession(level: QuizLevel, questionCount = 10): QuizQuestion[] {
+  const pool = QUIZ_QUESTIONS.filter((q) => q.difficulty === level);
+  return shuffle(pool).slice(0, questionCount).map((q) => ({
+    ...q,
+    options: shuffle(q.options),
+  }));
+}
+
+export function countQuestionsAtLevel(level: QuizLevel): number {
+  return QUIZ_QUESTIONS.filter((q) => q.difficulty === level).length;
+}
+
 export function buildQuizSession(questionCount = 10): QuizQuestion[] {
   // Shuffle questions AND their options for variety each session.
   return shuffle(QUIZ_QUESTIONS).slice(0, questionCount).map((q) => ({

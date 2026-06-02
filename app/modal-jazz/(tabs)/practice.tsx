@@ -8,7 +8,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { buildQuizSession, QuizQuestion, getRandomVideoId } from '../../../data/traditions/modal-jazz/quiz';
+import { buildLeveledQuizSession, countQuestionsAtLevel, QuizQuestion, QuizLevel, getRandomVideoId } from '../../../data/traditions/modal-jazz/quiz';
+import { useProgress } from '../../../hooks/useProgress';
+import { QUIZ_PASS_THRESHOLD, nextQuizLevel } from '../../../data/progress';
 import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
 import { Chrome } from '../../../components/chrome';
 import YoutubePlayer from 'react-native-youtube-iframe';
@@ -20,26 +22,30 @@ const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
 type QuizState = 'home' | 'question' | 'answer' | 'result';
 
 export default function PracticeScreen() {
+  const { recordQuizAnswer, isQuizLevelUnlocked, unlockQuizLevel } = useProgress();
   const [quizState, setQuizState] = useState<QuizState>('home');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState<QuizLevel>('beginner');
+  const [justUnlocked, setJustUnlocked] = useState<QuizLevel | null>(null);
   // Store random video ID per question so it doesn't change on re-render
   const sessionVideoIds = useRef<Record<string, string | null>>({});
 
-  const startQuiz = () => {
-    const session = buildQuizSession(10);
-    // Pre-assign random video IDs for the session
+  const startLevel = (level: QuizLevel) => {
+    const session = buildLeveledQuizSession(level, 10);
     const videoMap: Record<string, string | null> = {};
     session.forEach(q => { videoMap[q.id] = getRandomVideoId(q); });
     sessionVideoIds.current = videoMap;
+    setCurrentLevel(level);
     setQuestions(session);
     setCurrentIndex(0);
     setScore(0);
     setFinalScore(0);
     setSelectedAnswer(null);
+    setJustUnlocked(null);
     setQuizState('question');
   };
 
@@ -51,6 +57,8 @@ export default function PracticeScreen() {
   const handleNext = () => {
     const question = questions[currentIndex];
     const isCorrect = selectedAnswer === question.correctAnswer;
+    // Feed the mastery model: correct, mode-tagged answers deepen that mode.
+    recordQuizAnswer('modal-jazz', question.modeId, isCorrect);
     const newScore = isCorrect ? score + 1 : score;
     setScore(newScore);
 
@@ -60,12 +68,24 @@ export default function PracticeScreen() {
       setQuizState('question');
     } else {
       setFinalScore(newScore);
+      // Pass check: >= threshold unlocks the next level (persists).
+      const pct = newScore / questions.length;
+      const next = nextQuizLevel(currentLevel);
+      if (pct >= QUIZ_PASS_THRESHOLD && next && !isQuizLevelUnlocked('modal-jazz', next)) {
+        unlockQuizLevel('modal-jazz', next);
+        setJustUnlocked(next);
+      }
       setQuizState('result');
     }
   };
 
   if (quizState === 'home') {
-    return <HomeView onStart={startQuiz} />;
+    return (
+      <HomeView
+        onStartLevel={startLevel}
+        isUnlocked={(lvl) => isQuizLevelUnlocked('modal-jazz', lvl)}
+      />
+    );
   }
 
   if (quizState === 'result') {
@@ -73,8 +93,9 @@ export default function PracticeScreen() {
       <ResultView
         score={finalScore}
         total={questions.length}
+        justUnlocked={justUnlocked}
         onRestart={() => setQuizState('home')}
-        onRetry={startQuiz}
+        onRetry={() => startLevel(currentLevel)}
       />
     );
   }
@@ -98,12 +119,14 @@ export default function PracticeScreen() {
   );
 }
 
-function HomeView({ onStart }: { onStart: () => void }) {
-  const questionTypes = [
-    { icon: 'color-palette-outline', label: 'Color note', desc: 'Name the defining note' },
-    { icon: 'layers-outline', label: 'Chord context', desc: 'Which mode fits this chord?' },
-    { icon: 'musical-notes-outline', label: 'Classic tunes', desc: 'Listen and identify the mode' },
-    { icon: 'sunny-outline', label: 'Brightness', desc: 'Dark, neutral, or bright?' },
+function HomeView({ onStartLevel, isUnlocked }: {
+  onStartLevel: (level: QuizLevel) => void;
+  isUnlocked: (level: QuizLevel) => boolean;
+}) {
+  const levels: { level: QuizLevel; label: string; desc: string; count: number }[] = [
+    { level: 'beginner', label: 'Beginner', desc: 'The core modes and their colors', count: countQuestionsAtLevel('beginner') },
+    { level: 'intermediate', label: 'Intermediate', desc: 'Chord context and finer distinctions', count: countQuestionsAtLevel('intermediate') },
+    { level: 'advanced', label: 'Advanced', desc: 'Subtle theory and modal interchange', count: countQuestionsAtLevel('advanced') },
   ];
 
   return (
@@ -112,34 +135,46 @@ function HomeView({ onStart }: { onStart: () => void }) {
       <ScrollView contentContainerStyle={styles.homeContent} showsVerticalScrollIndicator={false}>
         <View style={styles.homeHeader}>
           <Text style={styles.heading}>Practice</Text>
-          <Text style={styles.subheading}>Train your ear</Text>
+          <Text style={styles.subheading}>Three levels. Pass one to unlock the next.</Text>
         </View>
 
-        <View style={styles.quizCard}>
-          <Text style={styles.quizCardTitle}>Mode quiz</Text>
-          <Text style={styles.quizCardSubtitle}>10 questions · mixed difficulty</Text>
-          <View style={styles.typeList}>
-            {questionTypes.map((t, i) => (
-              <View key={i} style={styles.typeRow}>
-                <View style={styles.typeIconWrap}>
-                  <Ionicons name={t.icon as any} size={16} color={JAZZ_COLORS.accent} />
+        <View style={styles.levelList}>
+          {levels.map(({ level, label, desc, count }, i) => {
+            const unlocked = isUnlocked(level);
+            const prev = i > 0 ? levels[i - 1].label : null;
+            return (
+              <TouchableOpacity
+                key={level}
+                style={[styles.levelCard, !unlocked && styles.levelCardLocked]}
+                activeOpacity={unlocked ? 0.8 : 1}
+                onPress={() => unlocked && onStartLevel(level)}
+                disabled={!unlocked}
+              >
+                <View style={styles.levelCardHeader}>
+                  <View style={styles.levelTitleRow}>
+                    <Text style={[styles.levelLabel, !unlocked && styles.levelLabelLocked]}>{label}</Text>
+                    {!unlocked && <Ionicons name="lock-closed" size={14} color={JAZZ_COLORS.textTertiary} />}
+                  </View>
+                  <Text style={styles.levelCount}>{count} questions</Text>
                 </View>
-                <View style={styles.typeText}>
-                  <Text style={styles.typeLabel}>{t.label}</Text>
-                  <Text style={styles.typeDesc}>{t.desc}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-          <TouchableOpacity style={styles.startButton} onPress={onStart}>
-            <Text style={styles.startButtonText}>Start quiz</Text>
-            <Ionicons name="arrow-forward" size={16} color={JAZZ_COLORS.background} />
-          </TouchableOpacity>
+                <Text style={[styles.levelDesc, !unlocked && styles.levelLabelLocked]}>
+                  {unlocked ? desc : `Score 70% on ${prev} to unlock`}
+                </Text>
+                {unlocked && (
+                  <View style={styles.levelStartRow}>
+                    <Text style={styles.levelStartText}>Start</Text>
+                    <Ionicons name="arrow-forward" size={15} color={JAZZ_COLORS.accent} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
 
 function QuestionView({
   question, questionNumber, total, selectedAnswer,
@@ -277,9 +312,13 @@ function QuestionView({
   );
 }
 
-function ResultView({ score, total, onRestart, onRetry }: {
-  score: number; total: number; onRestart: () => void; onRetry: () => void;
+function ResultView({ score, total, justUnlocked, onRestart, onRetry }: {
+  score: number; total: number; justUnlocked?: QuizLevel | null;
+  onRestart: () => void; onRetry: () => void;
 }) {
+  const levelLabel = justUnlocked
+    ? justUnlocked.charAt(0).toUpperCase() + justUnlocked.slice(1)
+    : null;
   const percentage = Math.round((score / total) * 100);
   const getMessage = () => {
     if (percentage === 100) return 'Perfect. Your ear is developing.';
@@ -294,6 +333,7 @@ function ResultView({ score, total, onRestart, onRetry }: {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.resultScroll} showsVerticalScrollIndicator={false}>
       <View style={styles.resultContainer}>
         <View style={[styles.scoreCircle, { borderColor: getColor() }]}>
           <Text style={[styles.scoreNumber, { color: getColor() }]}>{score}</Text>
@@ -301,6 +341,13 @@ function ResultView({ score, total, onRestart, onRetry }: {
         </View>
         <Text style={styles.percentage}>{percentage}%</Text>
         <Text style={styles.resultMessage}>{getMessage()}</Text>
+
+        {justUnlocked && (
+          <View style={styles.unlockBanner}>
+            <Ionicons name="sparkles" size={18} color={JAZZ_COLORS.accent} />
+            <Text style={styles.unlockText}>{levelLabel} level unlocked!</Text>
+          </View>
+        )}
 
         <View style={styles.breakdownCard}>
           <View style={styles.breakdownRow}>
@@ -325,6 +372,7 @@ function ResultView({ score, total, onRestart, onRetry }: {
           <Text style={styles.retryText}>Try again</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -333,6 +381,19 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: JAZZ_COLORS.background },
   homeContent: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xxl },
   homeHeader: { paddingTop: SPACING.lg, paddingBottom: SPACING.lg },
+  levelList: { gap: SPACING.md },
+  levelCard: { backgroundColor: JAZZ_COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: JAZZ_COLORS.border, padding: SPACING.lg, gap: 6 },
+  levelCardLocked: { opacity: 0.55 },
+  levelCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  levelTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  levelLabel: { fontSize: 18, fontWeight: '500', color: JAZZ_COLORS.textPrimary },
+  levelLabelLocked: { color: JAZZ_COLORS.textTertiary },
+  levelCount: { fontSize: 12, color: JAZZ_COLORS.textTertiary },
+  levelDesc: { fontSize: 13, color: JAZZ_COLORS.textSecondary, lineHeight: 19 },
+  levelStartRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
+  levelStartText: { fontSize: 14, fontWeight: '600', color: JAZZ_COLORS.accent },
+  unlockBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: JAZZ_COLORS.accentMuted, borderRadius: RADIUS.md, paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, marginBottom: SPACING.lg },
+  unlockText: { fontSize: 14, fontWeight: '600', color: JAZZ_COLORS.accent },
   heading: { fontSize: 40, fontWeight: '200', color: JAZZ_COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: JAZZ_COLORS.textSecondary, lineHeight: 19 },
   streakCard: {
@@ -413,6 +474,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'center', gap: SPACING.sm,
   },
   nextButtonText: { fontSize: 15, fontWeight: '600', color: JAZZ_COLORS.background },
+  resultScroll: { flexGrow: 1, justifyContent: 'center' },
   resultContainer: {
     flex: 1, alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: SPACING.lg, gap: SPACING.lg,

@@ -18,8 +18,11 @@ import {
   traditionCoverage as _traditionCoverage,
   traditionMastery as _traditionMastery,
   countModesAtLevel as _countModesAtLevel,
+  unlockQuizLevel as _unlockQuizLevel,
+  isQuizLevelUnlocked as _isQuizLevelUnlocked,
   UnlockableLesson,
   MasteryLevel,
+  QuizLevel,
 } from '../data/progress';
 
 /**
@@ -60,6 +63,11 @@ export function useProgress() {
 
   const recordQuizAnswer = useCallback(async (traditionId: string, modeId: string | undefined, correct: boolean) => {
     await _recordQuizAnswer(traditionId, modeId, correct);
+    await refresh();
+  }, [refresh]);
+
+  const unlockQuizLevel = useCallback(async (traditionId: string, level: QuizLevel) => {
+    await _unlockQuizLevel(traditionId, level);
     await refresh();
   }, [refresh]);
 
@@ -116,6 +124,10 @@ export function useProgress() {
       _countModesAtLevel(progress, traditionId, allModeIds, minLevel),
     [progress]
   );
+  const isQuizLevelUnlocked = useCallback(
+    (traditionId: string, level: QuizLevel) => _isQuizLevelUnlocked(progress, traditionId, level),
+    [progress]
+  );
 
   return {
     progress,
@@ -136,5 +148,7 @@ export function useProgress() {
     traditionCoverage,
     traditionMastery,
     countModesAtLevel,
+    unlockQuizLevel,
+    isQuizLevelUnlocked,
   };
 }

@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../../components/ShareableCard';
 import { COLORS, SPACING } from '../../../data/constants';
 import { useProgress } from '../../../hooks/useProgress';
+import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
 import Sound from 'react-native-sound';
 
@@ -93,7 +94,7 @@ export default function MakamDetailScreen() {
     return () => { audioEngine.stop(); };
   }, []);
 
-  const { markModeExplored } = useProgress();
+  const { markModeExplored, modeMasteryPoints } = useProgress();
   useEffect(() => {
     if (makam) markModeExplored('turkish-makam', makam.id);
   }, [makam?.id]);
@@ -176,6 +177,16 @@ export default function MakamDetailScreen() {
               </Text>
             </View>
           </View>
+
+          <MasteryBar
+            points={modeMasteryPoints('turkish-makam', makam.id)}
+            accent={COLORS.accent}
+            textPrimary={COLORS.textPrimary}
+            textSecondary={COLORS.textSecondary}
+            textTertiary={COLORS.textTertiary}
+            surface={COLORS.surface}
+            border={COLORS.border}
+          />
         </View>
 
         {/* ABOUT */}

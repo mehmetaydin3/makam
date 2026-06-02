@@ -337,6 +337,72 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       'That raised 4th lifts Lydian from grounded to floating.',
     difficulty: 'intermediate',
   },
+  {
+    id: 'jq-adv-dorian-chord',
+    type: 'chord_fit',
+    prompt: 'Over a minor 7th chord functioning as ii in a major key, which mode is the natural choice?',
+    options: ['Dorian', 'Phrygian', 'Aeolian', 'Locrian'],
+    correctAnswer: 'Dorian',
+    explanation:
+      'Dorian is the default mode over a ii-7 chord — its natural 6th brightens the minor sound without the darkness of Aeolian\'s flat 6th.',
+    modeId: 'dorian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'jq-adv-lydian-vs-ionian',
+    type: 'color_note',
+    prompt: 'What single note distinguishes Lydian from Ionian, giving it that floating quality?',
+    options: ['The raised 4th', 'The flat 7th', 'The natural 6th', 'The flat 2nd'],
+    correctAnswer: 'The raised 4th',
+    explanation:
+      'Lydian is Ionian with a #4. That raised fourth removes the tension of the perfect-4th-against-the-major-3rd, letting the mode float without pull to resolve.',
+    modeId: 'lydian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'jq-adv-mixo-dominant',
+    type: 'chord_fit',
+    prompt: 'Which mode is the primary choice over an unaltered dominant 7th chord?',
+    options: ['Mixolydian', 'Lydian', 'Dorian', 'Ionian'],
+    correctAnswer: 'Mixolydian',
+    explanation:
+      'Mixolydian — major 3rd plus flat 7th — spells a dominant 7th chord exactly, making it the home mode for unaltered V7 harmony.',
+    modeId: 'mixolydian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'jq-adv-phrygian-flat2',
+    type: 'color_note',
+    prompt: 'The flat 2nd is the signature of Phrygian. What harmonic flavour does it most evoke?',
+    options: ['Spanish / flamenco color', 'Bright pop major', 'Suspended floating', 'Bluesy dominant'],
+    correctAnswer: 'Spanish / flamenco color',
+    explanation:
+      'Phrygian\'s flat 2nd is the sound of flamenco and Spanish music — the half-step from root to b2 gives that dark, exotic pull.',
+    modeId: 'phrygian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'jq-adv-locrian-halfdim',
+    type: 'chord_fit',
+    prompt: 'Locrian is the usual mode over which chord quality?',
+    options: ['Half-diminished (m7b5)', 'Major 7th', 'Dominant 7th', 'Minor 6th'],
+    correctAnswer: 'Half-diminished (m7b5)',
+    explanation:
+      'Locrian — with its flat 5th and flat 7th — outlines a half-diminished (m7b5) chord, its natural harmonic home, typically the ii of a minor key.',
+    modeId: 'locrian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'jq-adv-aeolian-vs-dorian',
+    type: 'color_note',
+    prompt: 'Aeolian and Dorian are both minor modes. Which note separates them?',
+    options: ['The 6th (flat in Aeolian, natural in Dorian)', 'The 3rd', 'The 2nd', 'The 5th'],
+    correctAnswer: 'The 6th (flat in Aeolian, natural in Dorian)',
+    explanation:
+      'Both have a flat 3rd and flat 7th; the difference is the 6th — Aeolian\'s is flat (darker, the natural minor), Dorian\'s is natural (brighter, hopeful).',
+    modeId: 'aeolian',
+    difficulty: 'advanced',
+  },
 ];
 
 // ── Utilities ──────────────────────────────────────────────────────────────
@@ -363,6 +429,28 @@ export function getRandomQuestions(count: number, modeId?: string): QuizQuestion
   const pool = modeId ? getQuestionsByMode(modeId) : QUIZ_QUESTIONS;
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
+}
+
+export type QuizLevel = 'beginner' | 'intermediate' | 'advanced';
+
+/**
+ * Build a quiz session for a specific difficulty level. Draws only that
+ * level's questions (shuffled), with options shuffled too. Length adapts to
+ * how many questions exist at that level (up to questionCount).
+ */
+export function buildLeveledQuizSession(level: QuizLevel, questionCount = 10): QuizQuestion[] {
+  const pool = QUIZ_QUESTIONS.filter((q) => q.difficulty === level);
+  return [...pool]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, questionCount)
+    .map((q) => ({
+      ...q,
+      options: [...q.options].sort(() => Math.random() - 0.5),
+    }));
+}
+
+export function countQuestionsAtLevel(level: QuizLevel): number {
+  return QUIZ_QUESTIONS.filter((q) => q.difficulty === level).length;
 }
 
 export function buildQuizSession(questionCount = 10): QuizQuestion[] {
