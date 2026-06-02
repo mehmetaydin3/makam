@@ -1,10 +1,15 @@
-import Sound from 'react-native-sound';
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
+import { AUDIO_SAMPLES } from './neySamples';
 
 export type PlaybackState = 'idle' | 'loading' | 'playing' | 'stopped';
 
-Sound.setCategory('Playback');
+// Configure the audio session once: play in silent mode, don't stay active in bg.
+setAudioModeAsync({
+  playsInSilentMode: true,
+  shouldPlayInBackground: false,
+}).catch(() => {});
 
-let currentSound: Sound | null = null;
+let currentPlayer: AudioPlayer | null = null;
 let isPlaying = false;
 
 const ROOT_OFFSETS: Record<string, number> = {
@@ -23,22 +28,52 @@ const ROOT_OFFSETS: Record<string, number> = {
 
 const AVAILABLE_CENTS = [-900, -810, -765, -749, -700, -696, -650, -610, -606, -565, -550, -549, -514, -496, -492, -480, -470, -450, -406, -402, -400, -350, -334, -314, -310, -292, -280, -270, -265, -249, -202, -200, -198, -196, -150, -134, -110, -108, -106, -65, -50, -49, -47, -16, -14, 2, 4, 6, 8, 20, 30, 41, 50, 86, 92, 94, 96, 98, 100, 102, 150, 151, 153, 155, 166, 184, 186, 188, 201, 206, 208, 210, 220, 230, 245, 296, 298, 300, 301, 302, 337, 359, 366, 371, 381, 388, 392, 410, 449, 451, 453, 484, 500, 502, 506, 517, 592, 596, 600, 651, 653, 684, 688, 706, 710, 743, 796, 800, 802, 804, 835, 857, 888, 910, 947, 951, 1000, 1039, 1061, 1151];
 
+// Each ney sample is roughly this long; used as a timeout fallback in case
+// the didJustFinish event doesn't arrive (a known expo-audio edge case when
+// many players are created in sequence).
+const NOTE_MAX_MS = 2200;
+
 function findClosest(target: number): number {
   return AVAILABLE_CENTS.reduce((prev, curr) =>
     Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev
   );
 }
 
-async function loadSound(filename: string): Promise<Sound> {
-  return new Promise((resolve, reject) => {
-    const sound = new Sound(filename, Sound.MAIN_BUNDLE, (error) => {
-      if (error) { reject(error); } else { resolve(sound); }
-    });
-  });
-}
-
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Play a single bundled sample to completion, then release the player.
+function playOne(filename: string): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const moduleId = AUDIO_SAMPLES[filename];
+    if (moduleId == null) {
+      console.warn('Audio sample not found:', filename);
+      resolve();
+      return;
+    }
+    let finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      try { sub?.remove(); } catch {}
+      try { player.remove(); } catch {}
+      if (currentPlayer === player) currentPlayer = null;
+      resolve();
+    };
+
+    const player = createAudioPlayer(moduleId);
+    currentPlayer = player;
+
+    const sub = player.addListener('playbackStatusUpdate', (status: any) => {
+      if (status?.didJustFinish) done();
+    });
+
+    try { player.play(); } catch { done(); return; }
+
+    // Fallback so a missed didJustFinish never hangs the scale.
+    setTimeout(done, NOTE_MAX_MS);
+  });
 }
 
 export const audioEngine = {
@@ -53,31 +88,30 @@ export const audioEngine = {
     isPlaying = true;
     callback('playing', 0);
     const rootOffset = ROOT_OFFSETS[makamId.toLowerCase()] ?? 0;
-    console.log('makamId:', makamId, 'rootOffset:', rootOffset);
     try {
       for (let i = 0; i < cents.length; i++) {
         if (!isPlaying) break;
         const absoluteCents = rootOffset + cents[i];
         const closest = findClosest(absoluteCents);
-        console.log('degree', i, 'cents:', cents[i], 'absolute:', absoluteCents, 'file:', closest);
         const filename = `ney_c${closest}.wav`;
-        const sound = await loadSound(filename);
-        currentSound = sound;
-        sound.setVolume(1.0);
         callback('playing', i);
-        await new Promise<void>((resolve) => {
-          sound.play(() => { sound.release(); resolve(); });
-        });
-        if (i < cents.length - 1) await delay(80);
+        await playOne(filename);
+        if (i < cents.length - 1 && isPlaying) await delay(80);
       }
-    } catch (error) { console.error('Audio error:', error); }
+    } catch (error) {
+      console.error('Audio error:', error);
+    }
     isPlaying = false;
-    currentSound = null;
+    currentPlayer = null;
     callback('stopped');
   },
 
   async stop() {
     isPlaying = false;
-    if (currentSound) { currentSound.stop(); currentSound.release(); currentSound = null; }
+    if (currentPlayer) {
+      try { currentPlayer.pause(); } catch {}
+      try { currentPlayer.remove(); } catch {}
+      currentPlayer = null;
+    }
   },
 };
