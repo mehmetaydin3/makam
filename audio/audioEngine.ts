@@ -33,6 +33,7 @@ const AVAILABLE_CENTS = [-900, -810, -765, -749, -700, -696, -650, -610, -606, -
 // the didJustFinish event doesn't arrive (a known expo-audio edge case when
 // many players are created in sequence).
 const NOTE_MAX_MS = 2200;
+const NOTE_DURATION_MS = 750;  // each scale degree sounds this long, then is cut
 
 function findClosest(target: number): number {
   return AVAILABLE_CENTS.reduce((prev, curr) =>
@@ -86,8 +87,6 @@ export const audioEngine = {
     cents: number[],
     callback: (state: PlaybackState, degreeIndex?: number) => void
   ) {
-    // Hard-stop any prior playback and claim a new generation. Any loop from a
-    // previous call will see its generation is stale and bail immediately.
     await this.stop();
     const myGen = ++generation;
     isPlaying = true;
@@ -95,21 +94,41 @@ export const audioEngine = {
     callback('playing', 0);
     try {
       for (let i = 0; i < cents.length; i++) {
-        if (myGen !== generation) return; // superseded — abandon silently
+        if (myGen !== generation) return; // superseded
         const absoluteCents = rootOffset + cents[i];
         const closest = findClosest(absoluteCents);
         const filename = `ney_c${closest}.wav`;
+        const moduleId = AUDIO_SAMPLES[filename];
         callback('playing', i);
-        await playOne(filename);
-        if (myGen !== generation) return;
-        if (i < cents.length - 1) await delay(80);
+
+        if (moduleId != null) {
+          // Stop any lingering note first, then play this one.
+          if (currentPlayer) {
+            try { currentPlayer.pause(); } catch {}
+            try { currentPlayer.remove(); } catch {}
+            currentPlayer = null;
+          }
+          const player = createAudioPlayer(moduleId);
+          currentPlayer = player;
+          try { player.play(); } catch {}
+          // Hold this note for a fixed duration, then it gets cut by the next
+          // iteration (or by the final cleanup). This guarantees no overlap.
+          await delay(NOTE_DURATION_MS);
+          if (myGen !== generation) { try { player.pause(); player.remove(); } catch {} return; }
+        }
       }
     } catch (error) {
       console.error('Audio error:', error);
     }
+    // Final note: let it ring briefly, then stop cleanly.
     if (myGen === generation) {
+      await delay(150);
+      if (currentPlayer) {
+        try { currentPlayer.pause(); } catch {}
+        try { currentPlayer.remove(); } catch {}
+        currentPlayer = null;
+      }
       isPlaying = false;
-      currentPlayer = null;
       callback('stopped');
     }
   },
