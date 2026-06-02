@@ -11,7 +11,15 @@ import {
   isCategoryUnlocked as _isCategoryUnlocked,
   isModeExplored as _isModeExplored,
   traditionState as _traditionState,
+  recordQuizAnswer as _recordQuizAnswer,
+  modeMasteryPoints as _modeMasteryPoints,
+  modeMasteryLevel as _modeMasteryLevel,
+  isModeCovered as _isModeCovered,
+  traditionCoverage as _traditionCoverage,
+  traditionMastery as _traditionMastery,
+  countModesAtLevel as _countModesAtLevel,
   UnlockableLesson,
+  MasteryLevel,
 } from '../data/progress';
 
 /**
@@ -45,8 +53,13 @@ export function useProgress() {
     await refresh();
   }, [refresh]);
 
-  const markLessonComplete = useCallback(async (traditionId: string, lessonId: string) => {
-    await _markLessonComplete(traditionId, lessonId);
+  const markLessonComplete = useCallback(async (traditionId: string, lessonId: string, modeIds: string[] = []) => {
+    await _markLessonComplete(traditionId, lessonId, modeIds);
+    await refresh();
+  }, [refresh]);
+
+  const recordQuizAnswer = useCallback(async (traditionId: string, modeId: string | undefined, correct: boolean) => {
+    await _recordQuizAnswer(traditionId, modeId, correct);
     await refresh();
   }, [refresh]);
 
@@ -78,6 +91,31 @@ export function useProgress() {
       _traditionState(progress, traditionId, totalModes, totalLessons),
     [progress]
   );
+  const modeMasteryPoints = useCallback(
+    (traditionId: string, modeId: string) => _modeMasteryPoints(progress, traditionId, modeId),
+    [progress]
+  );
+  const modeMasteryLevel = useCallback(
+    (traditionId: string, modeId: string) => _modeMasteryLevel(progress, traditionId, modeId),
+    [progress]
+  );
+  const isModeCovered = useCallback(
+    (traditionId: string, modeId: string) => _isModeCovered(progress, traditionId, modeId),
+    [progress]
+  );
+  const traditionCoverage = useCallback(
+    (traditionId: string, allModeIds: string[]) => _traditionCoverage(progress, traditionId, allModeIds),
+    [progress]
+  );
+  const traditionMastery = useCallback(
+    (traditionId: string, allModeIds: string[]) => _traditionMastery(progress, traditionId, allModeIds),
+    [progress]
+  );
+  const countModesAtLevel = useCallback(
+    (traditionId: string, allModeIds: string[], minLevel: MasteryLevel) =>
+      _countModesAtLevel(progress, traditionId, allModeIds, minLevel),
+    [progress]
+  );
 
   return {
     progress,
@@ -91,5 +129,12 @@ export function useProgress() {
     isCategoryUnlocked,
     isModeExplored,
     traditionState,
+    recordQuizAnswer,
+    modeMasteryPoints,
+    modeMasteryLevel,
+    isModeCovered,
+    traditionCoverage,
+    traditionMastery,
+    countModesAtLevel,
   };
 }
