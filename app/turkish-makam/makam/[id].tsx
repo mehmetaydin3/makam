@@ -83,7 +83,7 @@ export default function MakamDetailScreen() {
     undulating: 'İnici-Çıkıcı ↗↘',
   } : SEYIR_LABELS_EN;
   const makam = getMakamById(id as string);
-  const accent = makam?.color ?? accent;
+  const accent = makam?.color ?? COLORS.accent;
   const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
   const [selectedUsul, setSelectedUsul] = useState<string | null>(null);
@@ -194,7 +194,7 @@ export default function MakamDetailScreen() {
 
         {/* WESTERN ANALOGY */}
         {makam.westernAnalogy ? (
-          <View style={[styles.analogyCard, { borderColor: accent + '33', borderLeftColor: accent }]}>
+          <View style={[styles.analogyCard, { backgroundColor: accent + '11', borderColor: accent + '33', borderLeftColor: accent }]}>
             <Text style={[styles.analogyLabel, { color: accent }]}>{language === 'tr' ? 'BATI MÜZİSYENLERİ İÇİN' : 'FOR WESTERN MUSICIANS'}</Text>
             <Text style={styles.analogyText}>{makam.westernAnalogy}</Text>
           </View>
