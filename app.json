@@ -33,7 +33,7 @@
         {
           "image": "./assets/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#0E0E0F"
+          "backgroundColor": "#06060E"
         }
       ],
       "expo-audio"
