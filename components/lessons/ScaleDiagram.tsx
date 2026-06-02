@@ -96,6 +96,42 @@ export default function ScaleDiagram({
     return steps[i] === 'W' ? WHOLE_WIDTH : HALF_WIDTH;
   };
 
+  // Play the scale from a given starting degree (0 = full scale from root).
+  const playFrom = (startIndex: number) => {
+    if (isPlaying) {
+      engineRef.current?.stop();
+      setIsPlaying(false);
+      setActiveDegree(null);
+      // if tapping the same flow while playing, just stop
+      return;
+    }
+    const allNotes = getMidiNotes(intervals, rootSemitone);
+    const midiNotes = allNotes.slice(startIndex);
+    if (midiNotes.length === 0) return;
+    setIsPlaying(true);
+    setActiveDegree(startIndex);
+    engineRef.current?.playScale(
+      midiNotes,
+      // callback index is relative to the slice — offset back to the real degree
+      (index) => setActiveDegree(startIndex + index),
+      () => {
+        setIsPlaying(false);
+        setActiveDegree(null);
+      }
+    );
+  };
+
+  // Tapping a degree immediately plays from there. While playing, a tap stops.
+  const handleDegreeTap = (i: number) => {
+    if (isPlaying) {
+      engineRef.current?.stop();
+      setIsPlaying(false);
+      setActiveDegree(null);
+      return;
+    }
+    playFrom(i);
+  };
+
   const handlePlayStop = () => {
     if (isPlaying) {
       engineRef.current?.stop();
@@ -103,17 +139,7 @@ export default function ScaleDiagram({
       setActiveDegree(null);
       return;
     }
-    const midiNotes = getMidiNotes(intervals, rootSemitone);
-    setIsPlaying(true);
-    setActiveDegree(0);
-    engineRef.current?.playScale(
-      midiNotes,
-      (index) => setActiveDegree(index),
-      () => {
-        setIsPlaying(false);
-        setActiveDegree(null);
-      }
-    );
+    playFrom(0);
   };
 
   return (
@@ -162,7 +188,12 @@ export default function ScaleDiagram({
               else if (avoidNote) { bgColor = JAZZ_COLORS.warning + '22'; borderColor = JAZZ_COLORS.warning; }
 
               return (
-                <View key={i} style={[styles.degreeCol, { width: w }]}>
+                <TouchableOpacity
+                  key={i}
+                  style={[styles.degreeCol, { width: w }]}
+                  onPress={() => handleDegreeTap(i)}
+                  activeOpacity={0.7}
+                >
                   <View style={[
                     styles.block,
                     { width: w - 4, backgroundColor: bgColor, borderColor },
@@ -179,7 +210,7 @@ export default function ScaleDiagram({
                   <Text style={[styles.stepLabel, (colorNote || isActive) && { color: accentColor }]}>
                     {i < steps.length ? steps[i] : ' '}
                   </Text>
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
@@ -222,6 +253,8 @@ export default function ScaleDiagram({
           {isPlaying ? 'Stop' : 'Play scale'}
         </Text>
       </TouchableOpacity>
+
+      <Text style={styles.tapHint}>Tap any degree to play from there</Text>
 
       {/* Legend */}
       <View style={styles.legend}>
@@ -285,6 +318,7 @@ const styles = StyleSheet.create({
     backgroundColor: JAZZ_COLORS.surfaceRaised,
   },
   playButtonText: { fontSize: 13, fontWeight: '600', color: JAZZ_COLORS.textSecondary },
+  tapHint: { fontSize: 11, color: JAZZ_COLORS.textTertiary, textAlign: 'center', marginTop: SPACING.sm },
   legend: { flexDirection: 'row', gap: SPACING.md, marginTop: SPACING.md, flexWrap: 'wrap' },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   legendWhole: { width: 20, height: 14, borderRadius: 3, backgroundColor: JAZZ_COLORS.surfaceRaised, borderWidth: 1, borderColor: JAZZ_COLORS.border },
