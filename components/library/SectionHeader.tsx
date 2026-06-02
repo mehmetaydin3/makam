@@ -4,12 +4,16 @@ import { COLORS } from '../../data/constants';
 type Props = {
   family: string;
   desc?: string;
+  color?: string;
 };
 
-export function SectionHeader({ family, desc }: Props) {
+export function SectionHeader({ family, desc, color }: Props) {
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>{family} FAMILY</Text>
+      <View style={styles.nameRow}>
+        {color && <View style={[styles.dot, { backgroundColor: color }]} />}
+        <Text style={[styles.name, color && { color }]}>{family} FAMILY</Text>
+      </View>
       {desc && <Text style={styles.desc}>{desc}</Text>}
     </View>
   );
@@ -22,6 +26,8 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     marginBottom: 12,
   },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  dot: { width: 7, height: 7, borderRadius: 2, transform: [{ rotate: '45deg' }] },
   name: {
     fontSize: 11,
     fontWeight: '400',

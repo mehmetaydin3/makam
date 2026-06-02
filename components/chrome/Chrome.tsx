@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING } from '../../data/constants';
+import { TraditionIntro, hasSeenIntro } from '../intro/TraditionIntro';
 
 type Props = {
   traditionName: string;
@@ -25,8 +26,19 @@ const TRADITIONS = [
 ];
 
 export function Chrome({ traditionName, accent }: Props) {
+  const traditionId = TRADITIONS.find((t) => t.name === traditionName)?.id ?? 'turkish-makam';
   const router = useRouter();
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [introOpen, setIntroOpen] = useState(false);
+
+  // Show the tradition intro automatically on first entry.
+  useEffect(() => {
+    let cancelled = false;
+    hasSeenIntro(traditionId).then((seen) => {
+      if (!cancelled && !seen) setIntroOpen(true);
+    });
+    return () => { cancelled = true; };
+  }, [traditionId]);
 
   const selectTradition = (route: string, name: string) => {
     setSwitcherOpen(false);
@@ -82,6 +94,14 @@ export function Chrome({ traditionName, accent }: Props) {
             <TouchableOpacity
               style={styles.journeyRow}
               activeOpacity={0.7}
+              onPress={() => { setSwitcherOpen(false); setIntroOpen(true); }}
+            >
+              <Ionicons name="information-circle-outline" size={18} color={COLORS.textSecondary} />
+              <Text style={styles.journeyRowText}>About this tradition</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.journeyRow}
+              activeOpacity={0.7}
               onPress={() => { setSwitcherOpen(false); router.push('/journey' as any); }}
             >
               <Ionicons name="compass-outline" size={18} color={COLORS.textSecondary} />
@@ -89,6 +109,14 @@ export function Chrome({ traditionName, accent }: Props) {
             </TouchableOpacity>
           </Pressable>
         </Pressable>
+      </Modal>
+
+      <Modal visible={introOpen} animationType="fade" presentationStyle="fullScreen" onRequestClose={() => setIntroOpen(false)}>
+        <TraditionIntro
+          traditionId={traditionId}
+          accent={accent}
+          onClose={() => setIntroOpen(false)}
+        />
       </Modal>
     </View>
   );

@@ -12,6 +12,7 @@ import { SONGS } from '../../../data/songs';
 import { USULS } from '../../../data/usuls';
 import { COLORS, SPACING } from '../../../data/constants';
 import { LibraryCard, SectionHeader } from '../../../components/library';
+import { familyShade, FAMILY_BASE } from '../../../data/familyColors';
 import { Chrome } from '../../../components/chrome';
 
 const SEYIR_OPTIONS = ['All', 'Ascending', 'Descending', 'Undulating'];
@@ -262,12 +263,12 @@ export default function ExploreScreen() {
           groupedMakams().map((group, gi) => (
             <View key={gi}>
               {group.family && (
-                <SectionHeader family={group.family} desc={group.desc} />
+                <SectionHeader family={group.family} desc={group.desc} color={FAMILY_BASE[group.family] || undefined} />
               )}
-              {group.makams.map((makam) => (
+              {group.makams.map((makam, mi) => (
                 <LibraryCard
                   key={makam.id}
-                  color={makam.color}
+                  color={familyShade(group.family, mi, group.makams.length)}
                   name={makam.name}
                   pronunciation={makam.pronunciation}
                   description={makam.description}

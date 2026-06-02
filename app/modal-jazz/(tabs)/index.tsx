@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { MODES, Mode } from '../../../data/traditions/modal-jazz/modes';
+import { BRIGHTNESS_BASE } from '../../../data/familyColors';
 import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
 import { useProgress } from '../../../hooks/useProgress';
 import { Chrome } from '../../../components/chrome';
@@ -152,6 +153,7 @@ export default function ModalJazzHome() {
           renderItem={({ item }) => (
             <ModeCard
               mode={item}
+              stripeColor={BRIGHTNESS_BASE[item.brightness] || JAZZ_COLORS.accent}
               onPress={() => router.push(('/modal-jazz/mode/' + item.id) as any)}
             />
           )}
@@ -194,10 +196,11 @@ export default function ModalJazzHome() {
   );
 }
 
-function ModeCard({ mode, onPress }: { mode: Mode; onPress: () => void }) {
+function ModeCard({ mode, stripeColor, onPress }: { mode: Mode; stripeColor: string; onPress: () => void }) {
   const accentColor = BRIGHTNESS_COLOR[mode.brightness];
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
+      <View style={[styles.colorStrip, { backgroundColor: stripeColor }]} />
       <View style={[styles.degreeBadge, { borderColor: accentColor }]}>
         <Text style={[styles.degreeText, { color: accentColor }]}>{mode.degree}</Text>
       </View>
@@ -271,6 +274,7 @@ const styles = StyleSheet.create({
   cardContent: { flex: 1, padding: SPACING.md },
   cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 },
   modeName: { fontSize: 18, fontWeight: '500', color: JAZZ_COLORS.textPrimary, letterSpacing: 0.5 },
+  colorStrip: { width: 4, alignSelf: 'stretch', borderTopLeftRadius: RADIUS.md, borderBottomLeftRadius: RADIUS.md, marginRight: 4 },
   brightnessPill: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.full },
   brightnessLabel: { fontSize: 10, fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase' },
   oneWord: {
