@@ -194,19 +194,28 @@ export default function JourneyScreen() {
         </View>
 
         <Text style={styles.sectionLabel}>CROSSROADS</Text>
-        <View style={styles.crossroadsCard}>
-          <Ionicons
-            name={crossroadsUnlocked ? 'git-compare-outline' : 'lock-closed-outline'}
-            size={20}
-            color={COLORS.textTertiary}
-            style={{ marginBottom: SPACING.sm }}
-          />
-          <Text style={styles.crossroadsText}>
-            {crossroadsUnlocked
-              ? 'A Crossroads has opened. Comparative essays await.'
-              : 'Explore more than one tradition, and connections between them will open here \u2014 how a phrygian flatness echoes H\u00fcseyni, how ideas travel between worlds.'}
-          </Text>
-        </View>
+        {crossroadsUnlocked ? (
+          <TouchableOpacity
+            style={styles.crossroadsCard}
+            activeOpacity={0.8}
+            onPress={() => router.push('/journey/crossroads' as any)}
+          >
+            <View style={styles.crossroadsRow}>
+              <Ionicons name="git-compare-outline" size={20} color={COLORS.accent} style={{ marginBottom: SPACING.sm }} />
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textTertiary} />
+            </View>
+            <Text style={styles.crossroadsText}>
+              A Crossroads has opened. Comparative pieces await — how a feeling travels between the two worlds.
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.crossroadsCard}>
+            <Ionicons name="lock-closed-outline" size={20} color={COLORS.textTertiary} style={{ marginBottom: SPACING.sm }} />
+            <Text style={styles.crossroadsText}>
+              Explore more than one tradition, and connections between them will open here \u2014 how Hicaz echoes a phrygian flatness, how ideas travel between worlds.
+            </Text>
+          </View>
+        )}
 
         <View style={{ height: 60 }} />
       </ScrollView>
@@ -247,6 +256,7 @@ const styles = StyleSheet.create({
   traditionNarrative: { fontSize: 13, fontWeight: '500', marginTop: 4 },
   statePill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: COLORS.surfaceRaised, borderWidth: 1, borderColor: COLORS.border },
   statePillText: { fontSize: 10, color: COLORS.textSecondary, letterSpacing: 0.5, textTransform: 'uppercase' },
-  crossroadsCard: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, borderStyle: 'dashed', padding: SPACING.lg },
+  crossroadsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  crossroadsCard: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.lg },
   crossroadsText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22 },
 });
