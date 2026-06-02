@@ -83,6 +83,7 @@ export default function MakamDetailScreen() {
     undulating: 'İnici-Çıkıcı ↗↘',
   } : SEYIR_LABELS_EN;
   const makam = getMakamById(id as string);
+  const accent = makam?.color ?? accent;
   const [playbackState, setPlaybackState] = useState<PlaybackState>('idle');
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
   const [selectedUsul, setSelectedUsul] = useState<string | null>(null);
@@ -121,7 +122,7 @@ export default function MakamDetailScreen() {
   if (!makam) return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity onPress={() => router.back()} style={styles.header}>
-        <Text style={styles.backText}>← Makams</Text>
+        <Text style={[styles.backText, { color: accent }]}>← Makams</Text>
       </TouchableOpacity>
       <Text style={styles.errorText}>Makam not found.</Text>
     </SafeAreaView>
@@ -150,10 +151,10 @@ export default function MakamDetailScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>← Makams</Text>
+          <Text style={[styles.backText, { color: accent }]}>← Makams</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setShowShare(true)} style={styles.shareButton}>
-          <Ionicons name="share-outline" size={20} color={COLORS.accent} />
+          <Ionicons name="share-outline" size={20} color={accent} />
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -167,8 +168,8 @@ export default function MakamDetailScreen() {
             <View style={styles.tag}>
               <Text style={styles.tagText}>{makam.family} {language === 'tr' ? ' ailesi' : ' family'}</Text>
             </View>
-            <View style={[styles.tag, styles.tagAccent]}>
-              <Text style={[styles.tagText, styles.tagTextAccent]}>
+            <View style={[styles.tag, styles.tagAccent, { borderColor: accent + '55' }]}>
+              <Text style={[styles.tagText, styles.tagTextAccent, { color: accent }]}>
                 {SEYIR_LABELS[makam.seyir]}
               </Text>
             </View>
@@ -176,7 +177,7 @@ export default function MakamDetailScreen() {
 
           <MasteryBar
             points={modeMasteryPoints('turkish-makam', makam.id)}
-            accent={COLORS.accent}
+            accent={accent}
             textPrimary={COLORS.textPrimary}
             textSecondary={COLORS.textSecondary}
             textTertiary={COLORS.textTertiary}
@@ -187,14 +188,14 @@ export default function MakamDetailScreen() {
 
         {/* ABOUT */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Hakkında' : 'About'}</Text>
+          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Hakkında' : 'About'}</Text>
           <Text style={styles.description}>{makam.description}</Text>
         </View>
 
         {/* WESTERN ANALOGY */}
         {makam.westernAnalogy ? (
-          <View style={styles.analogyCard}>
-            <Text style={styles.analogyLabel}>{language === 'tr' ? 'BATI MÜZİSYENLERİ İÇİN' : 'FOR WESTERN MUSICIANS'}</Text>
+          <View style={[styles.analogyCard, { borderColor: accent + '33', borderLeftColor: accent }]}>
+            <Text style={[styles.analogyLabel, { color: accent }]}>{language === 'tr' ? 'BATI MÜZİSYENLERİ İÇİN' : 'FOR WESTERN MUSICIANS'}</Text>
             <Text style={styles.analogyText}>{makam.westernAnalogy}</Text>
           </View>
         ) : null}
@@ -217,7 +218,7 @@ export default function MakamDetailScreen() {
 
         {/* MOOD */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Duygu' : 'Mood'}</Text>
+          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Duygu' : 'Mood'}</Text>
           <View style={styles.moodRow}>
             {(makam.mood || []).map((m) => (
               <View key={m} style={styles.moodTag}>
@@ -229,7 +230,7 @@ export default function MakamDetailScreen() {
 
         {/* LISTENING SECTION */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Dinle' : 'Listen'}</Text>
+          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Dinle' : 'Listen'}</Text>
           {makam.listening.sarki.youtubeId && (
             <AudioCard
               example={makam.listening.sarki}
@@ -249,7 +250,7 @@ export default function MakamDetailScreen() {
 
         {/* SCALE DEGREES */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>{language === 'tr' ? 'Dizi Dereceleri' : 'Scale Degrees'}</Text>
+          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Dizi Dereceleri' : 'Scale Degrees'}</Text>
           <MakamScaleDiagram
             makamId={makam.id}
             scale={makam.scale || []}
@@ -262,16 +263,16 @@ export default function MakamDetailScreen() {
 
         {/* CHARACTERISTIC MOVEMENT */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Characteristic Movement</Text>
-          <View style={styles.phraseCard}>
+          <Text style={[styles.sectionLabel, { color: accent }]}>Characteristic Movement</Text>
+          <View style={[styles.phraseCard, { borderLeftColor: accent }]}>
             <Text style={styles.phraseText}>"{makam.characteristicPhrase}"</Text>
           </View>
         </View>
 
         {/* USUL PAIRINGS */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Rhythmic Cycles (Usul)</Text>
-          <View style={{ backgroundColor: COLORS.accent + '11', borderRadius: 12, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: COLORS.accent + '33' }}>
+          <Text style={[styles.sectionLabel, { color: accent }]}>Rhythmic Cycles (Usul)</Text>
+          <View style={{ backgroundColor: accent + '11', borderRadius: 12, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
             <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
               A makam without its usul is just a scale. The rhythmic cycle gives it life — pulse, momentum, and form. Tap any usul below to hear how it sounds and feel how it moves.
             </Text>
@@ -296,8 +297,8 @@ export default function MakamDetailScreen() {
                   onPress={() => setSelectedUsul(usulId)}
                   style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, gap: SPACING.md }}
                 >
-                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55', alignItems: 'center', justifyContent: 'center' }}>
-                    <Ionicons name="play" size={15} color={COLORS.accent} />
+                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: accent + '22', borderWidth: 1, borderColor: accent + '55', alignItems: 'center', justifyContent: 'center' }}>
+                    <Ionicons name="play" size={15} color={accent} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: COLORS.textPrimary, fontSize: 16, fontWeight: '500', marginBottom: 2 }}>{usul}</Text>
@@ -312,7 +313,7 @@ export default function MakamDetailScreen() {
 
         {/* SEYIR */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Seyir</Text>
+          <Text style={[styles.sectionLabel, { color: accent }]}>Seyir</Text>
           <View style={styles.seyirCard}>
             <Text style={styles.seyirType}>{SEYIR_LABELS[makam.seyir]}</Text>
           </View>
@@ -320,7 +321,7 @@ export default function MakamDetailScreen() {
 
         {/* RELATED MAKAMS */}
         <View style={{ marginBottom: 80 }}>
-          <Text style={styles.sectionLabel}>{language === 'tr' ? 'İlgili Makamlar' : 'Related Makams'}</Text>
+          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'İlgili Makamlar' : 'Related Makams'}</Text>
           <View style={styles.relatedRow}>
             {(makam.relatedMakams || []).map((name) => (
               <TouchableOpacity
@@ -361,7 +362,7 @@ export default function MakamDetailScreen() {
               {selectedUsulData && (
                 <>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase' }}>Usul</Text>
+                    <Text style={{ color: accent, fontSize: 11, fontWeight: '700', letterSpacing: 2, textTransform: 'uppercase' }}>Usul</Text>
                     <TouchableOpacity onPress={closeUsulModal}>
                       <Text style={{ color: COLORS.textTertiary, fontSize: 20 }}>✕</Text>
                     </TouchableOpacity>
@@ -372,7 +373,7 @@ export default function MakamDetailScreen() {
                     {selectedUsulData.pattern.map((beat, i) => (
                       <View key={i} style={{
                         flex: 1, height: 32, borderRadius: 4,
-                        backgroundColor: beat === 'strong' ? COLORS.accent : beat === 'medium' ? COLORS.accent + '55' : beat === 'weak' ? '#2A2A2C' : 'transparent',
+                        backgroundColor: beat === 'strong' ? accent : beat === 'medium' ? accent + '55' : beat === 'weak' ? '#2A2A2C' : 'transparent',
                         borderWidth: beat === 'rest' ? 1 : 0, borderColor: COLORS.border,
                       }} />
                     ))}
@@ -380,10 +381,10 @@ export default function MakamDetailScreen() {
                   <Text style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 24, marginBottom: 20 }}>{selectedUsulData.description}</Text>
                   <TouchableOpacity
                     onPress={playUsul}
-                    style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55', borderRadius: 12, padding: 14 }}
+                    style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: accent + '22', borderWidth: 1, borderColor: accent + '55', borderRadius: 12, padding: 14 }}
                   >
-                    <Ionicons name={usulPlaying ? "stop" : "play"} size={15} color={COLORS.accent} />
-                    <Text style={{ color: COLORS.accent, fontSize: 14, fontWeight: '600' }}>{usulPlaying ? 'Stop' : 'Hear this usul'}</Text>
+                    <Ionicons name={usulPlaying ? "stop" : "play"} size={15} color={accent} />
+                    <Text style={{ color: accent, fontSize: 14, fontWeight: '600' }}>{usulPlaying ? 'Stop' : 'Hear this usul'}</Text>
                   </TouchableOpacity>
                 </>
               )}

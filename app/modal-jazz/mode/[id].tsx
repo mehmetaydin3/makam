@@ -132,7 +132,7 @@ export default function ModalJazzModeDetail() {
               <View style={styles.progressionsRow}>
                 {ctx.commonProgressions.map((p, j) => (
                   <View key={j} style={styles.progressionPill}>
-                    <Text style={styles.progressionText}>{p}</Text>
+                    <Text style={[styles.progressionText, { color: accentColor }]}>{p}</Text>
                   </View>
                 ))}
               </View>
@@ -152,7 +152,7 @@ export default function ModalJazzModeDetail() {
                   <Text style={styles.tuneTitle}>{tune.title}</Text>
                   <Text style={styles.tuneYear}>{tune.year}</Text>
                 </View>
-                <Text style={styles.tuneArtist}>{tune.artist}</Text>
+                <Text style={[styles.tuneArtist, { color: accentColor }]}>{tune.artist}</Text>
                 <Text style={styles.tuneWhy}>{tune.whyThisTune}</Text>
                 {videoId && (
                   <View style={styles.playerWrapper}>
@@ -182,10 +182,10 @@ export default function ModalJazzModeDetail() {
         {/* ── Theory ── */}
         <Section label="Theory">
           <View style={styles.theoryGrid}>
-            <TheoryRow label="Degree" value={`${mode.degree}${ordinal(mode.degree)} degree of the major scale`} />
-            <TheoryRow label="Formula" value={mode.formula} />
-            <TheoryRow label="Relative key" value={mode.relativeKey} />
-            <TheoryRow label="Intervals" value={mode.intervals.join('  ')} mono />
+            <TheoryRow accent={accentColor} label="Degree" value={`${mode.degree}${ordinal(mode.degree)} degree of the major scale`} />
+            <TheoryRow accent={accentColor} label="Formula" value={mode.formula} />
+            <TheoryRow accent={accentColor} label="Relative key" value={mode.relativeKey} />
+            <TheoryRow accent={accentColor} label="Intervals" value={mode.intervals.join('  ')} mono />
           </View>
         </Section>
 
@@ -231,11 +231,11 @@ function Divider() {
   return <View style={styles.divider} />;
 }
 
-function TheoryRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+function TheoryRow({ label, value, mono, accent }: { label: string; value: string; mono?: boolean; accent?: string }) {
   return (
     <View style={styles.theoryRow}>
       <Text style={styles.theoryLabel}>{label}</Text>
-      <Text style={[styles.theoryValue, mono && styles.theoryMono]}>{value}</Text>
+      <Text style={[styles.theoryValue, mono && styles.theoryMono, mono && accent ? { color: accent } : null]}>{value}</Text>
     </View>
   );
 }
