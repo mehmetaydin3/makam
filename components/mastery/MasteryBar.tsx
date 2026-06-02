@@ -72,10 +72,10 @@ export function MasteryBar({ points, accent, textPrimary, textSecondary, textTer
 
       <Text style={[styles.caption, { color: textSecondary }]}>
         {level === 0
-          ? 'Explore and quiz this to build mastery.'
+          ? 'Explore and practice this to build mastery.'
           : maxed
           ? 'You know this one inside out.'
-          : 'Keep quizzing to deepen your understanding.'}
+          : 'Practice and revisit to deepen your understanding.'}
       </Text>
     </View>
   );

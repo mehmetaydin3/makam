@@ -13,7 +13,6 @@ import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
 import { MakamScaleDiagram } from '../../../components/scale/MakamScaleDiagram';
-import Sound from 'react-native-sound';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
@@ -89,7 +88,7 @@ export default function MakamDetailScreen() {
   const [selectedUsul, setSelectedUsul] = useState<string | null>(null);
   const selectedUsulData = selectedUsul ? getUsulById(selectedUsul) : null;
   const [usulPlaying, setUsulPlaying] = useState(false);
-  const usulSoundRef = useRef<Sound | null>(null);
+  // usul playback now goes through the expo-audio engine
 
   useEffect(() => {
     return () => { audioEngine.stop(); };
@@ -131,24 +130,20 @@ export default function MakamDetailScreen() {
   const isPlaying = playbackState === 'playing';
 
   const closeUsulModal = () => {
-    if (usulSoundRef.current) { usulSoundRef.current.stop(); usulSoundRef.current.release(); usulSoundRef.current = null; }
+    audioEngine.stop();
     setUsulPlaying(false);
     setSelectedUsul(null);
   };
 
-  const playUsul = () => {
+  const playUsul = async () => {
     if (usulPlaying) {
-      if (usulSoundRef.current) { usulSoundRef.current.stop(); usulSoundRef.current.release(); usulSoundRef.current = null; }
+      await audioEngine.stop();
       setUsulPlaying(false);
       return;
     }
     const filename = `usul_${selectedUsul}.wav`;
-    const s = new Sound(filename, Sound.MAIN_BUNDLE, (error: any) => {
-      if (error) { console.error('Usul audio error:', error); return; }
-      usulSoundRef.current = s;
-      setUsulPlaying(true);
-      s.play(() => { s.release(); usulSoundRef.current = null; setUsulPlaying(false); });
-    });
+    setUsulPlaying(true);
+    await audioEngine.playUsul(filename, () => setUsulPlaying(false));
   };
 
   return (
@@ -302,7 +297,7 @@ export default function MakamDetailScreen() {
                   style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, gap: SPACING.md }}
                 >
                   <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55', alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: COLORS.accent, fontSize: 16 }}>▶</Text>
+                    <Ionicons name="play" size={15} color={COLORS.accent} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: COLORS.textPrimary, fontSize: 16, fontWeight: '500', marginBottom: 2 }}>{usul}</Text>
@@ -387,7 +382,7 @@ export default function MakamDetailScreen() {
                     onPress={playUsul}
                     style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55', borderRadius: 12, padding: 14 }}
                   >
-                    <Text style={{ fontSize: 18 }}>{usulPlaying ? '⏹' : '▶'}</Text>
+                    <Ionicons name={usulPlaying ? "stop" : "play"} size={15} color={COLORS.accent} />
                     <Text style={{ color: COLORS.accent, fontSize: 14, fontWeight: '600' }}>{usulPlaying ? 'Stop' : 'Hear this usul'}</Text>
                   </TouchableOpacity>
                 </>

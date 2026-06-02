@@ -114,11 +114,49 @@ export const audioEngine = {
     }
   },
 
+  // Play a single usul (rhythm) sample, e.g. 'usul_duyek.wav'. Unlike the ney
+  // notes, a usul is a long file — so it plays to natural completion (no short
+  // timeout) and is fully interruptible by stop(). onDone fires on finish or stop.
+  async playUsul(filename: string, onDone?: () => void) {
+    await this.stop();
+    const myGen = ++generation;
+    const moduleId = AUDIO_SAMPLES[filename];
+    if (moduleId == null) {
+      console.warn('Usul sample not found:', filename);
+      onDone?.();
+      return;
+    }
+    isPlaying = true;
+    let finished = false;
+    let sub: { remove: () => void } | null = null;
+    const player = createAudioPlayer(moduleId);
+    currentPlayer = player;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      try { sub?.remove(); } catch {}
+      try { player.pause(); } catch {}
+      try { player.remove(); } catch {}
+      if (currentPlayer === player) currentPlayer = null;
+      if (myGen === generation) isPlaying = false;
+      onDone?.();
+    };
+
+    sub = player.addListener('playbackStatusUpdate', (status: any) => {
+      // finish on natural end, or if a newer playback/stop superseded us
+      if (status?.didJustFinish || myGen !== generation) finish();
+    });
+
+    try { player.play(); } catch { finish(); }
+  },
+
   async stop() {
-    generation++;        // invalidate any in-flight playScale loop
+    generation++;        // invalidate any in-flight playScale loop / usul
     isPlaying = false;
     if (currentPlayer) {
       try { currentPlayer.pause(); } catch {}
+      try { currentPlayer.seekTo(0); } catch {}
       try { currentPlayer.remove(); } catch {}
       currentPlayer = null;
     }
