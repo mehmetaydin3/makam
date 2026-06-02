@@ -191,7 +191,7 @@ export default function ExploreScreen() {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-            <Text style={styles.heading}>Makam</Text>
+            <Text style={styles.heading}>The Makams</Text>
           </View>
         </View>
         <Text style={styles.subheading}>{t('homeSubtitle')}</Text>

@@ -80,7 +80,7 @@ export default function ModalJazzHome() {
 
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.heading}>Modal Jazz</Text>
+          <Text style={styles.heading}>The Modes</Text>
           <Text style={styles.subheading}>Seven modes, seven colors of feeling.</Text>
         </View>
 
