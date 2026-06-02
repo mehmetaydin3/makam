@@ -194,13 +194,13 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="star-outline"
             label={t('rateApp')}
-            onPress={() => { }}
+            onPress={() => Linking.openURL('https://apps.apple.com/app/id6772785333?action=write-review')}
           />
           <Divider />
           <SettingsRow
             icon="chatbubble-outline"
             label={t('sendFeedback')}
-            onPress={() => Linking.openURL('mailto:hello@themakam.com?subject=The Makam Feedback')}
+            onPress={() => Linking.openURL('mailto:hello@themodality.app?subject=The Modality Feedback')}
           />
         </View>
 
@@ -234,13 +234,13 @@ export default function SettingsScreen() {
           <View style={styles.creditBlock}>
             <Text style={styles.creditHeading}>Reference Performances</Text>
             <Text style={styles.creditBody}>
-              Curated YouTube embeds of master performances are linked from each makam detail screen. All rights remain with the original performers and uploaders.
+              Curated YouTube embeds of master performances are linked from lesson and detail screens. All rights remain with the original performers and uploaders.
             </Text>
           </View>
           <Divider />
           <View style={styles.creditBlock}>
             <Text style={styles.creditBody}>
-              The Makam is grateful to the CompMusic project and the musicians who have made authentic Turkish music research accessible to the world.
+              The Modality is grateful to the CompMusic project and the musicians who have made authentic Turkish music research accessible to the world.
             </Text>
           </View>
         </View>
@@ -265,9 +265,9 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.versionRow}>
-          <Text style={styles.versionText}>The Makam · v1.0.0</Text>
-          <Text style={styles.versionSubtext}>Built with love for Turkish classical music</Text>
-          <Text style={styles.versionSubtext}>hello@themakam.com</Text>
+          <Text style={styles.versionText}>The Modality · v2.0.0</Text>
+          <Text style={styles.versionSubtext}>Built with love for the world's modal traditions</Text>
+          <Text style={styles.versionSubtext}>hello@themodality.app</Text>
         </View>
 
         <View style={{ height: 80 }} />
