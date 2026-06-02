@@ -7,6 +7,7 @@ import { useProgress } from '../../hooks/useProgress';
 import { MAKAMS } from '../../data/makams';
 import { LESSONS } from '../../data/education';
 import { MODES as JAZZ_MODES } from '../../data/traditions/modal-jazz/modes';
+import { Constellation, StarDatum } from '../../components/constellation/Constellation';
 
 /**
  * Journey — the meta-layer above traditions.
@@ -23,7 +24,10 @@ import { MODES as JAZZ_MODES } from '../../data/traditions/modal-jazz/modes';
 
 type TraditionState = 'completed' | 'exploring' | 'started' | 'available';
 
+type TraditionSummary = { coverage: number; familiar: number; total: number };
 type TraditionView = {
+  summary: TraditionSummary;
+  stars: StarDatum[];
   id: string;
   name: string;
   tagline: string;
@@ -41,12 +45,41 @@ function stateLabel(state: TraditionState): string {
   }
 }
 
+const CARD_PREVIEW_W = 300;
+
 export default function JourneyScreen() {
   const router = useRouter();
-  const { traditionState, progress } = useProgress();
+  const { traditionState, progress, traditionCoverage, traditionMastery, countModesAtLevel, modeMasteryLevel, isModeCovered } = useProgress();
 
   const makamState = traditionState('turkish-makam', MAKAMS.length, LESSONS.length);
   const jazzState = traditionState('modal-jazz', JAZZ_MODES.length, 0);
+
+  const makamIds = MAKAMS.map((m) => m.id);
+  const jazzIds = JAZZ_MODES.map((m) => m.id);
+
+  // Live mastery summaries (Layer 3a) — coverage = how much sky is lit,
+  // familiar = modes at Familiar (L3) or above.
+  const makamSummary = {
+    coverage: traditionCoverage('turkish-makam', makamIds),
+    familiar: countModesAtLevel('turkish-makam', makamIds, 3),
+    total: makamIds.length,
+  };
+  const jazzSummary = {
+    coverage: traditionCoverage('modal-jazz', jazzIds),
+    familiar: countModesAtLevel('modal-jazz', jazzIds, 3),
+    total: jazzIds.length,
+  };
+
+  const makamStars: StarDatum[] = MAKAMS.map((m) => ({
+    id: m.id, name: m.name, group: m.family,
+    level: modeMasteryLevel('turkish-makam', m.id),
+    covered: isModeCovered('turkish-makam', m.id),
+  }));
+  const jazzStars: StarDatum[] = JAZZ_MODES.map((m) => ({
+    id: m.id, name: m.name, group: m.brightness,
+    level: modeMasteryLevel('modal-jazz', m.id),
+    covered: isModeCovered('modal-jazz', m.id),
+  }));
 
   const makamStarted = !!progress.traditions['turkish-makam'];
   const jazzStarted = !!progress.traditions['modal-jazz'];
@@ -66,6 +99,8 @@ export default function JourneyScreen() {
       accent: COLORS.accent,
       state: makamState,
       narrative: makamNarrative,
+      summary: makamSummary,
+      stars: makamStars,
     },
     {
       id: 'modal-jazz',
@@ -74,6 +109,8 @@ export default function JourneyScreen() {
       accent: '#7B8FFF',
       state: jazzState,
       narrative: jazzState === 'available' ? 'Waiting to be explored.' : 'You\u2019ve begun here.',
+      summary: jazzSummary,
+      stars: jazzStars,
     },
   ];
 
@@ -100,22 +137,59 @@ export default function JourneyScreen() {
         <Text style={styles.sectionLabel}>TRADITIONS</Text>
         <View style={styles.traditionList}>
           {traditions.map((tr) => (
-            <TouchableOpacity
-              key={tr.id}
-              style={styles.traditionCard}
-              activeOpacity={0.8}
-              onPress={() => router.push((tr.id === 'turkish-makam' ? '/turkish-makam' : '/modal-jazz') as any)}
-            >
-              <View style={[styles.traditionDiamond, { backgroundColor: tr.accent }]} />
-              <View style={styles.traditionBody}>
-                <Text style={styles.traditionName}>{tr.name}</Text>
-                <Text style={styles.traditionTagline}>{tr.tagline}</Text>
-                <Text style={[styles.traditionNarrative, { color: tr.accent }]}>{tr.narrative}</Text>
+            <View key={tr.id} style={styles.traditionCard}>
+              <View style={styles.cardTop}>
+                <View style={[styles.traditionDiamond, { backgroundColor: tr.accent }]} />
+                <View style={styles.traditionBody}>
+                  <Text style={styles.traditionName}>{tr.name}</Text>
+                  <Text style={styles.traditionTagline}>{tr.tagline}</Text>
+                </View>
               </View>
-              <View style={styles.statePill}>
-                <Text style={styles.statePillText}>{stateLabel(tr.state)}</Text>
+
+              {/* Mini constellation preview */}
+              <View style={styles.previewWrap}>
+                <Constellation
+                  stars={tr.stars}
+                  accent={tr.accent}
+                  width={CARD_PREVIEW_W}
+                  height={96}
+                  compact
+                />
               </View>
-            </TouchableOpacity>
+
+              {/* Coverage bar + familiar count */}
+              <View style={styles.summaryRow}>
+                <View style={styles.coverageTrack}>
+                  <View style={[styles.coverageFill, { width: `${Math.round(tr.summary.coverage * 100)}%`, backgroundColor: tr.accent }]} />
+                </View>
+                <Text style={styles.summaryText}>{Math.round(tr.summary.coverage * 100)}% explored</Text>
+              </View>
+              <Text style={[styles.masteryText, { color: tr.accent }]}>
+                {tr.summary.familiar > 0
+                  ? `${tr.summary.familiar} of ${tr.summary.total} ${tr.id === 'turkish-makam' ? 'makams' : 'modes'} familiar`
+                  : tr.narrative}
+              </Text>
+
+              {/* Actions */}
+              <View style={styles.cardActions}>
+                <TouchableOpacity
+                  style={[styles.skyBtn, { borderColor: tr.accent }]}
+                  onPress={() => router.push((`/journey/sky?tradition=${tr.id}`) as any)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="sparkles-outline" size={14} color={tr.accent} />
+                  <Text style={[styles.skyBtnText, { color: tr.accent }]}>View your sky</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.enterBtn}
+                  onPress={() => router.push((tr.id === 'turkish-makam' ? '/turkish-makam' : '/modal-jazz') as any)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.enterBtnText}>Enter</Text>
+                  <Ionicons name="chevron-forward" size={14} color={COLORS.textSecondary} />
+                </TouchableOpacity>
+              </View>
+            </View>
           ))}
         </View>
 
@@ -152,7 +226,20 @@ const styles = StyleSheet.create({
   divider: { width: 40, height: 2, backgroundColor: COLORS.accent, borderRadius: 999, marginVertical: SPACING.xl },
   sectionLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md, marginTop: SPACING.sm },
   traditionList: { gap: SPACING.sm, marginBottom: SPACING.xl },
-  traditionCard: { flexDirection: 'row', backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, gap: SPACING.md, alignItems: 'flex-start' },
+  traditionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  summaryRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.sm },
+  coverageTrack: { flex: 1, height: 5, borderRadius: 999, backgroundColor: COLORS.border, overflow: 'hidden' },
+  coverageFill: { height: 5, borderRadius: 999 },
+  summaryText: { fontSize: 11, color: COLORS.textTertiary },
+  masteryText: { fontSize: 12, marginTop: 6, fontWeight: '500' },
+  traditionCard: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, gap: SPACING.sm },
+  cardTop: { flexDirection: 'row', gap: SPACING.md, alignItems: 'flex-start' },
+  previewWrap: { alignItems: 'center', marginVertical: SPACING.xs, overflow: 'hidden', borderRadius: 12, backgroundColor: '#0C0C0F' },
+  cardActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: SPACING.sm },
+  skyBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, borderWidth: 1 },
+  skyBtnText: { fontSize: 13, fontWeight: '600' },
+  enterBtn: { flexDirection: 'row', alignItems: 'center', gap: 2, paddingHorizontal: 10, paddingVertical: 8 },
+  enterBtnText: { fontSize: 13, color: COLORS.textSecondary },
   traditionDiamond: { width: 10, height: 10, borderRadius: 2, transform: [{ rotate: '45deg' }], marginTop: 5 },
   traditionBody: { flex: 1, gap: 3 },
   traditionName: { fontSize: 18, fontWeight: '400', color: COLORS.textPrimary },
