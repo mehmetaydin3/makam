@@ -11,6 +11,7 @@ setAudioModeAsync({
 
 let currentPlayer: AudioPlayer | null = null;
 let isPlaying = false;
+let generation = 0;  // bumped on every stop/new-play so stale loops self-cancel
 
 const ROOT_OFFSETS: Record<string, number> = {
   rast:     -900,
@@ -53,6 +54,10 @@ function playOne(filename: string): Promise<void> {
       return;
     }
     let finished = false;
+    let sub: { remove: () => void } | null = null;
+    const player = createAudioPlayer(moduleId);
+    currentPlayer = player;
+
     const done = () => {
       if (finished) return;
       finished = true;
@@ -62,10 +67,7 @@ function playOne(filename: string): Promise<void> {
       resolve();
     };
 
-    const player = createAudioPlayer(moduleId);
-    currentPlayer = player;
-
-    const sub = player.addListener('playbackStatusUpdate', (status: any) => {
+    sub = player.addListener('playbackStatusUpdate', (status: any) => {
       if (status?.didJustFinish) done();
     });
 
@@ -84,29 +86,36 @@ export const audioEngine = {
     cents: number[],
     callback: (state: PlaybackState, degreeIndex?: number) => void
   ) {
-    if (isPlaying) return;
+    // Hard-stop any prior playback and claim a new generation. Any loop from a
+    // previous call will see its generation is stale and bail immediately.
+    await this.stop();
+    const myGen = ++generation;
     isPlaying = true;
-    callback('playing', 0);
     const rootOffset = ROOT_OFFSETS[makamId.toLowerCase()] ?? 0;
+    callback('playing', 0);
     try {
       for (let i = 0; i < cents.length; i++) {
-        if (!isPlaying) break;
+        if (myGen !== generation) return; // superseded — abandon silently
         const absoluteCents = rootOffset + cents[i];
         const closest = findClosest(absoluteCents);
         const filename = `ney_c${closest}.wav`;
         callback('playing', i);
         await playOne(filename);
-        if (i < cents.length - 1 && isPlaying) await delay(80);
+        if (myGen !== generation) return;
+        if (i < cents.length - 1) await delay(80);
       }
     } catch (error) {
       console.error('Audio error:', error);
     }
-    isPlaying = false;
-    currentPlayer = null;
-    callback('stopped');
+    if (myGen === generation) {
+      isPlaying = false;
+      currentPlayer = null;
+      callback('stopped');
+    }
   },
 
   async stop() {
+    generation++;        // invalidate any in-flight playScale loop
     isPlaying = false;
     if (currentPlayer) {
       try { currentPlayer.pause(); } catch {}

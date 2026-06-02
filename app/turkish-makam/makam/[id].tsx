@@ -12,6 +12,7 @@ import { COLORS, SPACING } from '../../../data/constants';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
+import { MakamScaleDiagram } from '../../../components/scale/MakamScaleDiagram';
 import Sound from 'react-native-sound';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -254,42 +255,12 @@ export default function MakamDetailScreen() {
         {/* SCALE DEGREES */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{language === 'tr' ? 'Dizi Dereceleri' : 'Scale Degrees'}</Text>
-          <TouchableOpacity
-            style={[styles.playButton, { borderColor: makam.color }, isPlaying && { backgroundColor: makam.color }]}
-            onPress={handlePlayStop}
-          >
-            <Text style={[styles.playButtonText, isPlaying && { color: '#fff' }]}>
-              {isPlaying ? '■  Stop' : '▶  Play Scale on Ney'}
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.degreeGrid}>
-            {(makam.scale || []).map((d, i) => {
-              const nearest = Math.round(d.cents / 100) * 100;
-              const dev = d.cents - nearest;
-              const abs = Math.abs(dev);
-              const dir = dev < 0 ? '♭' : '♯';
-              let interp = '';
-              if (abs >= 36 && abs <= 64) interp = '¼ tone ' + dir;
-              else if (abs >= 16 && abs <= 35) interp = 'slightly ' + dir;
-              else if (abs >= 65 && abs <= 85) interp = '¾ tone ' + dir;
-              const centsLabel = abs > 15 ? (dev > 0 ? '+' : '') + dev + '¢' : '';
-              const isActive = activeDegree === i;
-              return (
-                <View key={i} style={[
-                  styles.degreeItem,
-                  d.isCharacteristic && { borderColor: makam.color, borderWidth: 2 },
-                  isActive && { backgroundColor: makam.color + '33', borderColor: makam.color, borderWidth: 2 },
-                ]}>
-                  <Text style={[styles.degreeNote, (d.isCharacteristic || isActive) && { color: makam.color }]}>
-                    {noteNames === 'solfege' ? d.name.replace(' Koma', '').replace('Koma', '') : (d.westernNearest || d.name)}
-                  </Text>
-                  {interp ? <Text style={[styles.degreeInterp, d.isCharacteristic && { color: makam.color + 'cc' }]}>{interp}</Text> : null}
-                  {centsLabel && !interp ? <Text style={styles.degreeDev}>{centsLabel}</Text> : null}
-                  {centsLabel && interp ? <Text style={styles.degreeCentsSmall}>{centsLabel}</Text> : null}
-                </View>
-              );
-            })}
-          </View>
+          <MakamScaleDiagram
+            makamId={makam.id}
+            scale={makam.scale || []}
+            accentColor={makam.color}
+            noteNames={noteNames === 'solfege' ? 'solfege' : 'western'}
+          />
           {makam.characterNote ? <Text style={styles.characterNote}>{makam.characterNote}</Text> : null}
           <Text style={styles.scaleHint}>Highlighted notes are where this makam lives — they cannot be swapped for standard tuning.</Text>
         </View>
