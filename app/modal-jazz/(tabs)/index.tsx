@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   subheading: { fontSize: 13, color: JAZZ_COLORS.textSecondary, lineHeight: 19 },
   searchRow: {
     flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: SPACING.lg, marginVertical: SPACING.sm, gap: SPACING.sm,
+    marginHorizontal: SPACING.lg, marginTop: SPACING.sm, marginBottom: SPACING.md, gap: SPACING.sm,
   },
   searchBox: {
     flex: 1, flexDirection: 'row', alignItems: 'center',
