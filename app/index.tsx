@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { COLORS, SPACING } from '../data/constants';
@@ -57,6 +58,7 @@ export default function Index() {
   const [resolved, setResolved] = useState<'loading' | 'intro' | TraditionId>('loading');
   const [index, setIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
+  const insets = useSafeAreaInsets();
   const fade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -120,8 +122,12 @@ export default function Index() {
         ))}
 
         {/* Final page — the picker */}
-        <View style={styles.slide}>
-          <View style={styles.pickerContent}>
+        <View style={styles.pickerSlide}>
+          <ScrollView
+            style={styles.pickerScroll}
+            contentContainerStyle={[styles.pickerContent, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 100 }]}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.markRow}>
               <View style={[styles.diamond, { backgroundColor: '#C8975A' }]} />
               <View style={[styles.diamond, { backgroundColor: '#7B8FFF', marginLeft: -6 }]} />
@@ -145,27 +151,29 @@ export default function Index() {
                         <Text style={[styles.cardName, { color: live ? c.accent : COLORS.textSecondary }]}>{c.name}</Text>
                         {!live && <Text style={styles.comingSoon}>SOON</Text>}
                       </View>
-                      <Text style={styles.cardTagline}>{live ? c.tagline : c.blurb}</Text>
+                      <Text style={styles.cardTagline}>{c.blurb}</Text>
                     </View>
                   </TouchableOpacity>
                 );
               })}
             </View>
             <Text style={styles.footnote}>You can switch anytime from the chip at the top.</Text>
-          </View>
+          </ScrollView>
         </View>
       </ScrollView>
 
       {/* Footer: dots + next/skip (hidden on picker page) */}
       <View style={styles.footer}>
-        <View style={styles.dots}>
-          {Array.from({ length: totalPages }).map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, i === index && styles.dotActive]}
-            />
-          ))}
-        </View>
+        {index < PICKER_INDEX && (
+          <View style={styles.dots}>
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <View
+                key={i}
+                style={[styles.dot, i === index && styles.dotActive]}
+              />
+            ))}
+          </View>
+        )}
         {index < PICKER_INDEX ? (
           <View style={styles.navRow}>
             <TouchableOpacity onPress={() => goTo(PICKER_INDEX)} style={styles.skipBtn}>
@@ -187,33 +195,35 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#0A0A0B' },
   pager: { flex: 1 },
   slide: { width, flex: 1, justifyContent: 'center', paddingHorizontal: SPACING.xl },
+  pickerSlide: { width, flex: 1, paddingHorizontal: SPACING.xl },
+  pickerScroll: { flex: 1 },
   slideContent: { gap: SPACING.lg, paddingBottom: 80 },
   eyebrow: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 3, textTransform: 'uppercase' },
   title: { fontSize: 40, fontWeight: '200', letterSpacing: -1, lineHeight: 46, color: COLORS.textPrimary },
   rule: { width: 40, height: 2, borderRadius: 999, backgroundColor: COLORS.accent },
   body: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 26 },
   // Picker page
-  pickerContent: { gap: SPACING.md, paddingBottom: 80 },
-  markRow: { flexDirection: 'row', marginBottom: SPACING.sm },
+  pickerContent: { gap: SPACING.sm },
+  markRow: { flexDirection: 'row', marginTop: 8, marginBottom: SPACING.md, paddingTop: 4, paddingLeft: 4, height: 30, alignItems: 'center' },
   diamond: { width: 18, height: 18, borderRadius: 4, transform: [{ rotate: '45deg' }] },
-  pickerTitle: { fontSize: 36, fontWeight: '200', letterSpacing: -1, lineHeight: 42, color: COLORS.textPrimary, marginBottom: SPACING.sm },
-  cards: { gap: SPACING.md, marginTop: SPACING.sm },
+  pickerTitle: { fontSize: 30, fontWeight: '200', letterSpacing: -0.8, lineHeight: 35, color: COLORS.textPrimary, marginBottom: 4 },
+  cards: { gap: 11, marginTop: 4 },
   card: { flexDirection: 'row', alignItems: 'stretch', backgroundColor: COLORS.surface, borderRadius: 18, borderWidth: 1, overflow: 'hidden' },
   cardAccent: { width: 4 },
-  cardBody: { flex: 1, padding: SPACING.lg, gap: 8 },
+  cardBody: { flex: 1, paddingVertical: 16, paddingHorizontal: 18, gap: 6 },
   cardLocked: { opacity: 0.7 },
   cardNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   comingSoon: { fontSize: 9, fontWeight: '700', letterSpacing: 1, color: COLORS.textTertiary, borderWidth: 1, borderColor: COLORS.border, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 },
-  cardName: { fontSize: 22, fontWeight: '400', letterSpacing: -0.3 },
-  cardTagline: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 21 },
-  footnote: { fontSize: 12, color: COLORS.textTertiary, textAlign: 'center', marginTop: SPACING.lg },
+  cardName: { fontSize: 19, fontWeight: '500', letterSpacing: -0.3 },
+  cardTagline: { fontSize: 13.5, color: COLORS.textSecondary, lineHeight: 19 },
+  footnote: { fontSize: 12, color: COLORS.textTertiary, textAlign: 'center', marginTop: SPACING.md },
   // Footer
-  footer: { paddingHorizontal: SPACING.xl, paddingBottom: 48, gap: SPACING.lg },
+  footer: { paddingHorizontal: SPACING.xl, paddingTop: SPACING.sm, paddingBottom: 16, gap: SPACING.sm, backgroundColor: '#0A0A0B' },
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
   dot: { width: 6, height: 6, borderRadius: 999, backgroundColor: COLORS.border },
   dotActive: { backgroundColor: COLORS.accent, width: 18 },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  navSpacer: { height: 48 },
+  navSpacer: { height: 8 },
   skipBtn: { padding: SPACING.md },
   skipText: { fontSize: 14, color: COLORS.textTertiary },
   nextBtn: { paddingHorizontal: 28, paddingVertical: 14, borderRadius: 999, backgroundColor: COLORS.accent },
