@@ -36,7 +36,12 @@
           "backgroundColor": "#06060E"
         }
       ],
-      "expo-audio"
+[
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
