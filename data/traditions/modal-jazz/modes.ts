@@ -184,14 +184,16 @@ export const MODES: Mode[] = [
     ],
     classicTunes: [
       {
-        title: 'Flying (E.T. Theme)',
-        artist: 'John Williams',
-        year: 1982,
+        title: 'Inner Urge',
+        artist: 'Joe Henderson',
+        year: 1964,
         whyThisTune:
-          'Pure Lydian — the lifted, weightless quality made it perfect for a scene about defying gravity.',
+          'The definitive Lydian jazz tune — the head moves through a chain of maj7#11 chords, ' +
+          'each one the raised-4th color in pure form. Joe Henderson built the sound into the composition itself.',
+        youtubeId: 'N233dJw7GH4',
       },
     ],
-    notablePlayers: ['Stevie Wonder', 'Joe Satriani', 'Herbie Hancock'],
+    notablePlayers: ['Joe Henderson', 'Wayne Shorter', 'Herbie Hancock'],
     brightness: 'bright',
     difficulty: 'intermediate',
     relatedModes: ['ionian'],
@@ -222,14 +224,16 @@ export const MODES: Mode[] = [
     ],
     classicTunes: [
       {
-        title: 'Norwegian Wood',
-        artist: 'The Beatles',
-        year: 1965,
+        title: 'All Blues',
+        artist: 'Miles Davis',
+        year: 1959,
         whyThisTune:
-          'The verse is pure Mixolydian — the flat 7th gives it that folk-modal quality.',
+          'From Kind of Blue — a G dominant vamp that never resolves, the flat 7th ringing through ' +
+          'the whole tune. The recording that turned the Mixolydian sound into modal jazz.',
+        youtubeId: '-488UORrfJ0',
       },
     ],
-    notablePlayers: ['Miles Davis', 'Wes Montgomery', 'Stevie Ray Vaughan'],
+    notablePlayers: ['Miles Davis', 'Wes Montgomery', 'Cannonball Adderley'],
     brightness: 'neutral',
     difficulty: 'beginner',
     relatedModes: ['ionian', 'dorian'],

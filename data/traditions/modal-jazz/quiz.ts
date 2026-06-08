@@ -16,6 +16,7 @@ export interface QuizQuestion {
   correctAnswer: string;
   explanation: string;
   modeId?: string;
+  concept?: string;  // groups questions testing the SAME fact so a session never repeats one
   audioUrl?: string;
   videoIds?: string[];  // multiple IDs — one picked randomly per session
   difficulty: 'beginner' | 'intermediate' | 'advanced';
@@ -27,6 +28,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   {
     id: 'q-cn-dorian',
+    concept: 'dorian-6th',
     type: 'color_note',
     prompt: 'What is the color note of Dorian?',
     options: ['The flat 3rd', 'The natural 6th', 'The flat 7th', 'The raised 4th'],
@@ -40,6 +42,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cn-lydian',
+    concept: 'lydian-sharp4',
     type: 'color_note',
     prompt: 'What is the color note of Lydian?',
     options: ['The major 7th', 'The flat 7th', 'The raised 4th', 'The natural 6th'],
@@ -52,6 +55,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cn-mixolydian',
+    concept: 'mixo-b7',
     type: 'color_note',
     prompt: 'What is the color note of Mixolydian?',
     options: ['The raised 4th', 'The flat 6th', 'The flat 2nd', 'The flat 7th'],
@@ -64,6 +68,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cn-phrygian',
+    concept: 'phrygian-b2',
     type: 'color_note',
     prompt: 'What is the color note of Phrygian?',
     options: ['The flat 5th', 'The flat 6th', 'The flat 2nd', 'The flat 7th'],
@@ -75,6 +80,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cn-aeolian',
+    concept: 'aeolian-b6',
     type: 'color_note',
     prompt: 'What is the color note of Aeolian?',
     options: ['The flat 2nd', 'The flat 5th', 'The natural 6th', 'The flat 6th'],
@@ -87,6 +93,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cn-locrian',
+    concept: 'locrian-b5',
     type: 'color_note',
     prompt: 'What is the color note of Locrian?',
     options: ['The flat 2nd', 'The flat 6th', 'The flat 5th', 'The flat 7th'],
@@ -99,6 +106,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cn-ionian',
+    concept: 'ionian-maj7',
     type: 'color_note',
     prompt: 'What is the color note of Ionian?',
     options: ['The flat 7th', 'The raised 4th', 'The major 7th', 'The natural 6th'],
@@ -113,6 +121,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   {
     id: 'q-cf-m7',
+    concept: 'dorian-m7-chord',
     type: 'chord_fit',
     prompt: 'You see a Dm7 chord that sits for 8 bars. Which mode is the best default choice?',
     options: ['Aeolian', 'Phrygian', 'Dorian', 'Locrian'],
@@ -125,6 +134,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cf-maj7',
+    concept: 'ionian-maj7-chord',
     type: 'chord_fit',
     prompt: 'You see a Cmaj7 chord. Which mode is the natural choice?',
     options: ['Mixolydian', 'Lydian', 'Ionian', 'Dorian'],
@@ -137,6 +147,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cf-maj7sharp11',
+    concept: 'lydian-maj7sharp11-chord',
     type: 'chord_fit',
     prompt: 'The chart says Fmaj7#11. Which mode is being requested?',
     options: ['Ionian', 'Mixolydian', 'Aeolian', 'Lydian'],
@@ -149,6 +160,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cf-dom7',
+    concept: 'mixo-dom7-chord',
     type: 'chord_fit',
     prompt: 'You are playing over a G7 chord in a blues. Which mode fits?',
     options: ['Ionian', 'Dorian', 'Mixolydian', 'Lydian'],
@@ -161,6 +173,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cf-halfdim',
+    concept: 'locrian-halfdim-chord',
     type: 'chord_fit',
     prompt: 'You see a Bø7 (half-diminished) chord in a minor ii-V-i. Which mode fits?',
     options: ['Phrygian', 'Aeolian', 'Dorian', 'Locrian'],
@@ -173,6 +186,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cf-m7b9',
+    concept: 'phrygian-m7b9-chord',
     type: 'chord_fit',
     prompt: 'The chord is Em7(b9) with a Spanish feel. Which mode fits?',
     options: ['Aeolian', 'Dorian', 'Locrian', 'Phrygian'],
@@ -188,6 +202,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   {
     id: 'q-tn-sowhat',
+    concept: 'tune-dorian',
     type: 'tune_name',
     prompt: '"So What" by Miles Davis. Which mode is this tune built on?',
     options: ['Aeolian', 'Mixolydian', 'Dorian', 'Lydian'],
@@ -205,6 +220,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-tn-impressions',
+    concept: 'tune-phrygian',
     type: 'tune_name',
     prompt: `Coltrane's "Impressions" — the B section uses which mode?`,
     options: ['Dorian', 'Aeolian', 'Phrygian', 'Locrian'],
@@ -222,6 +238,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-tn-maidenvoyage',
+    concept: 'tune-dorian',
     type: 'tune_name',
     prompt: `Herbie Hancock's "Maiden Voyage." Which mode is primarily used?`,
     options: ['Ionian', 'Lydian', 'Mixolydian', 'Dorian'],
@@ -238,6 +255,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-tn-spain',
+    concept: 'tune-phrygian',
     type: 'tune_name',
     prompt: `Chick Corea's "Spain." Which mode does the opening melody draw from?`,
     options: ['Aeolian', 'Locrian', 'Dorian', 'Phrygian'],
@@ -255,6 +273,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   {
     id: 'q-br-brightest',
+    concept: 'bright-lydian',
     type: 'brightness',
     prompt: 'Which mode is considered the brightest of all seven diatonic modes?',
     options: ['Ionian', 'Mixolydian', 'Dorian', 'Lydian'],
@@ -265,6 +284,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-br-darkest',
+    concept: 'locrian-instability',
     type: 'brightness',
     prompt: 'Which mode is the most harmonically unstable?',
     options: ['Phrygian', 'Aeolian', 'Dorian', 'Locrian'],
@@ -276,6 +296,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-br-neutral-minor',
+    concept: 'dorian-neutral',
     type: 'brightness',
     prompt: 'Which minor mode is the most balanced — neither especially dark nor light?',
     options: ['Aeolian', 'Phrygian', 'Locrian', 'Dorian'],
@@ -290,6 +311,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   {
     id: 'q-an-phrygian',
+    concept: 'phrygian-b2',
     type: 'avoid_note',
     prompt: 'Phrygian has a note to use with care. Which is it?',
     options: ['The flat 5th', 'The flat 7th', 'The flat 2nd', 'The raised 4th'],
@@ -302,6 +324,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-an-locrian',
+    concept: 'locrian-b5',
     type: 'avoid_note',
     prompt: 'Which interval makes Locrian impossible to use as a tonal center?',
     options: ['The flat 2nd', 'The flat 6th', 'The flat 7th', 'The flat 5th'],
@@ -317,6 +340,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 
   {
     id: 'q-cp-dorian-aeolian',
+    concept: 'dorian-aeolian-6th',
     type: 'color_note',
     prompt: 'Dorian and Aeolian are both minor modes. What is the only note that differs?',
     options: ['The 3rd', 'The 5th', 'The 7th', 'The 6th'],
@@ -328,6 +352,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'q-cp-ionian-lydian',
+    concept: 'lydian-sharp4',
     type: 'color_note',
     prompt: 'Ionian and Lydian are both major modes. What is the only note that differs?',
     options: ['The 2nd', 'The 7th', 'The 3rd', 'The 4th'],
@@ -339,6 +364,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'jq-adv-dorian-chord',
+    concept: 'dorian-m7-chord',
     type: 'chord_fit',
     prompt: 'Over a minor 7th chord functioning as ii in a major key, which mode is the natural choice?',
     options: ['Dorian', 'Phrygian', 'Aeolian', 'Locrian'],
@@ -350,6 +376,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'jq-adv-lydian-vs-ionian',
+    concept: 'lydian-sharp4',
     type: 'color_note',
     prompt: 'What single note distinguishes Lydian from Ionian, giving it that floating quality?',
     options: ['The raised 4th', 'The flat 7th', 'The natural 6th', 'The flat 2nd'],
@@ -361,6 +388,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'jq-adv-mixo-dominant',
+    concept: 'mixo-dom7-chord',
     type: 'chord_fit',
     prompt: 'Which mode is the primary choice over an unaltered dominant 7th chord?',
     options: ['Mixolydian', 'Lydian', 'Dorian', 'Ionian'],
@@ -372,6 +400,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'jq-adv-phrygian-flat2',
+    concept: 'phrygian-b2',
     type: 'color_note',
     prompt: 'The flat 2nd is the signature of Phrygian. What harmonic flavour does it most evoke?',
     options: ['Spanish / flamenco color', 'Bright pop major', 'Suspended floating', 'Bluesy dominant'],
@@ -383,6 +412,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'jq-adv-locrian-halfdim',
+    concept: 'locrian-halfdim-chord',
     type: 'chord_fit',
     prompt: 'Locrian is the usual mode over which chord quality?',
     options: ['Half-diminished (m7b5)', 'Major 7th', 'Dominant 7th', 'Minor 6th'],
@@ -394,6 +424,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: 'jq-adv-aeolian-vs-dorian',
+    concept: 'dorian-aeolian-6th',
     type: 'color_note',
     prompt: 'Aeolian and Dorian are both minor modes. Which note separates them?',
     options: ['The 6th (flat in Aeolian, natural in Dorian)', 'The 3rd', 'The 2nd', 'The 5th'],
@@ -438,11 +469,59 @@ export type QuizLevel = 'beginner' | 'intermediate' | 'advanced';
  * level's questions (shuffled), with options shuffled too. Length adapts to
  * how many questions exist at that level (up to questionCount).
  */
+// Order easier question types first so a session EASES IN instead of opening
+// with a hard application question. Lower number = simpler = shown earlier.
+const TYPE_EASE: Record<QuestionType, number> = {
+  color_note: 0,
+  brightness: 0,
+  avoid_note: 1,
+  chord_fit: 2,
+  tune_name: 2,
+  id_by_ear: 3,
+};
+
+/**
+ * Pick up to `count` questions with NO overlap: never two that test the same
+ * `concept`, and at most two questions about the same mode — so one session
+ * can't feel repetitive. Backfills (still concept-unique) if the caps run short.
+ */
+function pickVaried(questions: QuizQuestion[], count: number): QuizQuestion[] {
+  const seenConcept = new Set<string>();
+  const modeCount: Record<string, number> = {};
+  const out: QuizQuestion[] = [];
+  for (const q of questions) {
+    if (out.length >= count) break;
+    const c = q.concept ?? q.id;
+    if (seenConcept.has(c)) continue;
+    const mode = q.modeId ?? '';
+    if (mode && (modeCount[mode] ?? 0) >= 2) continue;
+    seenConcept.add(c);
+    if (mode) modeCount[mode] = (modeCount[mode] ?? 0) + 1;
+    out.push(q);
+  }
+  if (out.length < count) {
+    for (const q of questions) {
+      if (out.length >= count) break;
+      const c = q.concept ?? q.id;
+      if (seenConcept.has(c)) continue;
+      seenConcept.add(c);
+      out.push(q);
+    }
+  }
+  return out;
+}
+
+/**
+ * Build a quiz session for a difficulty level. Draws that level's questions,
+ * removes overlap (one per concept, max two per mode), then orders them
+ * EASY-FIRST so the session starts basic and ramps up. Options are shuffled.
+ */
 export function buildLeveledQuizSession(level: QuizLevel, questionCount = 10): QuizQuestion[] {
-  const pool = QUIZ_QUESTIONS.filter((q) => q.difficulty === level);
-  return [...pool]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, questionCount)
+  const pool = [...QUIZ_QUESTIONS.filter((q) => q.difficulty === level)].sort(
+    () => Math.random() - 0.5,
+  );
+  return pickVaried(pool, questionCount)
+    .sort((a, b) => (TYPE_EASE[a.type] - TYPE_EASE[b.type]) || Math.random() - 0.5)
     .map((q) => ({
       ...q,
       options: [...q.options].sort(() => Math.random() - 0.5),

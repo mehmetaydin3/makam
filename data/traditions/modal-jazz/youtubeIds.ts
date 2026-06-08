@@ -9,10 +9,10 @@ export const YOUTUBE_IDS: Record<string, string> = {
   'Impressions':                'zfrUfiNIZk0',
   // Phrygian — Jazz Day 2024 Tangier, Dee Dee Bridgewater + Marcus Miller
   'Spain':                      'q2Uc2Ya2GrE',
-  // Lydian — Danish National Symphony live
-  'Flying (E.T. Theme)':        'W2Fot5Sb8DM',
-  // Mixolydian — Official Beatles audio
-  'Norwegian Wood':             'B_RQv7OMJFI',
+  // Lydian — Joe Henderson "Inner Urge" (Blue Note / UMG official)
+  'Inner Urge':                 'N233dJw7GH4',
+  // Mixolydian — Miles Davis "All Blues", Kind of Blue (official audio)
+  'All Blues':                  '-488UORrfJ0',
   // Aeolian — Michel Petrucciani, BMG official, Montreux 1996
   'My Funny Valentine':         'rtVMzzm2_L0',
   // Aeolian — Michel Petrucciani, BMG official, Montreux 1993
@@ -25,8 +25,8 @@ export const LESSON_YOUTUBE_IDS: Record<string, string> = {
   ionian:     'P_tAU3GM9XI',
   dorian:     'G3in_Ewqu_g',
   phrygian:   'q2Uc2Ya2GrE',
-  lydian:     'W2Fot5Sb8DM',
-  mixolydian: 'B_RQv7OMJFI',
+  lydian:     'N233dJw7GH4',
+  mixolydian: '-488UORrfJ0',
   aeolian:    'rtVMzzm2_L0',
   locrian:    'Yn4MJbjUgr0',
 };
