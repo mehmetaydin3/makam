@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SPACING, RADIUS } from '../../data/constants';
 import { useTheme } from '../../context/ThemeContext';
 import { audioEngine } from '../../audio/audioEngine';
+import { BreathingView, Pop } from '../common/motion';
 
 /**
  * MakamScaleDiagram — mirrors the jazz ScaleDiagram skeleton (root picker,
@@ -162,15 +163,17 @@ export function MakamScaleDiagram({ makamId, scale, accentColor, noteNames }: Pr
               onPress={() => handleDegreeTap(i)}
               activeOpacity={0.7}
             >
-              <View style={[
-                styles.block,
-                { backgroundColor: bgColor, borderColor },
-                (isChar || isActive) && styles.blockGlow,
-              ]}>
-                <Text style={[styles.degreeLabel, (isChar || isActive) && { color: accentColor, fontWeight: '700' }]}>
-                  {i + 1}
-                </Text>
-              </View>
+              <Pop trigger={isActive} style={{ alignSelf: 'stretch' }}>
+                <View style={[
+                  styles.block,
+                  { backgroundColor: bgColor, borderColor },
+                  (isChar || isActive) && styles.blockGlow,
+                ]}>
+                  <Text style={[styles.degreeLabel, (isChar || isActive) && { color: accentColor, fontWeight: '700' }]}>
+                    {i + 1}
+                  </Text>
+                </View>
+              </Pop>
               <Text style={[styles.stepLabel, (isChar || isActive) && { color: accentColor }]} numberOfLines={1}>
                 {stepCents(i)}
               </Text>
@@ -204,17 +207,19 @@ export function MakamScaleDiagram({ makamId, scale, accentColor, noteNames }: Pr
         })}
       </View>
 
-      {/* Play button */}
-      <TouchableOpacity
-        style={[styles.playButton, isPlaying && { backgroundColor: accentColor + '22', borderColor: accentColor }]}
-        onPress={handlePlayStop}
-        activeOpacity={0.8}
-      >
-        <Ionicons name={isPlaying ? 'stop' : 'play'} size={14} color={isPlaying ? accentColor : COLORS.textSecondary} />
-        <Text style={[styles.playButtonText, isPlaying && { color: accentColor }]}>
-          {isPlaying ? 'Stop' : 'Play scale on ney'}
-        </Text>
-      </TouchableOpacity>
+      {/* Play button — a gentle idle pulse invites the first tap */}
+      <BreathingView active={!isPlaying}>
+        <TouchableOpacity
+          style={[styles.playButton, isPlaying && { backgroundColor: accentColor + '22', borderColor: accentColor }]}
+          onPress={handlePlayStop}
+          activeOpacity={0.8}
+        >
+          <Ionicons name={isPlaying ? 'stop' : 'play'} size={14} color={isPlaying ? accentColor : COLORS.textSecondary} />
+          <Text style={[styles.playButtonText, isPlaying && { color: accentColor }]}>
+            {isPlaying ? 'Stop' : 'Play scale on ney'}
+          </Text>
+        </TouchableOpacity>
+      </BreathingView>
 
       <Text style={styles.tapHint}>Tap any degree to play from there</Text>
 

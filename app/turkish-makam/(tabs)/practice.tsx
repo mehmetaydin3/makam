@@ -15,6 +15,8 @@ import { useProgress } from '../../../hooks/useProgress';
 import { QUIZ_PASS_THRESHOLD, nextQuizLevel } from '../../../data/progress';
 import { COLORS, SPACING, RADIUS } from '../../../data/constants';
 import { Chrome } from '../../../components/chrome';
+import { RewardBurst } from '../../../components/rewards';
+import { PressableScale, Pop, Bounce, BreathingView } from '../../../components/common/motion';
 
 
 type QuizState = 'home' | 'question' | 'answer' | 'result';
@@ -29,6 +31,8 @@ export default function PracticeScreen() {
   const [finalScore, setFinalScore] = useState(0);
   const [currentLevel, setCurrentLevel] = useState<QuizLevel>('beginner');
   const [justUnlocked, setJustUnlocked] = useState<QuizLevel | null>(null);
+  // Celebratory overlay shown when a session finishes well / a level unlocks.
+  const [reward, setReward] = useState<{ kind: 'level' | 'daily'; title: string; subtitle?: string } | null>(null);
 
   const startLevel = (level: QuizLevel) => {
     const session = buildLeveledQuizSession(level, 10);
@@ -66,6 +70,10 @@ export default function PracticeScreen() {
       if (pct >= QUIZ_PASS_THRESHOLD && next && !isQuizLevelUnlocked('turkish-makam', next)) {
         unlockQuizLevel('turkish-makam', next);
         setJustUnlocked(next);
+        const label = next.charAt(0).toUpperCase() + next.slice(1);
+        setReward({ kind: 'level', title: `${label} unlocked`, subtitle: 'A new level of questions is open.' });
+      } else if (pct >= QUIZ_PASS_THRESHOLD) {
+        setReward({ kind: 'daily', title: 'Nicely done', subtitle: `${newScore} of ${questions.length} — you passed.` });
       }
       setQuizState('result');
     }
@@ -82,13 +90,25 @@ export default function PracticeScreen() {
 
   if (quizState === 'result') {
     return (
-      <ResultView
-        score={finalScore}
-        total={questions.length}
-        justUnlocked={justUnlocked}
-        onRestart={() => setQuizState('home')}
-        onRetry={() => startLevel(currentLevel)}
-      />
+      <>
+        <ResultView
+          score={finalScore}
+          total={questions.length}
+          justUnlocked={justUnlocked}
+          onRestart={() => setQuizState('home')}
+          onRetry={() => startLevel(currentLevel)}
+        />
+        <RewardBurst
+          visible={!!reward}
+          kind={reward?.kind ?? 'daily'}
+          title={reward?.title ?? ''}
+          subtitle={reward?.subtitle}
+          accent={COLORS.accent}
+          textPrimary={COLORS.textPrimary}
+          textSecondary={COLORS.textSecondary}
+          onDone={() => setReward(null)}
+        />
+      </>
     );
   }
 
@@ -255,6 +275,8 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   const [done, setDone] = useState(false);
   const [activity, setActivity] = useState<'idle' | 'anchor' | 'phrase' | 'compare'>('idle');
   const [hasPlayed, setHasPlayed] = useState(false);
+  // Celebratory overlay: streak milestones + a strong finish.
+  const [reward, setReward] = useState<{ kind: 'streak' | 'daily'; title: string; subtitle?: string } | null>(null);
 
   const question = questions[index];
 
@@ -339,8 +361,15 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
     setSelected(value);
     setShowAnswer(true);
     const correct = value === question.correctAnswer;
-    if (correct) { setScore((s) => s + 1); setStreak((s) => s + 1); }
-    else setStreak(0);
+    if (correct) {
+      setScore((s) => s + 1);
+      const nextStreak = streak + 1;
+      setStreak(nextStreak);
+      // Celebrate notable streaks (every 3 in a row) without nagging.
+      if (nextStreak >= 3 && nextStreak % 3 === 0) {
+        setReward({ kind: 'streak', title: `${nextStreak} in a row`, subtitle: 'Your ear is locking in.' });
+      }
+    } else setStreak(0);
     recordQuizAnswer('turkish-makam', question.makamId, correct);
   };
 
@@ -352,12 +381,17 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
       setShowAnswer(false);
       setHasPlayed(false);
     } else {
+      // The final answer is already scored, so `score` is current here.
+      if (score / questions.length >= 0.7) {
+        setReward({ kind: 'daily', title: 'Good ears', subtitle: `${score} of ${questions.length} by ear.` });
+      }
       setDone(true);
     }
   };
 
   const restart = () => {
     stopAll();
+    setReward(null);
     setQuestions(buildMakamEarSession(level, EAR_SESSION_LENGTH));
     setIndex(0);
     setSelected(null);
@@ -393,10 +427,10 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
           <Ionicons name="close" size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.questionCount}>{index + 1} / {questions.length}</Text>
-        <View style={styles.scorePillRow}>
+        <Bounce trigger={score} style={styles.scorePillRow}>
           {streak >= 2 && <Text style={styles.streakPill}>{streak}🔥</Text>}
           <Text style={styles.scoreDisplay}>{score} ✓</Text>
-        </View>
+        </Bounce>
       </View>
 
       <View style={styles.progressTrack}>
@@ -407,18 +441,20 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
         <Text style={styles.earKicker}>{kicker}</Text>
         <Text style={styles.prompt}>{question.prompt}</Text>
 
-        <TouchableOpacity
-          style={[styles.playButton, isBusy && styles.playButtonActive]}
-          onPress={isBusy ? stopAll : playItem}
-          activeOpacity={0.85}
-        >
-          <Ionicons
-            name={isBusy ? 'stop' : hasPlayed ? 'refresh' : 'play'}
-            size={26}
-            color={COLORS.background}
-          />
-          <Text style={styles.playButtonText}>{isBusy ? 'Stop' : playLabel}</Text>
-        </TouchableOpacity>
+        <BreathingView active={!isBusy && !hasPlayed && !showAnswer}>
+          <TouchableOpacity
+            style={[styles.playButton, isBusy && styles.playButtonActive]}
+            onPress={isBusy ? stopAll : playItem}
+            activeOpacity={0.85}
+          >
+            <Ionicons
+              name={isBusy ? 'stop' : hasPlayed ? 'refresh' : 'play'}
+              size={26}
+              color={COLORS.background}
+            />
+            <Text style={styles.playButtonText}>{isBusy ? 'Stop' : playLabel}</Text>
+          </TouchableOpacity>
+        </BreathingView>
 
         {/* A/B compare — hear every candidate, each anchored on its durak */}
         <TouchableOpacity
@@ -459,20 +495,21 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
               optionStyle = { ...styles.option, ...styles.optionSelected };
             }
             return (
-              <TouchableOpacity
-                key={opt.value}
-                style={optionStyle}
-                onPress={() => handleSelect(opt.value)}
-                activeOpacity={showAnswer ? 1 : 0.8}
-              >
-                {showAnswer && isCorrectOption && (
-                  <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
-                )}
-                {showAnswer && isSelected && !isCorrectOption && (
-                  <Ionicons name="close-circle" size={16} color={COLORS.warning} />
-                )}
-                <Text style={textStyle}>{opt.label}</Text>
-              </TouchableOpacity>
+              <Pop key={opt.value} trigger={showAnswer && isCorrectOption}>
+                <TouchableOpacity
+                  style={optionStyle}
+                  onPress={() => handleSelect(opt.value)}
+                  activeOpacity={showAnswer ? 1 : 0.8}
+                >
+                  {showAnswer && isCorrectOption && (
+                    <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
+                  )}
+                  {showAnswer && isSelected && !isCorrectOption && (
+                    <Ionicons name="close-circle" size={16} color={COLORS.warning} />
+                  )}
+                  <Text style={textStyle}>{opt.label}</Text>
+                </TouchableOpacity>
+              </Pop>
             );
           })}
         </View>
@@ -506,14 +543,25 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
 
       {showAnswer && (
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <PressableScale style={styles.nextButton} onPress={handleNext}>
             <Text style={styles.nextButtonText}>
               {index === questions.length - 1 ? 'See result' : 'Next'}
             </Text>
             <Ionicons name="arrow-forward" size={16} color={COLORS.background} />
-          </TouchableOpacity>
+          </PressableScale>
         </View>
       )}
+
+      <RewardBurst
+        visible={!!reward}
+        kind={reward?.kind ?? 'streak'}
+        title={reward?.title ?? ''}
+        subtitle={reward?.subtitle}
+        accent={COLORS.accent}
+        textPrimary={COLORS.textPrimary}
+        textSecondary={COLORS.textSecondary}
+        onDone={() => setReward(null)}
+      />
     </SafeAreaView>
   );
 }
@@ -545,9 +593,9 @@ function EarResultView({ score, total, onRestart, onRetry }: {
           <Text style={styles.percentage}>{percentage}%</Text>
           <Text style={styles.resultMessage}>{getMessage()}</Text>
 
-          <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
+          <PressableScale style={styles.restartButton} onPress={onRestart}>
             <Text style={styles.restartText}>Back to practice</Text>
-          </TouchableOpacity>
+          </PressableScale>
           <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
             <Ionicons name="refresh" size={16} color={COLORS.accent} />
             <Text style={styles.retryText}>New ears</Text>
@@ -577,7 +625,9 @@ function QuestionView({
           <Ionicons name="close" size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.questionCount}>{questionNumber} / {total}</Text>
-        <Text style={styles.scoreDisplay}>{score} ✓</Text>
+        <Bounce trigger={score}>
+          <Text style={styles.scoreDisplay}>{score} ✓</Text>
+        </Bounce>
       </View>
 
       <View style={styles.progressTrack}>
@@ -628,20 +678,21 @@ function QuestionView({
               optionStyle = { ...styles.option, ...styles.optionSelected };
             }
             return (
-              <TouchableOpacity
-                key={option}
-                style={optionStyle}
-                onPress={() => !showAnswer && onAnswer(option)}
-                activeOpacity={showAnswer ? 1 : 0.8}
-              >
-                {showAnswer && isCorrectOption && (
-                  <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
-                )}
-                {showAnswer && isSelected && !isCorrectOption && (
-                  <Ionicons name="close-circle" size={16} color={COLORS.warning} />
-                )}
-                <Text style={textStyle}>{option}</Text>
-              </TouchableOpacity>
+              <Pop key={option} trigger={showAnswer && isCorrectOption}>
+                <TouchableOpacity
+                  style={optionStyle}
+                  onPress={() => !showAnswer && onAnswer(option)}
+                  activeOpacity={showAnswer ? 1 : 0.8}
+                >
+                  {showAnswer && isCorrectOption && (
+                    <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
+                  )}
+                  {showAnswer && isSelected && !isCorrectOption && (
+                    <Ionicons name="close-circle" size={16} color={COLORS.warning} />
+                  )}
+                  <Text style={textStyle}>{option}</Text>
+                </TouchableOpacity>
+              </Pop>
             );
           })}
         </View>
@@ -666,12 +717,12 @@ function QuestionView({
 
       {showAnswer && (
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+          <PressableScale style={styles.nextButton} onPress={onNext}>
             <Text style={styles.nextButtonText}>
               {questionNumber === total ? 'See result' : 'Next'}
             </Text>
             <Ionicons name="arrow-forward" size={16} color={COLORS.background} />
-          </TouchableOpacity>
+          </PressableScale>
         </View>
       )}
     </SafeAreaView>
@@ -731,9 +782,9 @@ function ResultView({ score, total, justUnlocked, onRestart, onRetry }: {
         </View>
 
 
-        <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
+        <PressableScale style={styles.restartButton} onPress={onRestart}>
           <Text style={styles.restartText}>Back to practice</Text>
-        </TouchableOpacity>
+        </PressableScale>
         <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
           <Ionicons name="refresh" size={16} color={COLORS.accent} />
           <Text style={styles.retryText}>Try again</Text>

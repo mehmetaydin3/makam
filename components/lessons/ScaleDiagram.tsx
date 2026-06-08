@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SPACING, RADIUS } from '../../data/traditions/modal-jazz/theme';
 import { useTheme } from '../../context/ThemeContext';
 import RhodesEngine, { RhodesEngineRef } from '../../data/traditions/modal-jazz/RhodesEngine';
+import { BreathingView, Pop } from '../common/motion';
 
 interface ScaleDiagramProps {
   intervals: number[];
@@ -196,19 +197,21 @@ export default function ScaleDiagram({
                   onPress={() => handleDegreeTap(i)}
                   activeOpacity={0.7}
                 >
-                  <View style={[
-                    styles.block,
-                    { width: w - 4, backgroundColor: bgColor, borderColor },
-                    (colorNote || isActive) && styles.blockGlow,
-                  ]}>
-                    <Text style={[
-                      styles.degreeLabel,
-                      (colorNote || isActive) && { color: accentColor, fontWeight: '700' },
-                      avoidNote && !isActive && { color: JAZZ_COLORS.warning },
+                  <Pop trigger={isActive}>
+                    <View style={[
+                      styles.block,
+                      { width: w - 4, backgroundColor: bgColor, borderColor },
+                      (colorNote || isActive) && styles.blockGlow,
                     ]}>
-                      {degreeNumbers[i]}
-                    </Text>
-                  </View>
+                      <Text style={[
+                        styles.degreeLabel,
+                        (colorNote || isActive) && { color: accentColor, fontWeight: '700' },
+                        avoidNote && !isActive && { color: JAZZ_COLORS.warning },
+                      ]}>
+                        {degreeNumbers[i]}
+                      </Text>
+                    </View>
+                  </Pop>
                   <Text style={[styles.stepLabel, (colorNote || isActive) && { color: accentColor }]}>
                     {i < steps.length ? steps[i] : ' '}
                   </Text>
@@ -240,21 +243,23 @@ export default function ScaleDiagram({
         </View>
       </ScrollView>
 
-      {/* Play button */}
-      <TouchableOpacity
-        style={[styles.playButton, isPlaying && { backgroundColor: accentColor + '22', borderColor: accentColor }]}
-        onPress={handlePlayStop}
-        activeOpacity={0.8}
-      >
-        <Ionicons
-          name={isPlaying ? 'stop' : 'play'}
-          size={14}
-          color={isPlaying ? accentColor : JAZZ_COLORS.textSecondary}
-        />
-        <Text style={[styles.playButtonText, isPlaying && { color: accentColor }]}>
-          {isPlaying ? 'Stop' : 'Play scale'}
-        </Text>
-      </TouchableOpacity>
+      {/* Play button — a gentle idle pulse invites the first tap */}
+      <BreathingView active={!isPlaying}>
+        <TouchableOpacity
+          style={[styles.playButton, isPlaying && { backgroundColor: accentColor + '22', borderColor: accentColor }]}
+          onPress={handlePlayStop}
+          activeOpacity={0.8}
+        >
+          <Ionicons
+            name={isPlaying ? 'stop' : 'play'}
+            size={14}
+            color={isPlaying ? accentColor : JAZZ_COLORS.textSecondary}
+          />
+          <Text style={[styles.playButtonText, isPlaying && { color: accentColor }]}>
+            {isPlaying ? 'Stop' : 'Play scale'}
+          </Text>
+        </TouchableOpacity>
+      </BreathingView>
 
       <Text style={styles.tapHint}>Tap any degree to play from there</Text>
 
