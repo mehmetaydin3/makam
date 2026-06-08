@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING } from '../../data/constants';
+import { SPACING } from '../../data/constants';
+import { useTheme } from '../../context/ThemeContext';
 import { audioEngine } from '../../audio/audioEngine';
 
 /**
@@ -57,6 +58,8 @@ function komaLabel(cents: number): { interp: string } {
 }
 
 export function MakamScaleDiagram({ makamId, scale, accentColor, noteNames }: Props) {
+  const { colors: COLORS } = useTheme();
+  const styles = useMemo(() => makeStyles(COLORS), [COLORS]);
   const [rootOffset, setRootOffset] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
@@ -227,7 +230,7 @@ export function MakamScaleDiagram({ makamId, scale, accentColor, noteNames }: Pr
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (COLORS: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     backgroundColor: COLORS.surface,
     borderRadius: 16,

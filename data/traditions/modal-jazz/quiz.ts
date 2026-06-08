@@ -434,6 +434,319 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     modeId: 'aeolian',
     difficulty: 'advanced',
   },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ADDED: depth questions — weighted to intermediate & advanced, spread
+  // across all 7 modes and every type, each with a distinct concept tag.
+  // ══════════════════════════════════════════════════════════════════════
+
+  // ── Color note: filling out every mode / new angles ────────────────────
+  {
+    id: 'q-cn-mixo-vs-ionian',
+    concept: 'mixo-vs-ionian-7th',
+    type: 'color_note',
+    prompt: 'Ionian and Mixolydian are both major-quality modes. What single note separates them?',
+    options: ['The 4th', 'The 7th', 'The 2nd', 'The 6th'],
+    correctAnswer: 'The 7th',
+    explanation:
+      'Ionian has a major 7th; Mixolydian flats it. That one note turns a luminous major scale into a bluesy dominant.',
+    modeId: 'mixolydian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-cn-phrygian-vs-aeolian',
+    concept: 'phrygian-vs-aeolian-2nd',
+    type: 'color_note',
+    prompt: 'Phrygian and Aeolian share the same notes except one. Which degree differs?',
+    options: ['The 2nd', 'The 6th', 'The 7th', 'The 5th'],
+    correctAnswer: 'The 2nd',
+    explanation:
+      'Both are natural-minor in flavour, but Phrygian flats the 2nd. That half step above the root is the whole difference between melancholy and menace.',
+    modeId: 'phrygian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-cn-locrian-vs-phrygian',
+    concept: 'locrian-vs-phrygian-5th',
+    type: 'color_note',
+    prompt: 'Locrian is Phrygian with one further alteration. Which note is changed?',
+    options: ['The 5th is flatted', 'The 2nd is raised', 'The 7th is raised', 'The 3rd is raised'],
+    correctAnswer: 'The 5th is flatted',
+    explanation:
+      'Locrian = Phrygian with a flat 5th. Flatting the fifth collapses the tonic into a diminished chord — the source of Locrian\'s instability.',
+    modeId: 'locrian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-cn-dorian-two-colors',
+    concept: 'dorian-natural6-over-b3',
+    type: 'color_note',
+    prompt: 'Dorian places a bright color note over a minor framework. Which pairing creates its signature tension?',
+    options: ['Flat 3rd with natural 6th', 'Major 3rd with flat 7th', 'Flat 2nd with flat 6th', 'Flat 5th with flat 7th'],
+    correctAnswer: 'Flat 3rd with natural 6th',
+    explanation:
+      'Dorian\'s minor 3rd keeps it minor, while the natural 6th sitting a major sixth above the root brightens it — that flat-3rd-against-natural-6th pull is its identity.',
+    modeId: 'dorian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-cn-lydian-vs-mixo-bright',
+    concept: 'lydian-sharp4-vs-mixo',
+    type: 'color_note',
+    prompt: 'Lydian dominant aside, plain Lydian differs from Mixolydian by two notes. Which pair?',
+    options: ['Lydian has a #4 and a major 7th', 'Lydian has a b7 and b6', 'Lydian has a b2 and #4', 'Lydian has a natural 4 and b7'],
+    correctAnswer: 'Lydian has a #4 and a major 7th',
+    explanation:
+      'Mixolydian is #4-less and has a flat 7th; Lydian raises the 4th and keeps a major 7th. Lydian floats and resolves bright; Mixolydian pulls and resolves bluesy.',
+    modeId: 'lydian',
+    difficulty: 'advanced',
+  },
+
+  // ── Chord fit: richer harmonic contexts ────────────────────────────────
+  {
+    id: 'q-cf-m6',
+    concept: 'dorian-m6-chord',
+    type: 'chord_fit',
+    prompt: 'The chord is Cm6 (minor with a natural 6th in the voicing). Which mode matches it note-for-note?',
+    options: ['Aeolian', 'Dorian', 'Phrygian', 'Locrian'],
+    correctAnswer: 'Dorian',
+    explanation:
+      'A minor 6 chord spells out the natural 6th — exactly Dorian\'s color note. Aeolian would clash, since its 6th is flat.',
+    modeId: 'dorian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-cf-dom7sharp11',
+    concept: 'lydian-dom-7sharp11-chord',
+    type: 'chord_fit',
+    prompt: 'You see G7#11. Which scale provides that #11 while keeping the dominant 7th?',
+    options: ['Mixolydian', 'Lydian dominant (Lydian b7)', 'Ionian', 'Locrian'],
+    correctAnswer: 'Lydian dominant (Lydian b7)',
+    explanation:
+      'A 7#11 chord wants the #4/#11 over a dominant 7th — that is Lydian dominant (the 4th mode of melodic minor), heard as Lydian\'s #4 grafted onto Mixolydian\'s b7.',
+    modeId: 'lydian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-cf-tonic-major',
+    concept: 'ionian-Imaj-chord',
+    type: 'chord_fit',
+    prompt: 'A Cmaj7 acts as the tonic I chord of C major, with no #11 marked. Which mode is safest?',
+    options: ['Lydian', 'Ionian', 'Mixolydian', 'Dorian'],
+    correctAnswer: 'Ionian',
+    explanation:
+      'On a functioning I chord with no #11, Ionian is home. Lydian fits, but its #4 floats away from the grounded tonic the chart is asking for.',
+    modeId: 'ionian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-cf-iv-major-lydian',
+    concept: 'lydian-IVmaj-chord',
+    type: 'chord_fit',
+    prompt: 'Over the IV chord (Fmaj7) in the key of C, which mode lets you sound bright without leaving the key?',
+    options: ['Ionian', 'F Lydian', 'F Mixolydian', 'Aeolian'],
+    correctAnswer: 'F Lydian',
+    explanation:
+      'The IV chord\'s natural #11 is already in the parent key (B natural over F). F Lydian is the diatonic mode of the IV chord, so it floats while staying in C major.',
+    modeId: 'lydian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-cf-sus-dominant',
+    concept: 'mixo-sus-chord',
+    type: 'chord_fit',
+    prompt: 'The chart says G7sus4 sitting for several bars. Which mode is the natural fit?',
+    options: ['Lydian', 'Mixolydian', 'Locrian', 'Phrygian'],
+    correctAnswer: 'Mixolydian',
+    explanation:
+      'A sus dominant keeps the natural 4th (the suspension) and the flat 7th — both live in Mixolydian, which is the default colour over sus7 chords.',
+    modeId: 'mixolydian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-cf-minor-tonic-aeolian',
+    concept: 'aeolian-im-tonic-chord',
+    type: 'chord_fit',
+    prompt: 'A Cm chord is the tonic i of a dark minor-key ballad. Which mode supplies that natural-minor gravity?',
+    options: ['Dorian', 'Aeolian', 'Phrygian', 'Locrian'],
+    correctAnswer: 'Aeolian',
+    explanation:
+      'When the minor tonic wants weight and shadow rather than Dorian\'s lift, Aeolian\'s flat 6th is the natural-minor sound a ballad reaches for.',
+    modeId: 'aeolian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-cf-iii-phrygian',
+    concept: 'phrygian-iii-chord',
+    type: 'chord_fit',
+    prompt: 'Over the iii chord (Em7) in the key of C, which mode is diatonically correct?',
+    options: ['E Aeolian', 'E Dorian', 'E Phrygian', 'E Locrian'],
+    correctAnswer: 'E Phrygian',
+    explanation:
+      'The iii chord built on the 3rd degree of a major key yields Phrygian — the same seven notes of C major starting on E, complete with that flat 2nd (F natural).',
+    modeId: 'phrygian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-cf-vii-locrian',
+    concept: 'locrian-vii-chord',
+    type: 'chord_fit',
+    prompt: 'The vii chord of a major key (Bm7b5 in C) appears. Which mode is its diatonic match?',
+    options: ['B Phrygian', 'B Locrian', 'B Aeolian', 'B Dorian'],
+    correctAnswer: 'B Locrian',
+    explanation:
+      'The mode built on the 7th degree of a major key is Locrian — and its half-diminished tonic chord is exactly the vii(m7b5) you are looking at.',
+    modeId: 'locrian',
+    difficulty: 'advanced',
+  },
+
+  // ── Brightness: ordering & relative-darkness reasoning ─────────────────
+  {
+    id: 'q-br-order-major',
+    concept: 'brightness-order-major',
+    type: 'brightness',
+    prompt: 'Ranking the three major-quality modes from brightest to darkest, which order is correct?',
+    options: ['Lydian, Ionian, Mixolydian', 'Ionian, Lydian, Mixolydian', 'Mixolydian, Ionian, Lydian', 'Lydian, Mixolydian, Ionian'],
+    correctAnswer: 'Lydian, Ionian, Mixolydian',
+    explanation:
+      'Lydian (#4) is brightest, Ionian sits in the middle, and Mixolydian (b7) is the darkest of the major-3rd modes.',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-br-order-minor',
+    concept: 'brightness-order-minor',
+    type: 'brightness',
+    prompt: 'From brightest to darkest, how do the three common minor modes rank?',
+    options: ['Dorian, Aeolian, Phrygian', 'Phrygian, Aeolian, Dorian', 'Aeolian, Dorian, Phrygian', 'Dorian, Phrygian, Aeolian'],
+    correctAnswer: 'Dorian, Aeolian, Phrygian',
+    explanation:
+      'Dorian\'s natural 6th makes it the brightest minor; Aeolian flats the 6th; Phrygian flats both 6th and 2nd, making it the darkest of the three.',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-br-brightening-mechanism',
+    concept: 'brightness-mechanism-sharps',
+    type: 'brightness',
+    prompt: 'As you move through the modes from Lydian toward Locrian, what consistently happens to make each darker?',
+    options: ['One more scale degree is lowered', 'The root rises a half step', 'The 5th alternates', 'The tempo slows'],
+    correctAnswer: 'One more scale degree is lowered',
+    explanation:
+      'Order the modes Lydian-Ionian-Mixo-Dorian-Aeolian-Phrygian-Locrian and each successive mode flats exactly one more degree — a tidy ladder from brightest to darkest.',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-br-mixo-vs-ionian',
+    concept: 'brightness-mixo-darker-ionian',
+    type: 'brightness',
+    prompt: 'Why is Mixolydian considered darker than Ionian despite both having a major 3rd?',
+    options: ['Its flat 7th removes the leading-tone pull', 'Its raised 4th', 'Its flat 2nd', 'Its diminished 5th'],
+    correctAnswer: 'Its flat 7th removes the leading-tone pull',
+    explanation:
+      'Lowering the 7th strips away the major scale\'s luminous leading tone, relaxing the brightness into the earthier, bluesier dominant sound.',
+    modeId: 'mixolydian',
+    difficulty: 'intermediate',
+  },
+
+  // ── Avoid note: extend to other modes ──────────────────────────────────
+  {
+    id: 'q-an-ionian-4th',
+    concept: 'ionian-avoid-4th',
+    type: 'avoid_note',
+    prompt: 'Which note is the classic "avoid note" when improvising over a Cmaj7 in Ionian?',
+    options: ['The major 7th', 'The natural 4th', 'The 6th', 'The 2nd'],
+    correctAnswer: 'The natural 4th',
+    explanation:
+      'The natural 4th sits a half step above the major 3rd of the chord, creating a harsh clash. Players either pass through it quickly or raise it — which is precisely why Lydian exists.',
+    modeId: 'ionian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-an-mixo-4th',
+    concept: 'mixo-avoid-4th',
+    type: 'avoid_note',
+    prompt: 'Over a G7 in Mixolydian, which tone do soloists generally treat as an avoid note?',
+    options: ['The flat 7th', 'The natural 4th', 'The major 3rd', 'The 5th'],
+    correctAnswer: 'The natural 4th',
+    explanation:
+      'Just as in Ionian, the natural 4th clashes a half step above the chord\'s major 3rd. It is fine as a suspension or passing tone, but lingering on it muddies the dominant sound.',
+    modeId: 'mixolydian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-an-dorian-6th-careful',
+    concept: 'dorian-color-careful',
+    type: 'avoid_note',
+    prompt: 'Dorian\'s natural 6th is its color note, but why must it be handled with care over a static minor vamp?',
+    options: ['It can pull the ear toward the relative major', 'It is dissonant against the root', 'It is a tritone from the 3rd', 'It clashes with the 5th'],
+    correctAnswer: 'It can pull the ear toward the relative major',
+    explanation:
+      'The natural 6th is a strong, bright tone; leaning on it too hard can make the vamp sound like its relative major rather than minor. Used as a target or passing colour it defines Dorian; overused it dissolves the minor centre.',
+    modeId: 'dorian',
+    difficulty: 'advanced',
+  },
+
+  // ── Tune name: more repertoire across modes ────────────────────────────
+  {
+    id: 'q-tn-flamenco-sketches',
+    concept: 'tune-phrygian-flamenco',
+    type: 'tune_name',
+    prompt: 'Miles Davis’ "Flamenco Sketches" and the Sketches of Spain palette lean on which mode for their Spanish colour?',
+    options: ['Dorian', 'Phrygian', 'Lydian', 'Mixolydian'],
+    correctAnswer: 'Phrygian',
+    explanation:
+      'The Spanish/flamenco colour Miles reached for is the Phrygian flat 2nd — the same half-step-from-the-root sound that defines flamenco guitar.',
+    modeId: 'phrygian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-tn-little-sunflower',
+    concept: 'tune-dorian-sunflower',
+    type: 'tune_name',
+    prompt: 'Freddie Hubbard’s "Little Sunflower" rides a long suspended minor vamp. Which mode does it live in?',
+    options: ['Aeolian', 'Dorian', 'Phrygian', 'Locrian'],
+    correctAnswer: 'Dorian',
+    explanation:
+      'Like "So What" and "Maiden Voyage," "Little Sunflower" floats on a Dorian vamp — its natural 6th giving the minor groove that open, hovering brightness.',
+    modeId: 'dorian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-tn-fire-dorian',
+    concept: 'tune-dorian-evans-modal',
+    type: 'tune_name',
+    prompt: 'The slow modal vamps of the Kind of Blue session mostly explore which minor mode?',
+    options: ['Aeolian', 'Phrygian', 'Dorian', 'Locrian'],
+    correctAnswer: 'Dorian',
+    explanation:
+      'Kind of Blue is the landmark Dorian record — extended vamps that let players paint with the mode\'s natural-6th colour rather than chase chord changes.',
+    modeId: 'dorian',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'q-tn-maria-lydian',
+    concept: 'tune-lydian-maria',
+    type: 'tune_name',
+    prompt: 'The dreamy, floating opening of "Maria" (West Side Story) is a textbook example of which mode’s color?',
+    options: ['Ionian', 'Lydian', 'Mixolydian', 'Dorian'],
+    correctAnswer: 'Lydian',
+    explanation:
+      'That suspended, wonderstruck lift on the word "Maria" comes from Lydian\'s raised 4th — the brightest, most floating sound in the diatonic system.',
+    modeId: 'lydian',
+    difficulty: 'advanced',
+  },
+  {
+    id: 'q-tn-allblues',
+    concept: 'tune-mixo-allblues',
+    type: 'tune_name',
+    prompt: 'Miles Davis’ "All Blues" sits in a 6/8 G groove. Which mode colours its dominant tonality?',
+    options: ['Ionian', 'Mixolydian', 'Lydian', 'Dorian'],
+    correctAnswer: 'Mixolydian',
+    explanation:
+      '"All Blues" lives on a G dominant feel; G Mixolydian, with its flat 7th, supplies the bluesy modal colour over the slow waltz.',
+    modeId: 'mixolydian',
+    difficulty: 'advanced',
+  },
+
 ];
 
 // ── Utilities ──────────────────────────────────────────────────────────────

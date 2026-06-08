@@ -14,6 +14,8 @@ import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
 import { MakamScaleDiagram } from '../../../components/scale/MakamScaleDiagram';
+import { Accordion } from '../../../components/common/Accordion';
+import { CharacterBand } from '../../../components/common/CharacterBand';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
@@ -192,19 +194,23 @@ export default function MakamDetailScreen() {
           />
         </View>
 
-        {/* ABOUT */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Hakkında' : 'About'}</Text>
-          <Text style={styles.description}>{makam.description}</Text>
-        </View>
+        {/* HERO SCALE — hear it first */}
+        <MakamScaleDiagram
+          makamId={makam.id}
+          scale={makam.scale || []}
+          accentColor={makam.color}
+          noteNames={noteNames === 'solfege' ? 'solfege' : 'western'}
+        />
+        {makam.characterNote ? <Text style={styles.characterNote}>{makam.characterNote}</Text> : null}
 
-        {/* WESTERN ANALOGY */}
-        {makam.westernAnalogy ? (
-          <View style={[styles.analogyCard, { backgroundColor: accent + '11', borderColor: accent + '33', borderLeftColor: accent }]}>
-            <Text style={[styles.analogyLabel, { color: accent }]}>{language === 'tr' ? 'BATI MÜZİSYENLERİ İÇİN' : 'FOR WESTERN MUSICIANS'}</Text>
-            <Text style={styles.analogyText}>{makam.westernAnalogy}</Text>
-          </View>
-        ) : null}
+        {/* CHARACTER BAND — color + time + mood, compact */}
+        <CharacterBand
+          swatch={makam.color}
+          accent={accent}
+          colors={COLORS}
+          moods={makam.mood || []}
+          timeOfDay={makam.timeOfDay}
+        />
 
         {/* INFO ROW */}
         <View style={styles.infoRow}>
@@ -222,17 +228,16 @@ export default function MakamDetailScreen() {
           </View>
         </View>
 
-        {/* MOOD */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Duygu' : 'Mood'}</Text>
-          <View style={styles.moodRow}>
-            {(makam.mood || []).map((m) => (
-              <View key={m} style={styles.moodTag}>
-                <Text style={styles.moodText}>{m}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+        {/* ABOUT (collapsed) */}
+        <Accordion title={language === 'tr' ? 'Hakkında' : 'About'} accent={accent} colors={COLORS}>
+          <Text style={styles.description}>{makam.description}</Text>
+          {makam.westernAnalogy ? (
+            <View style={[styles.analogyCard, { backgroundColor: accent + '11', borderColor: accent + '33', borderLeftColor: accent, marginTop: SPACING.md, marginBottom: 0 }]}>
+              <Text style={[styles.analogyLabel, { color: accent }]}>{language === 'tr' ? 'BATI MÜZİSYENLERİ İÇİN' : 'FOR WESTERN MUSICIANS'}</Text>
+              <Text style={styles.analogyText}>{makam.westernAnalogy}</Text>
+            </View>
+          ) : null}
+        </Accordion>
 
         {/* LISTENING SECTION */}
         <View style={styles.section}>
@@ -254,30 +259,15 @@ export default function MakamDetailScreen() {
           )}
         </View>
 
-        {/* SCALE DEGREES */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Dizi Dereceleri' : 'Scale Degrees'}</Text>
-          <MakamScaleDiagram
-            makamId={makam.id}
-            scale={makam.scale || []}
-            accentColor={makam.color}
-            noteNames={noteNames === 'solfege' ? 'solfege' : 'western'}
-          />
-          {makam.characterNote ? <Text style={styles.characterNote}>{makam.characterNote}</Text> : null}
-          <Text style={styles.scaleHint}>Highlighted notes are where this makam lives — they cannot be swapped for standard tuning.</Text>
-        </View>
-
-        {/* CHARACTERISTIC MOVEMENT */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: accent }]}>Characteristic Movement</Text>
+        {/* CHARACTERISTIC MOVEMENT (collapsed) */}
+        <Accordion title="Characteristic Movement" accent={accent} colors={COLORS}>
           <View style={[styles.phraseCard, { borderLeftColor: accent }]}>
             <Text style={styles.phraseText}>"{makam.characteristicPhrase}"</Text>
           </View>
-        </View>
+        </Accordion>
 
-        {/* USUL PAIRINGS */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: accent }]}>Rhythmic Cycles (Usul)</Text>
+        {/* USUL PAIRINGS (collapsed) */}
+        <Accordion title="Rhythmic Cycles (Usul)" accent={accent} colors={COLORS}>
           <View style={{ backgroundColor: accent + '11', borderRadius: 12, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
             <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
               A makam without its usul is just a scale. The rhythmic cycle gives it life — pulse, momentum, and form. Tap any usul below to hear how it sounds and feel how it moves.
@@ -315,15 +305,14 @@ export default function MakamDetailScreen() {
               );
             })}
           </View>
-        </View>
+        </Accordion>
 
-        {/* SEYIR */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: accent }]}>Seyir</Text>
-          <View style={styles.seyirCard}>
+        {/* SEYIR (collapsed) */}
+        <Accordion title="Seyir" accent={accent} colors={COLORS}>
+          <View style={[styles.seyirCard, { borderWidth: 0, padding: 0 }]}>
             <Text style={styles.seyirType}>{SEYIR_LABELS[makam.seyir]}</Text>
           </View>
-        </View>
+        </Accordion>
 
         {/* RELATED MAKAMS */}
         <View style={{ marginBottom: 80 }}>

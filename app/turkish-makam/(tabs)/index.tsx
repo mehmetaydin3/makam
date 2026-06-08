@@ -19,6 +19,15 @@ import { Chrome } from '../../../components/chrome';
 const SEYIR_OPTIONS = ['All', 'Ascending', 'Descending', 'Undulating'];
 const FAMILY_OPTIONS = ['All', 'Rast', 'Ussak', 'Hicaz', 'Saba', 'Segah', 'Kurd', 'Buselik', 'Cargah', 'Nihavend'];
 
+// Visual time-of-day filter: a tiny sun/moon arc across the day.
+const TIME_OPTIONS: { value: string; icon: any; color: string }[] = [
+  { value: 'Dawn',      icon: 'partly-sunny-outline', color: '#E0A85A' },
+  { value: 'Morning',   icon: 'sunny-outline',        color: '#E0B85A' },
+  { value: 'Afternoon', icon: 'sunny-outline',        color: '#D89A4A' },
+  { value: 'Evening',   icon: 'partly-sunny-outline', color: '#C77A55' },
+  { value: 'Night',     icon: 'moon-outline',         color: '#7B8FCF' },
+];
+
 export default function ExploreScreen() {
   const router = useRouter();
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -70,7 +79,7 @@ export default function ExploreScreen() {
   const [timeFilter, setTimeFilter] = useState('All');
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const activeFilterCount = (seyirFilter !== 'All' ? 1 : 0) + moodFilter.length + timeSigFilter.length;
+  const activeFilterCount = (seyirFilter !== 'All' ? 1 : 0) + moodFilter.length + timeSigFilter.length + (timeFilter !== 'All' ? 1 : 0);
 
   const toggleTimeSig = (ts: string) => {
     setTimeSigFilter(prev => prev.includes(ts) ? prev.filter(t => t !== ts) : [...prev, ts]);
@@ -138,13 +147,14 @@ export default function ExploreScreen() {
       const matchingUsuls = USULS.filter(u => u.timeSignature === ts).map(u => u.name);
       return (m.commonUsuls || []).some(cu => matchingUsuls.some(mu => cu.includes(mu.split(' ')[0])));
     });
-    return matchesQuery && matchesSeyir && matchesMood && matchesTimeSig;
+    return matchesQuery && matchesSeyir && matchesMood && matchesTimeSig && matchesTime;
   });
 
   const clearFilters = () => {
     setSeyirFilter('All');
     setMoodFilter([]);
     setTimeSigFilter([]);
+    setTimeFilter('All');
   };
 
   // Family ordering — accessibility first for western audiences
@@ -166,7 +176,7 @@ export default function ExploreScreen() {
   const START_HERE = ['rast', 'ussak', 'hicaz'];
 
   // Group filtered makams by family when not searching
-  const isSearching = query.trim() !== '' || seyirFilter !== 'All' || moodFilter.length > 0 || timeSigFilter.length > 0;
+  const isSearching = query.trim() !== '' || seyirFilter !== 'All' || moodFilter.length > 0 || timeSigFilter.length > 0 || timeFilter !== 'All';
   
   const groupedMakams = () => {
     if (isSearching) return [{ family: null, makams: filtered }];
@@ -252,6 +262,12 @@ export default function ExploreScreen() {
               <Ionicons name="close" size={11} color={COLORS.accent} style={{ marginLeft: 4 }} />
             </TouchableOpacity>
           )}
+          {timeFilter !== 'All' && (
+            <TouchableOpacity style={styles.activePill} onPress={() => setTimeFilter('All')}>
+              <Text style={styles.activePillText}>{timeFilter}</Text>
+              <Ionicons name="close" size={11} color={COLORS.accent} style={{ marginLeft: 4 }} />
+            </TouchableOpacity>
+          )}
 
         </View>
       )}
@@ -278,6 +294,7 @@ export default function ExploreScreen() {
                   description={makam.description}
                   mood={makam.mood}
                   moodMap={moodMap}
+                  timeOfDay={makam.timeOfDay}
                   onPress={() => router.push(('/turkish-makam/makam/' + makam.id) as any)}
                 />
               ))}
@@ -322,6 +339,24 @@ export default function ExploreScreen() {
           </View>
 
 
+
+          {/* TIME OF DAY — visual sun/moon arc */}
+          <Text style={styles.filterLabel}>TIME OF DAY</Text>
+          <View style={styles.timeRow}>
+            {TIME_OPTIONS.map(opt => {
+              const active = timeFilter === opt.value;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  style={[styles.timeChip, active && { borderColor: opt.color, backgroundColor: opt.color + '22' }]}
+                  onPress={() => setTimeFilter(active ? 'All' : opt.value)}
+                >
+                  <Ionicons name={opt.icon} size={18} color={active ? opt.color : COLORS.textTertiary} />
+                  <Text style={[styles.timeChipText, active && { color: opt.color }]}>{opt.value}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
 
           {/* TIME SIGNATURE */}
           <Text style={styles.filterLabel}>RHYTHM</Text>
@@ -412,6 +447,9 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
     letterSpacing: 0.3,
     opacity: 0.8,
   },
+  timeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginBottom: SPACING.lg },
+  timeChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.background },
+  timeChipText: { fontSize: 13, color: COLORS.textSecondary },
   filterLabel: {
     fontSize: 10,
     fontWeight: '600',

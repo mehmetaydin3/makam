@@ -20,6 +20,14 @@ import {
   countModesAtLevel as _countModesAtLevel,
   unlockQuizLevel as _unlockQuizLevel,
   isQuizLevelUnlocked as _isQuizLevelUnlocked,
+  recordDailyChallenge as _recordDailyChallenge,
+  recordActivity as _recordActivity,
+  totalXp as _totalXp,
+  currentStreak as _currentStreak,
+  longestStreak as _longestStreak,
+  isStreakActiveToday as _isStreakActiveToday,
+  isDailyChallengeDone as _isDailyChallengeDone,
+  dailyChallengeResult as _dailyChallengeResult,
   UnlockableLesson,
   MasteryLevel,
   QuizLevel,
@@ -76,6 +84,17 @@ export function useProgress() {
     await refresh();
   }, [refresh]);
 
+  const recordDailyChallenge = useCallback(async (traditionId: string, score: number, total: number) => {
+    const res = await _recordDailyChallenge(traditionId, score, total);
+    await refresh();
+    return res;
+  }, [refresh]);
+
+  const recordActivity = useCallback(async () => {
+    await _recordActivity();
+    await refresh();
+  }, [refresh]);
+
   // ── Selectors bound to current progress ──
   const isLessonComplete = useCallback(
     (traditionId: string, lessonId: string) => _isLessonComplete(progress, traditionId, lessonId),
@@ -129,6 +148,20 @@ export function useProgress() {
     [progress]
   );
 
+  // ── Gamification selectors (bound to current progress) ──
+  const totalXp = _totalXp(progress);
+  const currentStreak = _currentStreak(progress);
+  const longestStreak = _longestStreak(progress);
+  const streakActiveToday = _isStreakActiveToday(progress);
+  const isDailyChallengeDone = useCallback(
+    (traditionId: string) => _isDailyChallengeDone(progress, traditionId),
+    [progress]
+  );
+  const dailyChallengeResult = useCallback(
+    (traditionId: string) => _dailyChallengeResult(progress, traditionId),
+    [progress]
+  );
+
   return {
     progress,
     loaded,
@@ -150,5 +183,13 @@ export function useProgress() {
     countModesAtLevel,
     unlockQuizLevel,
     isQuizLevelUnlocked,
+    recordDailyChallenge,
+    recordActivity,
+    totalXp,
+    currentStreak,
+    longestStreak,
+    streakActiveToday,
+    isDailyChallengeDone,
+    dailyChallengeResult,
   };
 }

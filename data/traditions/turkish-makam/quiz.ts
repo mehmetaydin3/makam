@@ -460,6 +460,304 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       'The Uşşak family is bound by its characteristic neutral second — the microtonal interval at the heart of its longing.',
     difficulty: 'advanced',
   },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ADDED: depth questions — weighted to beginner & intermediate so a
+  // beginner session is varied rather than dominated by one makam. All
+  // grounded in the makam data (seyir, durak, family, character).
+  // ══════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'mq-seyir-neva',
+    type: 'seyir',
+    prompt: 'Which direction does Neva travel?',
+    options: ['Ascending', 'Descending', 'Undulating'],
+    correctAnswer: 'Ascending',
+    explanation:
+      'Neva ascends, sharing the bright, rising character of its Rast family.',
+    makamId: 'neva',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-seyir-huseyni',
+    type: 'seyir',
+    prompt: 'What is the seyir of Hüseyni?',
+    options: ['Ascending', 'Descending', 'Undulating'],
+    correctAnswer: 'Ascending',
+    explanation:
+      'Hüseyni ascends purposefully toward its dominant — the opposite emotional arc from its sighing relative Uşşak, which descends.',
+    makamId: 'huseyni',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-seyir-mahur',
+    type: 'seyir',
+    prompt: 'Which way does Mahur move?',
+    options: ['Ascending', 'Descending', 'Undulating'],
+    correctAnswer: 'Ascending',
+    explanation:
+      'Mahur ascends — bright and confident, climbing in true Rast-family fashion.',
+    makamId: 'mahur',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-seyir-uzzal',
+    type: 'seyir',
+    prompt: 'What is the seyir of Uzzal?',
+    options: ['Ascending', 'Descending', 'Undulating'],
+    correctAnswer: 'Ascending',
+    explanation:
+      'Uzzal ascends, like its Hicaz-family kin, climbing through the dramatic augmented second.',
+    makamId: 'uzzal',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-seyir-hicazkar',
+    type: 'seyir',
+    prompt: 'Which direction does Hicazkar travel?',
+    options: ['Ascending', 'Descending', 'Undulating'],
+    correctAnswer: 'Ascending',
+    explanation:
+      'Hicazkar ascends — a grand, majestic expansion of the rising Hicaz sound.',
+    makamId: 'hicazkar',
+    difficulty: 'intermediate',
+  },
+
+  {
+    id: 'mq-emo-ussak',
+    type: 'emotion',
+    prompt: 'Which makam is the sound of longing and sighing, unresolved emotion?',
+    options: ['Uşşak', 'Çargah', 'Mahur', 'Rast'],
+    correctAnswer: 'Uşşak',
+    explanation:
+      'Uşşak descends like a sigh; its neutral second gives an ache no piano key can produce — the makam of longing.',
+    makamId: 'ussak',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-emo-huseyni',
+    type: 'emotion',
+    prompt: 'Which makam expresses a noble, heroic ache — the complex feeling of evening and longing, neither pure grief nor joy?',
+    options: ['Hüseyni', 'Saba', 'Çargah', 'Mahur'],
+    correctAnswer: 'Hüseyni',
+    explanation:
+      'Hüseyni climbs with noble intention; it carries the bittersweet ache of evening — aware, alive, and longing.',
+    makamId: 'huseyni',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-emo-neva',
+    type: 'emotion',
+    prompt: 'Which makam shares Rast’s warmth and brightness, feeling bright and uplifting?',
+    options: ['Neva', 'Saba', 'Kurd', 'Huzzam'],
+    correctAnswer: 'Neva',
+    explanation:
+      'Neva belongs to the Rast family and carries its warm, bright, uplifting character.',
+    makamId: 'neva',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-emo-mahur',
+    type: 'emotion',
+    prompt: 'Which makam is bright, confident, and grand — full of Rast-family brightness?',
+    options: ['Mahur', 'Saba', 'Kurd', 'Uşşak'],
+    correctAnswer: 'Mahur',
+    explanation:
+      'Mahur is bright and confident, expanding the Rast family\'s characteristic brightness on a grand scale.',
+    makamId: 'mahur',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-emo-buselik',
+    type: 'emotion',
+    prompt: 'Which makam has a direct, earnest, strong character as it climbs?',
+    options: ['Buselik', 'Saba', 'Huzzam', 'Uşşak'],
+    correctAnswer: 'Buselik',
+    explanation:
+      'Buselik ascends with a strong, earnest, direct character — plainspoken and resolute.',
+    makamId: 'buselik',
+    difficulty: 'intermediate',
+  },
+
+  {
+    id: 'mq-fam-muhayyer',
+    type: 'family',
+    prompt: 'To which family does Muhayyer belong?',
+    options: ['Rast', 'Uşşak', 'Hicaz', 'Segah'],
+    correctAnswer: 'Uşşak',
+    explanation:
+      'Muhayyer is an Uşşak-family makam, sharing its neutral second, though it wanders down from the high register.',
+    makamId: 'muhayyer',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-fam-saba',
+    type: 'family',
+    prompt: 'Which family does Saba belong to?',
+    options: ['Rast', 'Uşşak', 'Saba', 'Hicaz'],
+    correctAnswer: 'Saba',
+    explanation:
+      'Saba heads its own family — its unsettling interval that thwarts resolution is too distinctive to fold into another group.',
+    makamId: 'saba',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-fam-kurd',
+    type: 'family',
+    prompt: 'To which family does Kurd belong?',
+    options: ['Rast', 'Kurd', 'Hicaz', 'Segah'],
+    correctAnswer: 'Kurd',
+    explanation:
+      'Kurd anchors its own family, marked by its dark, descending, introspective character.',
+    makamId: 'kurd',
+    difficulty: 'beginner',
+  },
+  {
+    id: 'mq-fam-segah',
+    type: 'family',
+    prompt: 'Which family does Segah belong to?',
+    options: ['Rast', 'Uşşak', 'Hicaz', 'Segah'],
+    correctAnswer: 'Segah',
+    explanation:
+      'Segah heads the Segah family, built on its own distinctive pitch — mystical and devotional.',
+    makamId: 'segah',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-fam-nihavend',
+    type: 'family',
+    prompt: 'To which family does Nihavend belong?',
+    options: ['Rast', 'Uşşak', 'Nihavend', 'Segah'],
+    correctAnswer: 'Nihavend',
+    explanation:
+      'Nihavend heads its own family — often likened to the Western minor scale in its resigned melancholy.',
+    makamId: 'nihavend',
+    difficulty: 'intermediate',
+  },
+
+  {
+    id: 'mq-durak-neva',
+    type: 'durak',
+    prompt: 'On which note does Neva come to rest?',
+    options: ['Sol (G)', 'La (A)', 'Re (D)', 'Do (C)'],
+    correctAnswer: 'La (A)',
+    explanation:
+      'Neva rests on La (A), even though, like Rast, it is a bright ascending makam.',
+    makamId: 'neva',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-durak-kurd',
+    type: 'durak',
+    prompt: 'What is the durak of Kurd?',
+    options: ['Sol (G)', 'La (A)', 'Re (D)', 'Do (C)'],
+    correctAnswer: 'Re (D)',
+    explanation:
+      'Kurd rests on Re (D), descending into stillness on its durak.',
+    makamId: 'kurd',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-durak-mahur',
+    type: 'durak',
+    prompt: 'On which note does Mahur rest?',
+    options: ['Sol (G)', 'La (A)', 'Re (D)', 'Do (C)'],
+    correctAnswer: 'Sol (G)',
+    explanation:
+      'Mahur rests on Sol (G), the same durak as Rast, the family it belongs to.',
+    makamId: 'mahur',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-durak-nihavend',
+    type: 'durak',
+    prompt: 'What is the durak of Nihavend?',
+    options: ['Sol (G)', 'La (A)', 'Re (D)', 'Do (C)'],
+    correctAnswer: 'Re (D)',
+    explanation:
+      'Nihavend rests on Re (D), settling there in its resigned, minor-like descent.',
+    makamId: 'nihavend',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-durak-buselik',
+    type: 'durak',
+    prompt: 'On which note does Buselik rest?',
+    options: ['Sol (G)', 'La (A)', 'Re (D)', 'Do (C)'],
+    correctAnswer: 'La (A)',
+    explanation:
+      'Buselik rests on La (A), climbing earnestly from and back to that durak.',
+    makamId: 'buselik',
+    difficulty: 'intermediate',
+  },
+
+  {
+    id: 'mq-feat-rast-warm-third',
+    type: 'feature',
+    prompt: 'What gives Rast its warmth that a Western major scale cannot replicate?',
+    options: ['A slightly lowered 3rd and 6th degree', 'An augmented second', 'A flat 2nd', 'A diminished 5th'],
+    correctAnswer: 'A slightly lowered 3rd and 6th degree',
+    explanation:
+      'Rast tunes its 3rd and 6th degrees slightly lower than Western equivalents (the koma-flattened pitches), giving a warmth no equal-tempered major scale can match.',
+    makamId: 'rast',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-feat-hicaz-interval-order',
+    type: 'feature',
+    prompt: 'What is the signature melodic move of Hicaz?',
+    options: ['A minor second followed by an augmented second', 'Two whole tones in a row', 'A descending neutral second', 'A perfect fourth leap'],
+    correctAnswer: 'A minor second followed by an augmented second',
+    explanation:
+      'Hicaz lurches upward from a lowered 2nd to a raised 3rd — a minor second immediately followed by an augmented second, the dramatic gesture at its heart.',
+    makamId: 'hicaz',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-feat-ussak-neutral-second',
+    type: 'feature',
+    prompt: 'Uşşak opens with which characteristic gesture?',
+    options: ['A droop to its neutral second', 'A leap to the augmented third', 'A rise to the sharp fourth', 'A fall to the flat fifth'],
+    correctAnswer: 'A droop to its neutral second',
+    explanation:
+      'Uşşak begins on the root and immediately droops to the neutral second before settling on the third — that falling sigh is its emotional signature.',
+    makamId: 'ussak',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-rel-ussak-huseyni-seyir',
+    type: 'relationship',
+    prompt: 'Uşşak and Hüseyni share the same lower tetrachord. What sets them apart?',
+    options: ['Their seyir — Uşşak descends, Hüseyni ascends', 'Their durak', 'Their family', 'The augmented second'],
+    correctAnswer: 'Their seyir — Uşşak descends, Hüseyni ascends',
+    explanation:
+      'Same lower four notes, opposite motion: Uşşak sighs downward (melancholic) while Hüseyni climbs (noble, heroic). Seyir is what distinguishes the pair.',
+    makamId: 'huseyni',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-rel-rast-mahur',
+    type: 'relationship',
+    prompt: 'Mahur and Rast belong to the same family. What do they share?',
+    options: ['Brightness and the Sol durak', 'A descending seyir', 'The augmented second', 'A neutral second'],
+    correctAnswer: 'Brightness and the Sol durak',
+    explanation:
+      'Both are bright, confident Rast-family makams resting on Sol (G) — Mahur is essentially Rast made grand.',
+    makamId: 'mahur',
+    difficulty: 'intermediate',
+  },
+  {
+    id: 'mq-rel-saba-grief',
+    type: 'relationship',
+    prompt: 'What musical feature is the source of Saba’s grief?',
+    options: ['An unexpected interval that denies resolution', 'A bright raised fourth', 'A major third', 'A perfect cadence'],
+    correctAnswer: 'An unexpected interval that denies resolution',
+    explanation:
+      'Saba contains an unsettling interval that thwarts the resolution the ear expects — the musical root of its weeping, grief-laden character.',
+    makamId: 'saba',
+    difficulty: 'intermediate',
+  },
+
 ];
 
 export function getQuestionsByType(type: QuestionType): QuizQuestion[] {

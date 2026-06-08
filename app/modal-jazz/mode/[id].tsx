@@ -17,6 +17,8 @@ import { useTheme } from '../../../context/ThemeContext';
 import YouTubeEmbed from '../../../components/lessons/YouTubeEmbed';
 import { YOUTUBE_IDS } from '../../../data/traditions/modal-jazz/youtubeIds';
 import ScaleDiagram from '../../../components/lessons/ScaleDiagram';
+import { Accordion } from '../../../components/common/Accordion';
+import { CharacterBand } from '../../../components/common/CharacterBand';
 
 const brightnessColor = (c: JazzColorScheme): Record<string, string> => ({
   bright: c.bright,
@@ -80,7 +82,6 @@ export default function ModalJazzModeDetail() {
                'diminished · 7th degree'}
             </Text>
           </View>
-          <Text style={styles.character}>{mode.character}</Text>
 
           <MasteryBar
             points={modeMasteryPoints('modal-jazz', mode.id)}
@@ -93,41 +94,50 @@ export default function ModalJazzModeDetail() {
           />
         </View>
 
-        <Divider />
+        {/* ── HERO SCALE — hear it first ── */}
+        <ScaleDiagram defaultRootSemitone={mode.degree === 1 ? 0 : mode.degree === 2 ? 2 : mode.degree === 3 ? 4 : mode.degree === 4 ? 5 : mode.degree === 5 ? 7 : mode.degree === 6 ? 9 : 11}
+          intervals={mode.intervals}
+          colorNoteInterval={mode.colorNoteInterval}
+          avoidNoteInterval={mode.avoidNoteInterval}
+          brightness={mode.brightness}
+        />
 
-        {/* ── Scale structure ── */}
-        <Section label="Scale structure">
-          <ScaleDiagram defaultRootSemitone={mode.degree === 1 ? 0 : mode.degree === 2 ? 2 : mode.degree === 3 ? 4 : mode.degree === 4 ? 5 : mode.degree === 5 ? 7 : mode.degree === 6 ? 9 : 11}
-            intervals={mode.intervals}
-            colorNoteInterval={mode.colorNoteInterval}
-            avoidNoteInterval={mode.avoidNoteInterval}
-            brightness={mode.brightness}
-          />
+        {/* ── CHARACTER BAND — brightness swatch + one-word ── */}
+        <CharacterBand
+          swatch={accentColor}
+          accent={accentColor}
+          colors={JAZZ_COLORS}
+          swatchLabel={mode.brightness}
+          moods={[mode.oneWord]}
+        />
 
-          {/* Color note callout */}
-          <View style={[styles.colorNoteCard, { borderLeftColor: accentColor }]}>
-            <Text style={styles.colorNoteHeading}>The color note</Text>
-            <Text style={[styles.colorNoteValue, { color: accentColor }]}>{mode.colorNote}</Text>
-            <Text style={styles.colorNoteExplain}>
-              This is the note that defines the sound of {mode.name}. Remove it and the mode loses its identity.
-            </Text>
+        {/* Color note callout — the defining sound */}
+        <View style={[styles.colorNoteCard, { borderLeftColor: accentColor }]}>
+          <Text style={styles.colorNoteHeading}>The color note</Text>
+          <Text style={[styles.colorNoteValue, { color: accentColor }]}>{mode.colorNote}</Text>
+          <Text style={styles.colorNoteExplain}>
+            This is the note that defines the sound of {mode.name}. Remove it and the mode loses its identity.
+          </Text>
+        </View>
+
+        {mode.avoidNote && (
+          <View style={[styles.avoidNoteCard, { marginTop: SPACING.sm }]}>
+            <Text style={styles.avoidLabel}>Avoid note</Text>
+            <Text style={styles.avoidValue}>{mode.avoidNote}</Text>
+            <Text style={styles.avoidExplain}>Use this note carefully — it can clash against the tonic.</Text>
           </View>
+        )}
 
-          {mode.avoidNote && (
-            <View style={styles.avoidNoteCard}>
-              <Text style={styles.avoidLabel}>Avoid note</Text>
-              <Text style={styles.avoidValue}>{mode.avoidNote}</Text>
-              <Text style={styles.avoidExplain}>Use this note carefully — it can clash against the tonic.</Text>
-            </View>
-          )}
-        </Section>
+        {/* ── About (collapsed) ── */}
+        <View style={{ height: SPACING.md }} />
+        <Accordion title="About this mode" accent={accentColor} colors={JAZZ_COLORS}>
+          <Text style={styles.character}>{mode.character}</Text>
+        </Accordion>
 
-        <Divider />
-
-        {/* ── When to use it ── */}
-        <Section label="When to use it">
+        {/* ── When to use it (collapsed) ── */}
+        <Accordion title="When to use it" accent={accentColor} colors={JAZZ_COLORS}>
           {mode.chordContexts.map((ctx, i) => (
-            <View key={i} style={styles.chordCard}>
+            <View key={i} style={[styles.chordCard, i === 0 && { marginTop: 0 }]}>
               <View style={styles.chordCardTop}>
                 <Text style={styles.chordSymbol}>{ctx.chordSymbol}</Text>
                 <Text style={styles.chordType}>{ctx.chordType}</Text>
@@ -142,11 +152,9 @@ export default function ModalJazzModeDetail() {
               </View>
             </View>
           ))}
-        </Section>
+        </Accordion>
 
-        <Divider />
-
-        {/* ── Hear it ── */}
+        {/* ── Hear it (kept visible — audio) ── */}
         <Section label="Hear it in action">
           {mode.classicTunes.map((tune, i) => {
             const videoId = tune.youtubeId || YOUTUBE_IDS[tune.title];
@@ -168,10 +176,8 @@ export default function ModalJazzModeDetail() {
           })}
         </Section>
 
-        <Divider />
-
-        {/* ── Notable players ── */}
-        <Section label="Notable players">
+        {/* ── Notable players (collapsed) ── */}
+        <Accordion title="Notable players" accent={accentColor} colors={JAZZ_COLORS}>
           <View style={styles.playersRow}>
             {mode.notablePlayers.map((p, i) => (
               <View key={i} style={styles.playerPill}>
@@ -179,25 +185,21 @@ export default function ModalJazzModeDetail() {
               </View>
             ))}
           </View>
-        </Section>
+        </Accordion>
 
-        <Divider />
-
-        {/* ── Theory ── */}
-        <Section label="Theory">
+        {/* ── Theory (collapsed) ── */}
+        <Accordion title="Theory" accent={accentColor} colors={JAZZ_COLORS}>
           <View style={styles.theoryGrid}>
             <TheoryRow accent={accentColor} label="Degree" value={`${mode.degree}${ordinal(mode.degree)} degree of the major scale`} />
             <TheoryRow accent={accentColor} label="Formula" value={mode.formula} />
             <TheoryRow accent={accentColor} label="Relative key" value={mode.relativeKey} />
             <TheoryRow accent={accentColor} label="Intervals" value={mode.intervals.join('  ')} mono />
           </View>
-        </Section>
+        </Accordion>
 
-        {/* ── Often confused with ── */}
+        {/* ── Often confused with (collapsed) ── */}
         {related.length > 0 && (
-          <>
-            <Divider />
-            <Section label="Often confused with">
+            <Accordion title="Often confused with" accent={accentColor} colors={JAZZ_COLORS}>
               {related.map((r) => (
                 <TouchableOpacity
                   key={r.id}
@@ -212,8 +214,7 @@ export default function ModalJazzModeDetail() {
                   <Ionicons name="arrow-forward" size={16} color={JAZZ_COLORS.textTertiary} />
                 </TouchableOpacity>
               ))}
-            </Section>
-          </>
+            </Accordion>
         )}
 
         <View style={{ height: SPACING.xxl }} />
@@ -231,12 +232,6 @@ function Section({ label, children }: { label: string; children: React.ReactNode
       {children}
     </View>
   );
-}
-
-function Divider() {
-  const { jazzColors } = useTheme();
-  const styles = useMemo(() => makeStyles(jazzColors), [jazzColors]);
-  return <View style={styles.divider} />;
 }
 
 function TheoryRow({ label, value, mono, accent }: { label: string; value: string; mono?: boolean; accent?: string }) {

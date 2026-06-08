@@ -11,6 +11,7 @@ import { LESSONS } from '../../data/education';
 import { MODES as JAZZ_MODES } from '../../data/traditions/modal-jazz/modes';
 import { COMING_SOON_TRADITIONS, LIVE_TRADITIONS } from '../../data/traditions/registry';
 import { Constellation, StarDatum } from '../../components/constellation/Constellation';
+import { StreakBadge, XpBadge } from '../../components/rewards';
 
 /**
  * Journey — the meta-layer above traditions.
@@ -55,7 +56,11 @@ export default function JourneyScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const COLORS = colors;
-  const { traditionState, progress, traditionCoverage, traditionMastery, countModesAtLevel, modeMasteryLevel, isModeCovered } = useProgress();
+  const {
+    traditionState, progress, traditionCoverage, traditionMastery, countModesAtLevel,
+    modeMasteryLevel, isModeCovered,
+    totalXp, currentStreak, streakActiveToday, isDailyChallengeDone,
+  } = useProgress();
 
   const makamState = traditionState('turkish-makam', MAKAMS.length, LESSONS.length);
   const jazzState = traditionState('modal-jazz', JAZZ_MODES.length, 0);
@@ -139,6 +144,12 @@ export default function JourneyScreen() {
           Every tradition you explore becomes part of your map. The more worlds you cross into, the more connections reveal themselves.
         </Text>
 
+        {/* Streak + XP at a glance */}
+        <View style={styles.badgeRow}>
+          <StreakBadge streak={currentStreak} activeToday={streakActiveToday} colors={COLORS} />
+          <XpBadge xp={totalXp} colors={COLORS} />
+        </View>
+
         <View style={styles.divider} />
 
         <Text style={styles.sectionLabel}>TRADITIONS</Text>
@@ -196,6 +207,23 @@ export default function JourneyScreen() {
                   <Ionicons name="chevron-forward" size={14} color={COLORS.textSecondary} />
                 </TouchableOpacity>
               </View>
+
+              {/* Daily challenge chip */}
+              <TouchableOpacity
+                style={[styles.dailyChip, { borderColor: isDailyChallengeDone(tr.id) ? COLORS.success : tr.accent }]}
+                activeOpacity={0.8}
+                onPress={() => router.push((`/journey/daily?tradition=${tr.id}`) as any)}
+              >
+                <Ionicons
+                  name={isDailyChallengeDone(tr.id) ? 'checkmark-done' : 'flame'}
+                  size={14}
+                  color={isDailyChallengeDone(tr.id) ? COLORS.success : tr.accent}
+                />
+                <Text style={[styles.dailyChipText, { color: isDailyChallengeDone(tr.id) ? COLORS.success : tr.accent }]}>
+                  {isDailyChallengeDone(tr.id) ? 'Daily done today' : 'Daily challenge'}
+                </Text>
+                <Ionicons name="chevron-forward" size={13} color={COLORS.textTertiary} style={{ marginLeft: 'auto' }} />
+              </TouchableOpacity>
             </View>
           ))}
         </View>
@@ -260,6 +288,9 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   heading: { fontSize: 36, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, lineHeight: 42, marginBottom: SPACING.md },
   subheading: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22 },
   divider: { width: 40, height: 2, backgroundColor: COLORS.accent, borderRadius: 999, marginVertical: SPACING.xl },
+  badgeRow: { flexDirection: 'row', gap: SPACING.sm, marginTop: SPACING.lg },
+  dailyChip: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: SPACING.sm, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1 },
+  dailyChipText: { fontSize: 13, fontWeight: '600' },
   sectionLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md, marginTop: SPACING.sm },
   traditionList: { gap: SPACING.sm, marginBottom: SPACING.xl },
   traditionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

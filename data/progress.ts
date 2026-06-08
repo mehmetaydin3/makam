@@ -36,6 +36,31 @@ export interface UserProgress {
   traditions: Record<string, TraditionProgress>;
   createdAt: string;
   updatedAt: string;
+  // ── Gamification layer (opt-in, additive) ────────────────────────────────
+  // These fields make progress *fun and visible*. They never gate content and
+  // never decrease the underlying mastery model — they sit on top of it.
+  xp?: number;                       // lifetime experience points
+  streak?: StreakState;              // daily activity streak
+  dailyChallenges?: DailyChallengeLog; // traditionId -> dateKey -> result
+}
+
+/** A daily-activity streak. `lastActiveDate` is a local YYYY-MM-DD key. */
+export interface StreakState {
+  current: number;       // consecutive active days ending at lastActiveDate
+  longest: number;       // best streak ever reached
+  lastActiveDate?: string; // local date key of the most recent active day
+}
+
+/** Per-tradition, per-day record of the daily challenge outcome. */
+export interface DailyChallengeLog {
+  // traditionId -> { [dateKey]: { score, total, completedAt } }
+  [traditionId: string]: Record<string, DailyChallengeResult>;
+}
+
+export interface DailyChallengeResult {
+  score: number;
+  total: number;
+  completedAt: string; // ISO
 }
 
 // Minimal shape a lesson must expose for unlock logic. Both traditions'
@@ -59,6 +84,53 @@ export const MASTERY_POINTS = {
   lesson: 3,         // completed a lesson that teaches this mode (one-time per lesson)
   correctAnswer: 2,  // each correct quiz answer tagged to this mode (repeatable)
 } as const;
+
+// ── XP model ─────────────────────────────────────────────────────────────────
+// XP is the *visible* reward currency layered over mastery. Every meaningful
+// action grants XP. Unlike mastery, XP is global (across traditions) so the
+// star-map's "fuel" and the user's level read as one growing number.
+
+export const XP_AWARDS = {
+  explore: 10,         // first time a mode/makam detail is opened
+  correctAnswer: 5,    // each correct quiz answer
+  lesson: 25,          // completing a lesson
+  masterLevelUp: 40,   // a mode crossing into a new mastery level
+  dailyChallenge: 60,  // finishing a daily challenge (any score)
+  streakDay: 15,       // extending the daily streak
+} as const;
+
+// XP needed to reach "player level" N (simple quadratic curve).
+export function xpForLevel(level: number): number {
+  return 100 * level * level; // L1=100, L2=400, L3=900 ...
+}
+
+export function playerLevelForXp(xp: number): number {
+  let lvl = 0;
+  while (xp >= xpForLevel(lvl + 1)) lvl++;
+  return lvl;
+}
+
+// Progress toward the next player level, as {current, next} point counts.
+export function xpToNextLevel(xp: number): { current: number; next: number; level: number } {
+  const level = playerLevelForXp(xp);
+  const floor = xpForLevel(level);
+  const ceil = xpForLevel(level + 1);
+  return { current: xp - floor, next: ceil - floor, level };
+}
+
+// ── Date helpers (local-time daily boundaries) ───────────────────────────────
+export function localDateKey(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function dayDiff(a: string, b: string): number {
+  const da = new Date(a + 'T00:00:00');
+  const db = new Date(b + 'T00:00:00');
+  return Math.round((db.getTime() - da.getTime()) / 86400000);
+}
 
 export type MasteryLevel = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -192,6 +264,50 @@ function awardMastery(
   t.masteryPoints![modeId] = (t.masteryPoints![modeId] ?? 0) + points;
 }
 
+// ── Internal: XP + streak helpers (gamification layer) ───────────────────────
+
+function addXp(p: UserProgress, amount: number): void {
+  p.xp = (p.xp ?? 0) + amount;
+}
+
+/**
+ * Register that the user did *something* today. Advances the daily streak:
+ *   - same day as last → no change
+ *   - exactly the next day → streak +1 (and award streak XP)
+ *   - a gap → streak resets to 1
+ * Returns true if the streak was extended (today is a newly-active day), so
+ * callers can show a reward moment.
+ */
+function touchStreak(p: UserProgress): { extended: boolean; current: number } {
+  const today = localDateKey();
+  const st: StreakState = p.streak ?? { current: 0, longest: 0 };
+  if (st.lastActiveDate === today) {
+    p.streak = st;
+    return { extended: false, current: st.current };
+  }
+  const gap = st.lastActiveDate ? dayDiff(st.lastActiveDate, today) : Infinity;
+  st.current = gap === 1 ? st.current + 1 : 1;
+  st.lastActiveDate = today;
+  st.longest = Math.max(st.longest, st.current);
+  p.streak = st;
+  addXp(p, XP_AWARDS.streakDay);
+  return { extended: true, current: st.current };
+}
+
+// Award mastery *and* the matching level-up XP when a mode crosses a level.
+function awardMasteryWithXp(
+  t: TraditionProgress,
+  p: UserProgress,
+  modeId: string,
+  points: number,
+  sourceKey?: string,
+): void {
+  const before = levelForPoints(t.masteryPoints?.[modeId] ?? 0);
+  awardMastery(t, modeId, points, sourceKey);
+  const after = levelForPoints(t.masteryPoints?.[modeId] ?? 0);
+  if (after > before) addXp(p, XP_AWARDS.masterLevelUp * (after - before));
+}
+
 // ── Mutations ────────────────────────────────────────────────────────────────
 
 export async function markTraditionStarted(traditionId: string): Promise<void> {
@@ -203,11 +319,14 @@ export async function markTraditionStarted(traditionId: string): Promise<void> {
 export async function markModeExplored(traditionId: string, modeId: string): Promise<void> {
   const prog = await loadProgress();
   const t = ensureTradition(prog, traditionId);
-  if (!t.modesExplored.includes(modeId)) {
+  const firstTime = !t.modesExplored.includes(modeId);
+  if (firstTime) {
     t.modesExplored.push(modeId);
+    addXp(prog, XP_AWARDS.explore); // first visit only
   }
   // Exploring contributes a one-time mastery point (even if re-opened later).
-  awardMastery(t, modeId, MASTERY_POINTS.explore, 'explore');
+  awardMasteryWithXp(t, prog, modeId, MASTERY_POINTS.explore, 'explore');
+  if (firstTime) touchStreak(prog);
   await saveProgress(prog);
 }
 
@@ -218,12 +337,15 @@ export async function markLessonComplete(
 ): Promise<void> {
   const prog = await loadProgress();
   const t = ensureTradition(prog, traditionId);
-  if (!t.lessonsCompleted.includes(lessonId)) {
+  const firstTime = !t.lessonsCompleted.includes(lessonId);
+  if (firstTime) {
     t.lessonsCompleted.push(lessonId);
+    addXp(prog, XP_AWARDS.lesson);
+    touchStreak(prog);
   }
   // A completed lesson awards one-time mastery points to each mode it teaches.
   for (const modeId of modeIds) {
-    awardMastery(t, modeId, MASTERY_POINTS.lesson, 'lesson:' + lessonId);
+    awardMasteryWithXp(t, prog, modeId, MASTERY_POINTS.lesson, 'lesson:' + lessonId);
   }
   await saveProgress(prog);
 }
@@ -238,10 +360,14 @@ export async function recordQuizAnswer(
   modeId: string | undefined,
   correct: boolean,
 ): Promise<void> {
-  if (!modeId || !correct) return; // only correct, mode-tagged answers move mastery
+  if (!correct) return; // no punishment; nothing moves on a wrong answer
   const prog = await loadProgress();
   const t = ensureTradition(prog, traditionId);
-  awardMastery(t, modeId, MASTERY_POINTS.correctAnswer); // repeatable, no sourceKey
+  addXp(prog, XP_AWARDS.correctAnswer); // every correct answer earns XP
+  touchStreak(prog);                    // quizzing counts as daily activity
+  if (modeId) {
+    awardMasteryWithXp(t, prog, modeId, MASTERY_POINTS.correctAnswer); // repeatable
+  }
   await saveProgress(prog);
 }
 
@@ -388,4 +514,80 @@ export function traditionState(
   const lessonsAll = totalLessons > 0 && t.lessonsCompleted.length >= totalLessons;
   if (modesAll && lessonsAll) return 'completed';
   return 'exploring';
+}
+
+
+// ── Gamification mutations ───────────────────────────────────────────────────
+
+/**
+ * Record the result of a daily challenge for a tradition. Idempotent per day:
+ * the first completion of the day logs the result, awards the daily XP, and
+ * extends the streak. Subsequent completions the same day do not re-award.
+ * Returns whether this was the first completion today + the new streak length.
+ */
+export async function recordDailyChallenge(
+  traditionId: string,
+  score: number,
+  total: number,
+): Promise<{ firstToday: boolean; streak: number; xpAwarded: number }> {
+  const prog = await loadProgress();
+  const log = (prog.dailyChallenges ??= {});
+  const tradLog = (log[traditionId] ??= {});
+  const key = localDateKey();
+  if (tradLog[key]) {
+    return { firstToday: false, streak: prog.streak?.current ?? 0, xpAwarded: 0 };
+  }
+  tradLog[key] = { score, total, completedAt: new Date().toISOString() };
+  const xpBefore = prog.xp ?? 0;
+  addXp(prog, XP_AWARDS.dailyChallenge);
+  touchStreak(prog); // may add streakDay XP too
+  const xpAwarded = (prog.xp ?? 0) - xpBefore;
+  await saveProgress(prog);
+  return { firstToday: true, streak: prog.streak?.current ?? 0, xpAwarded };
+}
+
+/**
+ * Generic "the user did something today" hook (e.g. completed an ear-training
+ * round). Touches the streak only — useful where no other mutation fires.
+ */
+export async function recordActivity(): Promise<void> {
+  const prog = await loadProgress();
+  touchStreak(prog);
+  await saveProgress(prog);
+}
+
+// ── Gamification selectors ───────────────────────────────────────────────────
+
+export function totalXp(p: UserProgress): number {
+  return p.xp ?? 0;
+}
+
+export function currentStreak(p: UserProgress): number {
+  const st = p.streak;
+  if (!st || !st.lastActiveDate) return 0;
+  // A streak only "counts" today if the last active day was today or yesterday.
+  const gap = dayDiff(st.lastActiveDate, localDateKey());
+  if (gap <= 1) return st.current;
+  return 0; // lapsed — shown as broken until the user is active again
+}
+
+export function longestStreak(p: UserProgress): number {
+  return p.streak?.longest ?? 0;
+}
+
+/** True if today's streak is still "alive" (active today or yesterday). */
+export function isStreakActiveToday(p: UserProgress): boolean {
+  const st = p.streak;
+  return !!st?.lastActiveDate && st.lastActiveDate === localDateKey();
+}
+
+/** Has the user completed today's daily challenge for this tradition? */
+export function isDailyChallengeDone(p: UserProgress, traditionId: string): boolean {
+  return !!p.dailyChallenges?.[traditionId]?.[localDateKey()];
+}
+
+export function dailyChallengeResult(
+  p: UserProgress, traditionId: string,
+): DailyChallengeResult | undefined {
+  return p.dailyChallenges?.[traditionId]?.[localDateKey()];
 }

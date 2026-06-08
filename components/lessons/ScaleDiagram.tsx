@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { JAZZ_COLORS, SPACING, RADIUS } from '../../data/traditions/modal-jazz/theme';
+import { SPACING, RADIUS } from '../../data/traditions/modal-jazz/theme';
+import { useTheme } from '../../context/ThemeContext';
 import RhodesEngine, { RhodesEngineRef } from '../../data/traditions/modal-jazz/RhodesEngine';
 
 interface ScaleDiagramProps {
@@ -11,12 +12,6 @@ interface ScaleDiagramProps {
   brightness: 'bright' | 'neutral' | 'dark';
   defaultRootSemitone: number;
 }
-
-const BRIGHTNESS_COLOR: Record<string, string> = {
-  bright: JAZZ_COLORS.bright,
-  neutral: JAZZ_COLORS.neutral,
-  dark: JAZZ_COLORS.dark,
-};
 
 const DEGREE_NUMBERS: Record<number, string> = {
   0: '1', 1: '2', 2: '2', 3: '3', 4: '3',
@@ -73,6 +68,13 @@ function getMidiNotes(intervals: number[], rootSemitone: number): number[] {
 export default function ScaleDiagram({
   intervals, colorNoteInterval, avoidNoteInterval, brightness, defaultRootSemitone,
 }: ScaleDiagramProps) {
+  const { jazzColors: JAZZ_COLORS } = useTheme();
+  const styles = useMemo(() => makeStyles(JAZZ_COLORS), [JAZZ_COLORS]);
+  const BRIGHTNESS_COLOR: Record<string, string> = {
+    bright: JAZZ_COLORS.bright,
+    neutral: JAZZ_COLORS.neutral,
+    dark: JAZZ_COLORS.dark,
+  };
   const [rootSemitone, setRootSemitone] = useState(defaultRootSemitone);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeDegree, setActiveDegree] = useState<number | null>(null);
@@ -275,7 +277,7 @@ export default function ScaleDiagram({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (JAZZ_COLORS: ReturnType<typeof useTheme>['jazzColors']) => StyleSheet.create({
   container: {
     backgroundColor: JAZZ_COLORS.surface,
     borderRadius: RADIUS.lg,
