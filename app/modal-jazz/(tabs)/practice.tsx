@@ -459,11 +459,17 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
 
       <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.earKicker}>
-          {question.mode === 'brightness' ? 'Hear the color'
-            : question.mode === 'family' ? 'Same color, different mode'
-            : 'Name that mode'}
+          {question.mode === 'brightness' ? 'Bright or dark?'
+            : 'Which mode?'}
         </Text>
         <Text style={styles.prompt}>{question.prompt}</Text>
+
+        {/* Always-visible instruction: spell out exactly what to do. */}
+        <Text style={styles.earInstruction}>
+          {question.mode === 'brightness'
+            ? 'Tap Play to hear it, then choose what you heard. Not sure? Tap Hear bright vs dark.'
+            : 'Tap Play to hear it, then choose the mode you heard. Not sure? Tap Hear each option.'}
+        </Text>
 
         {/* Big Play / Replay control — sounds home, then the mode.
             A subtle breathing pulse invites the first tap. */}
@@ -491,14 +497,14 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
         >
           <Ionicons name="git-compare" size={16} color={isBusy ? JAZZ_COLORS.textTertiary : JAZZ_COLORS.accent} />
           <Text style={[styles.compareButtonText, isBusy && { color: JAZZ_COLORS.textTertiary }]}>
-            {question.mode === 'brightness' ? 'Compare brighter vs darker' : 'Compare the options'}
+            {question.mode === 'brightness' ? 'Hear bright vs dark' : 'Hear each option'}
           </Text>
         </TouchableOpacity>
 
         <Text style={styles.earHint}>
           {showAnswer
             ? `Anchored in ${question.rootLabel} — home was the low ${question.rootLabel}.`
-            : 'You hear “home” first, then the mode. Replay or compare as needed.'}
+            : 'Each Play sounds “home” first, then the phrase you’re identifying.'}
         </Text>
 
         <View style={styles.optionsGrid}>
@@ -992,6 +998,10 @@ const styles = StyleSheet.create({
     fontSize: 11, fontWeight: '600', color: JAZZ_COLORS.textTertiary,
     letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: SPACING.sm,
   },
+  earInstruction: {
+    fontSize: 14, color: JAZZ_COLORS.textSecondary, lineHeight: 20,
+    marginBottom: SPACING.lg,
+  },
   playButton: {
     backgroundColor: JAZZ_COLORS.accent, borderRadius: RADIUS.lg,
     paddingVertical: 22, alignItems: 'center', justifyContent: 'center',
@@ -1008,8 +1018,8 @@ const styles = StyleSheet.create({
   compareButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 6, paddingVertical: 12, marginBottom: SPACING.sm,
-    borderRadius: RADIUS.md, borderWidth: 1, borderColor: JAZZ_COLORS.border,
-    backgroundColor: JAZZ_COLORS.surface,
+    borderRadius: RADIUS.md, borderWidth: 1, borderColor: JAZZ_COLORS.accent,
+    backgroundColor: JAZZ_COLORS.accentMuted,
   },
   compareButtonText: { fontSize: 14, fontWeight: '600', color: JAZZ_COLORS.accent },
   revealRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: SPACING.sm },

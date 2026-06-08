@@ -167,7 +167,7 @@ function buildABQuestion(): EarQuestion {
     id: nextId(target.id),
     task: 'ab',
     ...revealFields(target),
-    prompt: 'You heard the durak, then a makam. Which of these two was it?',
+    prompt: 'Which makam did you hear?',
     options,
     correctAnswer: target.name,
   };
@@ -182,7 +182,7 @@ function buildThreeQuestion(): EarQuestion {
     id: nextId(target.id),
     task: 'three',
     ...revealFields(target),
-    prompt: 'Anchored on its durak — which makam did you hear?',
+    prompt: 'Which makam did you hear?',
     options,
     correctAnswer: target.name,
   };
@@ -199,7 +199,7 @@ function buildFullIdQuestion(): EarQuestion {
     id: nextId(target.id),
     task: 'fullId',
     ...revealFields(target),
-    prompt: 'Name the makam you heard.',
+    prompt: 'Which makam did you hear?',
     options,
     correctAnswer: target.name,
   };

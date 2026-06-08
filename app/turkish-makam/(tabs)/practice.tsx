@@ -415,10 +415,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
     activity === 'compare' ? 'Comparing…' :
     hasPlayed ? 'Replay' : 'Play';
 
-  const kicker =
-    question.task === 'ab' ? 'Which makam?'
-    : question.task === 'three' ? 'Name that makam'
-    : 'Name that makam';
+  const kicker = 'Which makam?';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -440,6 +437,11 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
       <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.earKicker}>{kicker}</Text>
         <Text style={styles.prompt}>{question.prompt}</Text>
+
+        {/* Always-visible instruction: spell out exactly what to do. */}
+        <Text style={styles.earInstruction}>
+          Tap Play to hear it, then choose the makam you heard. Not sure? Tap Hear each makam.
+        </Text>
 
         <BreathingView active={!isBusy && !hasPlayed && !showAnswer}>
           <TouchableOpacity
@@ -465,14 +467,14 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
         >
           <Ionicons name="git-compare" size={16} color={isBusy ? COLORS.textTertiary : COLORS.accent} />
           <Text style={[styles.compareButtonText, isBusy && { color: COLORS.textTertiary }]}>
-            {question.task === 'ab' ? 'Compare the two' : 'Compare the options'}
+            Hear each makam
           </Text>
         </TouchableOpacity>
 
         <Text style={styles.earHint}>
           {showAnswer
             ? `Played on the ney, anchored on the durak (${question.durak}).`
-            : 'You hear the durak first, then the makam. Replay or compare as needed.'}
+            : 'Each Play sounds the durak first, then the makam you’re identifying.'}
         </Text>
 
         <View style={styles.optionsGrid}>
@@ -943,6 +945,10 @@ const styles = StyleSheet.create({
     fontSize: 11, fontWeight: '600', color: COLORS.textTertiary,
     letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: SPACING.sm,
   },
+  earInstruction: {
+    fontSize: 14, color: COLORS.textSecondary, lineHeight: 20,
+    marginBottom: SPACING.lg,
+  },
   playButton: {
     backgroundColor: COLORS.accent, borderRadius: RADIUS.lg,
     paddingVertical: 22, alignItems: 'center', justifyContent: 'center',
@@ -959,7 +965,7 @@ const styles = StyleSheet.create({
   compareButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 8, paddingVertical: 12, borderRadius: RADIUS.md,
-    borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface,
+    borderWidth: 1, borderColor: COLORS.accent, backgroundColor: COLORS.accentMuted,
     marginBottom: SPACING.sm,
   },
   compareButtonText: { fontSize: 14, fontWeight: '600', color: COLORS.accent },

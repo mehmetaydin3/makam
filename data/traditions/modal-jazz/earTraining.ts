@@ -180,15 +180,15 @@ function buildBrightnessQuestion(): EarQuestion {
     : base.phraseNotes;
 
   const options: EarOption[] = [
-    { label: 'Brighter', value: 'Brighter', phraseNotes: brightPhrase, isCorrect: targetIsBright },
-    { label: 'Darker', value: 'Darker', phraseNotes: darkPhrase, isCorrect: !targetIsBright },
+    { label: 'Bright (major-leaning)', value: 'Brighter', phraseNotes: brightPhrase, isCorrect: targetIsBright },
+    { label: 'Dark (minor-leaning)', value: 'Darker', phraseNotes: darkPhrase, isCorrect: !targetIsBright },
   ];
 
   return {
     id: nextId(target.id),
     mode: 'brightness',
     ...base,
-    prompt: 'Does this sound brighter or darker?',
+    prompt: 'Did that sound bright (major-leaning) or dark (minor-leaning)?',
     options,
     correctAnswer: targetIsBright ? 'Brighter' : 'Darker',
   };
@@ -219,7 +219,7 @@ function buildFamilyQuestion(): EarQuestion {
     id: nextId(target.id),
     mode: 'family',
     ...base,
-    prompt: 'Three modes share this color. Which did you hear?',
+    prompt: 'Which mode did you hear?',
     options,
     correctAnswer: target.name,
   };
@@ -249,7 +249,7 @@ function buildFullIdQuestion(): EarQuestion {
     id: nextId(target.id),
     mode: 'fullId',
     ...base,
-    prompt: 'Name the mode you heard.',
+    prompt: 'Which mode did you hear?',
     options,
     correctAnswer: target.name,
   };
