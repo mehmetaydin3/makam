@@ -142,9 +142,9 @@ function HomeView({ onStartLevel, isUnlocked }: {
   ];
 
   const earLevels: { level: EarLevel; label: string; desc: string }[] = [
-    { level: 'beginner', label: 'Beginner', desc: 'Core modes, three choices' },
-    { level: 'intermediate', label: 'Intermediate', desc: 'More modes, four choices' },
-    { level: 'advanced', label: 'Advanced', desc: 'Same-color modes — a real ear test' },
+    { level: 'beginner', label: 'Brighter or Darker?', desc: 'Hear home, then one mode — just call the feeling' },
+    { level: 'intermediate', label: 'Same Color', desc: 'Three modes share a color — which did you hear?' },
+    { level: 'advanced', label: 'Name the Mode', desc: 'Full mode ID, anchored to home — a real ear test' },
   ];
 
   return (
@@ -156,7 +156,7 @@ function HomeView({ onStartLevel, isUnlocked }: {
           <Text style={styles.subheading}>
             {section === 'quiz'
               ? 'Three levels. Pass one to unlock the next.'
-              : 'Listen, then name the mode. Replay as often as you like.'}
+              : 'Hear home, then the mode. Three levels, from easy to expert.'}
           </Text>
         </View>
 
@@ -243,63 +243,121 @@ function HomeView({ onStartLevel, isUnlocked }: {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Ear training: "Name that mode by ear". Self-contained — mounts its own
+// Ear training V2: "Hear the color of a mode". Self-contained — mounts its own
 // RhodesEngine and runs an 8-question session generated at runtime from MODES.
-// The Rhodes synth is the *only* engine jazz ear training uses.
+//
+// Every item is ANCHORED: we sound "home" (root → 5th → root) first, pause, then
+// play the mode's phrase, so the color lands against a center rather than in the
+// abstract. The Rhodes can't hold a drone, so the anchor is a clearly-sounded
+// reference, replayable on demand. An A/B "Compare" control plays each candidate
+// (each prefixed by the same anchor) back-to-back before the learner commits.
+// Rhodes is the *only* engine jazz ear training uses.
 // ─────────────────────────────────────────────────────────────────────────────
 const EAR_SESSION_LENGTH = 8;
+const ANCHOR_TO_PHRASE_GAP = 520;   // ms of silence between "home" and the phrase
+const AB_GAP = 700;                 // ms of silence between A/B candidates
 
 function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => void }) {
   const { recordQuizAnswer } = useProgress();
   const engineRef = useRef<RhodesEngineRef>(null);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const [questions, setQuestions] = useState<EarQuestion[]>(() => buildEarSession(level, EAR_SESSION_LENGTH));
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [done, setDone] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [activity, setActivity] = useState<'idle' | 'anchor' | 'phrase' | 'compare'>('idle');
   const [hasPlayed, setHasPlayed] = useState(false);
 
   const question = questions[index];
 
-  // Stop audio when leaving the flow.
-  useEffect(() => () => { engineRef.current?.stop(); }, []);
+  const clearTimers = () => {
+    timersRef.current.forEach((t) => clearTimeout(t));
+    timersRef.current = [];
+  };
+  const stopAll = () => {
+    clearTimers();
+    engineRef.current?.stop();
+    setActivity('idle');
+  };
 
-  // Auto-play each new question's scale once it appears.
+  // Stop audio + timers when leaving the flow.
+  useEffect(() => () => { clearTimers(); engineRef.current?.stop(); }, []);
+
+  // Auto-play "home → phrase" once each new question appears.
   useEffect(() => {
     if (done || !question) return;
-    const t = setTimeout(() => play(), 350);
+    const t = setTimeout(() => playItem(), 350);
+    timersRef.current.push(t);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, done]);
 
-  const play = () => {
-    if (!question) return;
-    setIsPlaying(true);
-    setHasPlayed(true);
-    engineRef.current?.playScale(
-      question.midiNotes,
-      undefined,
-      () => setIsPlaying(false),
-    );
+  // Play the anchor ("home"), then after a breath of silence the given phrase.
+  const playAnchoredPhrase = (phrase: number[], onEnd?: () => void) => {
+    setActivity('anchor');
+    engineRef.current?.playScale(question.anchorNotes, undefined, () => {
+      const t = setTimeout(() => {
+        setActivity('phrase');
+        engineRef.current?.playScale(phrase, undefined, () => {
+          setActivity('idle');
+          onEnd?.();
+        });
+      }, ANCHOR_TO_PHRASE_GAP);
+      timersRef.current.push(t);
+    });
   };
 
-  const handleSelect = (answer: string) => {
+  // The main "Play / Replay": home, then the actual mode you must identify.
+  const playItem = () => {
+    if (!question) return;
+    stopAll();
+    setHasPlayed(true);
+    playAnchoredPhrase(question.phraseNotes);
+  };
+
+  // A/B compare: play each option's phrase (each prefixed by home) in turn, so
+  // the learner can weigh the candidates before answering.
+  const compareOptions = () => {
+    if (!question) return;
+    stopAll();
+    setHasPlayed(true);
+    setActivity('compare');
+    const opts = question.options;
+    const runFrom = (i: number) => {
+      if (i >= opts.length) { setActivity('idle'); return; }
+      setActivity('anchor');
+      engineRef.current?.playScale(question.anchorNotes, undefined, () => {
+        const t1 = setTimeout(() => {
+          setActivity('phrase');
+          engineRef.current?.playScale(opts[i].phraseNotes, undefined, () => {
+            const t2 = setTimeout(() => runFrom(i + 1), AB_GAP);
+            timersRef.current.push(t2);
+          });
+        }, ANCHOR_TO_PHRASE_GAP);
+        timersRef.current.push(t1);
+      });
+    };
+    runFrom(0);
+  };
+
+  const handleSelect = (value: string) => {
     if (showAnswer) return;
-    engineRef.current?.stop();
-    setIsPlaying(false);
-    setSelected(answer);
+    stopAll();
+    setSelected(value);
     setShowAnswer(true);
-    const correct = answer === question.correctAnswer;
-    if (correct) setScore(s => s + 1);
+    const correct = value === question.correctAnswer;
+    if (correct) { setScore((s) => s + 1); setStreak((s) => s + 1); }
+    else setStreak(0);
     // Feed the same mastery model the quiz uses, tagged by mode.
     recordQuizAnswer('modal-jazz', question.modeId, correct);
   };
 
   const handleNext = () => {
-    engineRef.current?.stop();
+    stopAll();
     if (index < questions.length - 1) {
       setIndex(index + 1);
       setSelected(null);
@@ -311,12 +369,13 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
   };
 
   const restart = () => {
-    engineRef.current?.stop();
+    stopAll();
     setQuestions(buildEarSession(level, EAR_SESSION_LENGTH));
     setIndex(0);
     setSelected(null);
     setShowAnswer(false);
     setScore(0);
+    setStreak(0);
     setDone(false);
     setHasPlayed(false);
   };
@@ -332,16 +391,27 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
 
   const progress = (index + 1) / questions.length;
   const isCorrect = selected === question.correctAnswer;
+  const isBusy = activity !== 'idle';
+  const playLabel =
+    activity === 'anchor' ? 'Home…' :
+    activity === 'phrase' ? 'Listen…' :
+    hasPlayed ? 'Replay' : 'Play';
+  const playIcon = isBusy ? 'musical-note' : hasPlayed ? 'refresh' : 'play';
 
   return (
     <SafeAreaView style={styles.safe}>
       <RhodesEngine ref={engineRef} />
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => { engineRef.current?.stop(); onExit(); }} style={styles.quitButton}>
+        <TouchableOpacity onPress={() => { stopAll(); onExit(); }} style={styles.quitButton}>
           <Ionicons name="close" size={22} color={JAZZ_COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.questionCount}>{index + 1} / {questions.length}</Text>
-        <Text style={styles.scoreDisplay}>{score} ✓</Text>
+        <View style={styles.scorePillRow}>
+          {streak >= 2 && (
+            <Text style={styles.streakPill}>{streak}🔥</Text>
+          )}
+          <Text style={styles.scoreDisplay}>{score} ✓</Text>
+        </View>
       </View>
 
       <View style={styles.progressTrack}>
@@ -349,34 +419,50 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
       </View>
 
       <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.earKicker}>Name that mode</Text>
-        <Text style={styles.prompt}>Which mode is this?</Text>
+        <Text style={styles.earKicker}>
+          {question.mode === 'brightness' ? 'Hear the color'
+            : question.mode === 'family' ? 'Same color, different mode'
+            : 'Name that mode'}
+        </Text>
+        <Text style={styles.prompt}>{question.prompt}</Text>
 
-        {/* Big Play / Replay control */}
+        {/* Big Play / Replay control — sounds home, then the mode */}
         <TouchableOpacity
-          style={[styles.playButton, isPlaying && styles.playButtonActive]}
-          onPress={isPlaying ? () => { engineRef.current?.stop(); setIsPlaying(false); } : play}
+          style={[styles.playButton, isBusy && styles.playButtonActive]}
+          onPress={isBusy ? stopAll : playItem}
           activeOpacity={0.85}
         >
           <Ionicons
-            name={isPlaying ? 'stop' : hasPlayed ? 'refresh' : 'play'}
+            name={isBusy ? 'stop' : (playIcon as any)}
             size={26}
             color={JAZZ_COLORS.background}
           />
-          <Text style={styles.playButtonText}>
-            {isPlaying ? 'Playing…' : hasPlayed ? 'Replay' : 'Play'}
+          <Text style={styles.playButtonText}>{isBusy ? 'Stop' : playLabel}</Text>
+        </TouchableOpacity>
+
+        {/* A/B compare — hear every candidate, each anchored to home */}
+        <TouchableOpacity
+          style={styles.compareButton}
+          onPress={compareOptions}
+          activeOpacity={0.85}
+          disabled={isBusy}
+        >
+          <Ionicons name="git-compare" size={16} color={isBusy ? JAZZ_COLORS.textTertiary : JAZZ_COLORS.accent} />
+          <Text style={[styles.compareButtonText, isBusy && { color: JAZZ_COLORS.textTertiary }]}>
+            {question.mode === 'brightness' ? 'Compare brighter vs darker' : 'Compare the options'}
           </Text>
         </TouchableOpacity>
+
         <Text style={styles.earHint}>
           {showAnswer
-            ? `Played in ${question.rootLabel}`
-            : 'Played on the Rhodes. Tap replay as needed.'}
+            ? `Anchored in ${question.rootLabel} — home was the low ${question.rootLabel}.`
+            : 'You hear “home” first, then the mode. Replay or compare as needed.'}
         </Text>
 
         <View style={styles.optionsGrid}>
-          {question.options.map((option) => {
-            const isSelected = selected === option;
-            const isCorrectOption = option === question.correctAnswer;
+          {question.options.map((opt) => {
+            const isSelected = selected === opt.value;
+            const isCorrectOption = opt.value === question.correctAnswer;
             let optionStyle = styles.option;
             let textStyle = styles.optionText;
             if (showAnswer) {
@@ -394,9 +480,9 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
             }
             return (
               <TouchableOpacity
-                key={option}
+                key={opt.value}
                 style={optionStyle}
-                onPress={() => handleSelect(option)}
+                onPress={() => handleSelect(opt.value)}
                 activeOpacity={showAnswer ? 1 : 0.8}
               >
                 {showAnswer && isCorrectOption && (
@@ -405,7 +491,7 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
                 {showAnswer && isSelected && !isCorrectOption && (
                   <Ionicons name="close-circle" size={16} color={JAZZ_COLORS.warning} />
                 )}
-                <Text style={textStyle}>{option}</Text>
+                <Text style={textStyle}>{opt.label}</Text>
               </TouchableOpacity>
             );
           })}
@@ -415,16 +501,32 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
           <View style={[styles.explanationCard, { borderLeftColor: isCorrect ? JAZZ_COLORS.success : JAZZ_COLORS.warning }]}>
             <View style={styles.explanationHeader}>
               <Ionicons
-                name={isCorrect ? 'checkmark-circle' : 'information-circle'}
+                name={isCorrect ? 'sparkles' : 'information-circle'}
                 size={16}
                 color={isCorrect ? JAZZ_COLORS.success : JAZZ_COLORS.warning}
               />
               <Text style={[styles.explanationLabel, { color: isCorrect ? JAZZ_COLORS.success : JAZZ_COLORS.warning }]}>
-                {isCorrect ? 'Correct' : 'Not quite'}
+                {isCorrect ? (streak >= 3 ? `Nice — ${streak} in a row!` : 'You heard it!') : 'Not quite'}
               </Text>
             </View>
+            <View style={styles.revealRow}>
+              <View style={[styles.brightnessTag, {
+                backgroundColor: (question.brightness === 'bright' ? JAZZ_COLORS.bright
+                  : question.brightness === 'dark' ? JAZZ_COLORS.dark
+                  : JAZZ_COLORS.neutral) + '22',
+              }]}>
+                <Text style={[styles.brightnessTagText, {
+                  color: question.brightness === 'bright' ? JAZZ_COLORS.bright
+                    : question.brightness === 'dark' ? JAZZ_COLORS.dark
+                    : JAZZ_COLORS.neutral,
+                }]}>
+                  {question.oneWord}
+                </Text>
+              </View>
+              <Text style={styles.revealMode}>{question.rootLabel} {question.modeName}</Text>
+            </View>
             <Text style={styles.explanationText}>
-              That was {question.rootLabel} {question.correctAnswer}.
+              {`That ${question.colorNote} you heard floating over home — that's what makes it ${question.modeName}.`}
             </Text>
           </View>
         )}
@@ -483,7 +585,6 @@ function EarResultView({ score, total, onRestart, onRetry }: {
     </SafeAreaView>
   );
 }
-
 
 function QuestionView({
   question, questionNumber, total, selectedAnswer,
@@ -845,4 +946,17 @@ const styles = StyleSheet.create({
     fontSize: 12, color: JAZZ_COLORS.textTertiary, textAlign: 'center',
     marginBottom: SPACING.xl,
   },
+  scorePillRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  streakPill: { fontSize: 13, fontWeight: '700', color: JAZZ_COLORS.warning },
+  compareButton: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 6, paddingVertical: 12, marginBottom: SPACING.sm,
+    borderRadius: RADIUS.md, borderWidth: 1, borderColor: JAZZ_COLORS.border,
+    backgroundColor: JAZZ_COLORS.surface,
+  },
+  compareButtonText: { fontSize: 14, fontWeight: '600', color: JAZZ_COLORS.accent },
+  revealRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: SPACING.sm },
+  brightnessTag: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: RADIUS.full },
+  brightnessTagText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
+  revealMode: { fontSize: 15, fontWeight: '600', color: JAZZ_COLORS.textPrimary },
 });
