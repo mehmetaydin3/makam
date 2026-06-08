@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS, SPACING } from '../../data/constants';
-import { MoodBand } from '../common/MoodBand';
 
 type Props = {
   color: string;
@@ -13,7 +12,7 @@ type Props = {
   onPress: () => void;
 };
 
-export function LibraryCard({ color, name, pronunciation, description, mood, moodMap, timeOfDay, onPress }: Props) {
+export function LibraryCard({ color, name, pronunciation, description, onPress }: Props) {
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.75} onPress={onPress}>
       <View style={[styles.colorStrip, { backgroundColor: color }]} />
@@ -27,15 +26,6 @@ export function LibraryCard({ color, name, pronunciation, description, mood, moo
           </View>
         </View>
         <Text style={styles.desc} numberOfLines={2}>{description}</Text>
-        <View style={styles.footer}>
-          <MoodBand
-            moods={mood}
-            moodMap={moodMap}
-            characterColor={color}
-            timeOfDay={timeOfDay}
-            max={3}
-          />
-        </View>
       </View>
     </TouchableOpacity>
   );

@@ -19,7 +19,6 @@ import { JAZZ_COLORS, JazzColorScheme, SPACING, RADIUS } from '../../../data/tra
 import { useTheme } from '../../../context/ThemeContext';
 import { useProgress } from '../../../hooks/useProgress';
 import { Chrome } from '../../../components/chrome';
-import { MoodBand } from '../../../components/common/MoodBand';
 
 type BrightnessFilter = 'all' | 'bright' | 'neutral' | 'dark';
 
@@ -216,14 +215,6 @@ function ModeCard({ mode, stripeColor, onPress }: { mode: Mode; stripeColor: str
           <Text style={styles.modeName}>{mode.name}</Text>
         </View>
         <Text style={styles.character} numberOfLines={2}>{mode.character}</Text>
-        <View style={styles.cardFooter}>
-          <MoodBand
-            moods={[mode.oneWord]}
-            characterColor={accentColor}
-            brightness={mode.brightness}
-            max={1}
-          />
-        </View>
       </View>
     </TouchableOpacity>
   );

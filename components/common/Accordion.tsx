@@ -33,12 +33,12 @@ type Props = {
   /** Accent for the chevron + title tint when open. */
   accent: string;
   colors: AccordionColors;
-  /** Start expanded. Defaults to collapsed. */
+  /** Start expanded. Defaults to open. */
   defaultOpen?: boolean;
   children: React.ReactNode;
 };
 
-export function Accordion({ title, accent, colors, defaultOpen = false, children }: Props) {
+export function Accordion({ title, accent, colors, defaultOpen = true, children }: Props) {
   const [open, setOpen] = useState(defaultOpen);
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
