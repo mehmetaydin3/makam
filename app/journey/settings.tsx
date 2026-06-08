@@ -1,9 +1,10 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Linking, Alert, Modal, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING } from '../../data/constants';
+import { COLORS, SPACING, ColorScheme } from '../../data/constants';
+import { useTheme, ThemeMode } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { resetTraditionProgress } from '../../data/progress';
 import { resetEverything } from '../../lib/lastTradition';
@@ -17,6 +18,9 @@ type RowProps = {
 };
 
 function SettingsRow({ icon, label, value, onPress, showChevron = true }: RowProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const COLORS = colors;
   return (
     <TouchableOpacity style={styles.row} onPress={onPress} disabled={!onPress} activeOpacity={0.7}>
       <View style={styles.rowLeft}>
@@ -40,6 +44,9 @@ type ToggleRowProps = {
 };
 
 function ToggleRow({ icon, label, sublabel, value, onToggle }: ToggleRowProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const COLORS = colors;
   return (
     <View style={styles.row}>
       <View style={styles.rowLeft}>
@@ -60,16 +67,23 @@ function ToggleRow({ icon, label, sublabel, value, onToggle }: ToggleRowProps) {
 }
 
 function SectionHeader({ title }: { title: string }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   return <Text style={styles.sectionHeader}>{title}</Text>;
 }
 
 function Divider() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   return <View style={styles.divider} />;
 }
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, t, noteNames, setNoteNames } = useLanguage();
+  const { colors, mode: themeMode, setMode: setThemeMode } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const COLORS = colors;
   const [showWestern, setShowWestern] = useState(true);
   const [showCents, setShowCents] = useState(true);
   const [resetSheetOpen, setResetSheetOpen] = useState(false);
@@ -175,6 +189,32 @@ export default function SettingsScreen() {
               >
                 <Text style={[styles.langText, noteNames === 'letter' && styles.langTextActive]}>Letter</Text>
               </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <SectionHeader title="APPEARANCE" />
+        <View style={styles.group}>
+          <View style={[styles.row, { flexDirection: 'column', alignItems: 'flex-start', gap: 12 }]}>
+            <View style={styles.rowLeft}>
+              <Ionicons name="contrast-outline" size={18} color={COLORS.accent} style={styles.rowIcon} />
+              <View>
+                <Text style={styles.rowLabel}>Theme</Text>
+                <Text style={styles.rowSublabel}>Light, dark, or match your device</Text>
+              </View>
+            </View>
+            <View style={[styles.languageSelector, { marginLeft: 34 }]}>
+              {(['light', 'dark', 'system'] as ThemeMode[]).map((m) => (
+                <TouchableOpacity
+                  key={m}
+                  style={[styles.langOption, themeMode === m && styles.langOptionActive]}
+                  onPress={() => setThemeMode(m)}
+                >
+                  <Text style={[styles.langText, themeMode === m && styles.langTextActive]}>
+                    {m === 'light' ? 'Light' : m === 'dark' ? 'Dark' : 'System'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         </View>
@@ -298,7 +338,7 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
   backButton: { alignSelf: 'flex-start' },

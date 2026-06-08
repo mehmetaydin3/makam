@@ -1,4 +1,4 @@
-import { COLORS, SPACING, RADIUS } from '../../constants';
+import { COLORS, COLORS_LIGHT, SPACING, RADIUS } from '../../constants';
 
 /**
  * Modal Jazz tradition theme.
@@ -64,6 +64,45 @@ export const JAZZ_COLORS = {
   black: COLORS.black,
   error: COLORS.error,
 } as const;
+
+/**
+ * JAZZ_COLORS_LIGHT — light counterpart to JAZZ_COLORS. Mirrors its shape
+ * exactly. Base/text tokens come from COLORS_LIGHT (shared app identity);
+ * the accent + brightness tags are the Modal Jazz override, tuned for light.
+ * The dark JAZZ_COLORS above is unchanged.
+ */
+export const JAZZ_COLORS_LIGHT = {
+  // Base — shared with Makam (light)
+  background: COLORS_LIGHT.background,
+  surface: COLORS_LIGHT.surface,
+  surfaceRaised: COLORS_LIGHT.surfaceRaised,
+  border: COLORS_LIGHT.border,
+
+  // Text — shared with Makam (light)
+  textPrimary: COLORS_LIGHT.textPrimary,
+  textSecondary: COLORS_LIGHT.textSecondary,
+  textTertiary: COLORS_LIGHT.textTertiary,
+
+  // Accent — Modal Jazz blue-violet, deepened for contrast on light
+  accent: '#4655C8',
+  accentMuted: '#4655C822',
+
+  // Brightness tags — tuned for light backgrounds
+  bright: '#C28A00',
+  neutral: '#4655C8',
+  dark: '#8A2FA8',
+
+  // Status
+  warning: '#C2741A',
+  success: '#2F7E5A',
+
+  // Utility — shared
+  white: COLORS_LIGHT.white,
+  black: COLORS_LIGHT.black,
+  error: COLORS_LIGHT.error,
+} as const;
+
+export type JazzColorScheme = { [K in keyof typeof JAZZ_COLORS]: string };
 
 // Re-export shared spacing/radius so jazz screens have one import site
 export { SPACING, RADIUS };

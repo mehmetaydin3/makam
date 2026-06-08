@@ -15,7 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { MODES, Mode } from '../../../data/traditions/modal-jazz/modes';
 import { BRIGHTNESS_BASE } from '../../../data/familyColors';
-import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
+import { JAZZ_COLORS, JazzColorScheme, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
+import { useTheme } from '../../../context/ThemeContext';
 import { useProgress } from '../../../hooks/useProgress';
 import { Chrome } from '../../../components/chrome';
 
@@ -28,14 +29,17 @@ const FILTERS: { label: string; value: BrightnessFilter }[] = [
   { label: 'Dark', value: 'dark' },
 ];
 
-const BRIGHTNESS_COLOR: Record<string, string> = {
-  bright: JAZZ_COLORS.bright,
-  neutral: JAZZ_COLORS.neutral,
-  dark: JAZZ_COLORS.dark,
-};
+const brightnessColor = (c: JazzColorScheme): Record<string, string> => ({
+  bright: c.bright,
+  neutral: c.neutral,
+  dark: c.dark,
+});
 
 export default function ModalJazzHome() {
   const router = useRouter();
+  const { jazzColors } = useTheme();
+  const styles = useMemo(() => makeStyles(jazzColors), [jazzColors]);
+  const JAZZ_COLORS = jazzColors;
   const { markTraditionStarted } = useProgress();
   const [search, setSearch] = useState('');
   useEffect(() => { markTraditionStarted('modal-jazz'); }, []);
@@ -197,7 +201,9 @@ export default function ModalJazzHome() {
 }
 
 function ModeCard({ mode, stripeColor, onPress }: { mode: Mode; stripeColor: string; onPress: () => void }) {
-  const accentColor = BRIGHTNESS_COLOR[mode.brightness];
+  const { jazzColors } = useTheme();
+  const styles = useMemo(() => makeStyles(jazzColors), [jazzColors]);
+  const accentColor = brightnessColor(jazzColors)[mode.brightness];
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       <View style={[styles.colorStrip, { backgroundColor: stripeColor }]} />
@@ -222,7 +228,7 @@ function ModeCard({ mode, stripeColor, onPress }: { mode: Mode; stripeColor: str
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (JAZZ_COLORS: JazzColorScheme) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: JAZZ_COLORS.background },
   container: { flex: 1, backgroundColor: JAZZ_COLORS.background },
   header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },

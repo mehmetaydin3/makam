@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,16 +12,17 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getModeById, getRelatedModes } from '../../../data/traditions/modal-jazz/modes';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
-import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
+import { JAZZ_COLORS, JazzColorScheme, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
+import { useTheme } from '../../../context/ThemeContext';
 import YouTubeEmbed from '../../../components/lessons/YouTubeEmbed';
 import { YOUTUBE_IDS } from '../../../data/traditions/modal-jazz/youtubeIds';
 import ScaleDiagram from '../../../components/lessons/ScaleDiagram';
 
-const BRIGHTNESS_COLOR: Record<string, string> = {
-  bright: JAZZ_COLORS.bright,
-  neutral: JAZZ_COLORS.neutral,
-  dark: JAZZ_COLORS.dark,
-};
+const brightnessColor = (c: JazzColorScheme): Record<string, string> => ({
+  bright: c.bright,
+  neutral: c.neutral,
+  dark: c.dark,
+});
 
 
 export default function ModalJazzModeDetail() {
@@ -29,6 +30,9 @@ export default function ModalJazzModeDetail() {
   const modeId = id as string;
   const router = useRouter();
   const { markModeExplored, modeMasteryPoints } = useProgress();
+  const { jazzColors } = useTheme();
+  const styles = useMemo(() => makeStyles(jazzColors), [jazzColors]);
+  const JAZZ_COLORS = jazzColors;
   const mode = getModeById(modeId);
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export default function ModalJazzModeDetail() {
     );
   }
 
-  const accentColor = BRIGHTNESS_COLOR[mode.brightness];
+  const accentColor = brightnessColor(jazzColors)[mode.brightness];
   const related = getRelatedModes(mode.id);
 
   return (
@@ -219,6 +223,8 @@ export default function ModalJazzModeDetail() {
 }
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
+  const { jazzColors } = useTheme();
+  const styles = useMemo(() => makeStyles(jazzColors), [jazzColors]);
   return (
     <View style={styles.section}>
       <Text style={styles.sectionLabel}>{label}</Text>
@@ -228,10 +234,14 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 }
 
 function Divider() {
+  const { jazzColors } = useTheme();
+  const styles = useMemo(() => makeStyles(jazzColors), [jazzColors]);
   return <View style={styles.divider} />;
 }
 
 function TheoryRow({ label, value, mono, accent }: { label: string; value: string; mono?: boolean; accent?: string }) {
+  const { jazzColors } = useTheme();
+  const styles = useMemo(() => makeStyles(jazzColors), [jazzColors]);
   return (
     <View style={styles.theoryRow}>
       <Text style={styles.theoryLabel}>{label}</Text>
@@ -246,7 +256,7 @@ function ordinal(n: number): string {
   return s[(v - 20) % 10] || s[v] || s[0];
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (JAZZ_COLORS: JazzColorScheme) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: JAZZ_COLORS.background },
   errorContainer: { flex: 1, backgroundColor: JAZZ_COLORS.background, justifyContent: 'center', alignItems: 'center' },
   navBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm },

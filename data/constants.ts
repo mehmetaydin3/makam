@@ -39,6 +39,43 @@ export const COLORS = {
   dark: '#7A6E9E',
 };
 
+// ─── Colors (Light) ───────────────────────────────────────────────────────────
+// Light counterpart to COLORS. The dark COLORS object above is kept byte-for-byte
+// unchanged so there is zero dark regression; this is the additive light palette.
+export const COLORS_LIGHT = {
+  // Base
+  background: '#FAF8F4',
+  surface: '#FFFFFF',
+  surfaceRaised: '#F1EEE8',
+  border: '#E2DDD4',
+
+  // Text
+  textPrimary: '#1A1916',
+  textSecondary: '#6B665E',
+  textTertiary: '#A29C92',
+
+  // Accent — same warm gold, slightly deepened for contrast on light
+  accent: '#A9743A',
+  accentMuted: '#A9743A1A',
+
+  // Seyir colors (subtle, for tags only)
+  ascending: '#3E6E4E',
+  descending: '#5E5286',
+  undulating: '#9C4622',
+
+  // Utility
+  white: '#FFFFFF',
+  black: '#000000',
+  error: '#C23838',
+
+  // Quiz feedback + difficulty (Practice tab)
+  success: '#3E6E4E',
+  warning: '#A9743A',
+  dark: '#5E5286',
+};
+
+export type ColorScheme = { [K in keyof typeof COLORS]: string };
+
 // ─── Spacing ──────────────────────────────────────────────────────────────────
 export const SPACING = {
   xs: 4,

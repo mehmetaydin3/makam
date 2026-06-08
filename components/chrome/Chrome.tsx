@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { COLORS, SPACING } from '../../data/constants';
+import { SPACING, ColorScheme } from '../../data/constants';
+import { useTheme } from '../../context/ThemeContext';
 import { TRADITIONS, LIVE_TRADITIONS, traditionByName } from '../../data/traditions/registry';
 import { TraditionIntro, hasSeenIntro } from '../intro/TraditionIntro';
 
@@ -25,6 +26,8 @@ type Props = {
 export function Chrome({ traditionName, accent }: Props) {
   const traditionId = traditionByName(traditionName)?.id ?? 'modal-jazz';
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [introOpen, setIntroOpen] = useState(false);
 
@@ -49,16 +52,26 @@ export function Chrome({ traditionName, accent }: Props) {
       <TouchableOpacity style={styles.chip} activeOpacity={0.7} onPress={() => setSwitcherOpen(true)}>
         <View style={[styles.diamond, { backgroundColor: accent }]} />
         <Text style={styles.chipText}>{traditionName}</Text>
-        <Ionicons name="chevron-down" size={14} color={COLORS.textSecondary} />
+        <Ionicons name="chevron-down" size={14} color={colors.textSecondary} />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.avatar}
-        activeOpacity={0.7}
-        onPress={() => router.push('/journey' as any)}
-      >
-        <Ionicons name="person-circle-outline" size={28} color={accent} />
-      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          activeOpacity={0.7}
+          onPress={() => router.push('/journey/settings' as any)}
+          accessibilityLabel="Settings"
+        >
+          <Ionicons name="settings-outline" size={22} color={colors.textSecondary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.avatar}
+          activeOpacity={0.7}
+          onPress={() => router.push('/journey' as any)}
+        >
+          <Ionicons name="person-circle-outline" size={28} color={accent} />
+        </TouchableOpacity>
+      </View>
 
       <Modal
         visible={switcherOpen}
@@ -87,7 +100,7 @@ export function Chrome({ traditionName, accent }: Props) {
                     <Text style={styles.sheetRowTagline}>{live ? tr.tagline : 'Coming soon'}</Text>
                   </View>
                   {isCurrent && <Ionicons name="checkmark" size={18} color={tr.accent} />}
-                  {!live && <Ionicons name="lock-closed" size={14} color={COLORS.textTertiary} />}
+                  {!live && <Ionicons name="lock-closed" size={14} color={colors.textTertiary} />}
                 </TouchableOpacity>
               );
             })}
@@ -96,7 +109,7 @@ export function Chrome({ traditionName, accent }: Props) {
               activeOpacity={0.7}
               onPress={() => { setSwitcherOpen(false); setIntroOpen(true); }}
             >
-              <Ionicons name="information-circle-outline" size={18} color={COLORS.textSecondary} />
+              <Ionicons name="information-circle-outline" size={18} color={colors.textSecondary} />
               <Text style={styles.journeyRowText}>About this tradition</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -104,7 +117,7 @@ export function Chrome({ traditionName, accent }: Props) {
               activeOpacity={0.7}
               onPress={() => { setSwitcherOpen(false); router.push('/journey' as any); }}
             >
-              <Ionicons name="compass-outline" size={18} color={COLORS.textSecondary} />
+              <Ionicons name="compass-outline" size={18} color={colors.textSecondary} />
               <Text style={styles.journeyRowText}>View your journey</Text>
             </TouchableOpacity>
           </Pressable>
@@ -122,7 +135,7 @@ export function Chrome({ traditionName, accent }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -134,6 +147,8 @@ const styles = StyleSheet.create({
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4 },
   diamond: { width: 8, height: 8, borderRadius: 2, transform: [{ rotate: '45deg' }] },
   chipText: { fontSize: 14, color: COLORS.textPrimary, fontWeight: '500' },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  iconButton: { padding: 2 },
   avatar: { padding: 2 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   sheet: {

@@ -2,7 +2,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING } from '../../data/constants';
+import { useMemo } from 'react';
+import { SPACING, ColorScheme } from '../../data/constants';
+import { useTheme } from '../../context/ThemeContext';
 import { useProgress } from '../../hooks/useProgress';
 import { MAKAMS } from '../../data/makams';
 import { LESSONS } from '../../data/education';
@@ -50,6 +52,9 @@ const CARD_PREVIEW_W = 300;
 
 export default function JourneyScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const COLORS = colors;
   const { traditionState, progress, traditionCoverage, traditionMastery, countModesAtLevel, modeMasteryLevel, isModeCovered } = useProgress();
 
   const makamState = traditionState('turkish-makam', MAKAMS.length, LESSONS.length);
@@ -245,7 +250,7 @@ export default function JourneyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
   backButton: { marginLeft: -4 },

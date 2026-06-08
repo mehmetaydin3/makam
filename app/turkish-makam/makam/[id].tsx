@@ -2,13 +2,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getUsulById } from '../../../data/usuls';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, AudioExample } from '../../../data/makams';
 import { useLanguage } from '../../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../../components/ShareableCard';
-import { COLORS, SPACING } from '../../../data/constants';
+import { SPACING, ColorScheme } from '../../../data/constants';
+import { useTheme } from '../../../context/ThemeContext';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
@@ -34,6 +35,8 @@ function AudioCard({
   color: string;
   showTaksimExplainer?: boolean;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   return (
     <View style={[styles.audioCard, { borderLeftColor: color }]}>
       <Text style={[styles.audioCardLabel, { color }]}>{label}</Text>
@@ -76,6 +79,9 @@ export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { t, language, noteNames } = useLanguage();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const COLORS = colors;
   const [showShare, setShowShare] = useState(false);
   const SEYIR_LABELS = language === 'tr' ? {
     ascending: 'Çıkıcı ↗',
@@ -397,7 +403,7 @@ export default function MakamDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   errorText: { color: COLORS.textSecondary, padding: SPACING.lg },
   header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

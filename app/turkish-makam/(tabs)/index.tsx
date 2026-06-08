@@ -4,13 +4,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Animated } from 'react-native';
 import { MAKAMS } from '../../../data/makams';
 import { useLanguage } from '../../../context/LanguageContext';
 import { SONGS } from '../../../data/songs';
 import { USULS } from '../../../data/usuls';
-import { COLORS, SPACING } from '../../../data/constants';
+import { SPACING, ColorScheme } from '../../../data/constants';
+import { useTheme } from '../../../context/ThemeContext';
 import { LibraryCard, SectionHeader } from '../../../components/library';
 import { familyShade, FAMILY_BASE } from '../../../data/familyColors';
 import { Chrome } from '../../../components/chrome';
@@ -43,6 +44,9 @@ export default function ExploreScreen() {
     }
   );
   const { t, language } = useLanguage();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const COLORS = colors;
   const moodMap: Record<string, string> = language === 'tr' ? {
     'Joyful': 'Neşeli', 'Serene': 'Sakin', 'Balanced': 'Dengeli',
     'Calm': 'Sakin', 'Melancholic': 'Melankolik', 'Longing': 'Özlem',
@@ -345,7 +349,7 @@ export default function ExploreScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.lg, paddingBottom: SPACING.sm },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
