@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { buildLeveledQuizSession, countQuestionsAtLevel, QuizQuestion, QuizLevel } from '../../../data/traditions/turkish-makam/quiz';
+import { buildMakamEarSession, MakamEarQuestion, EarLevel, EAR_TRAINING_AVAILABLE } from '../../../data/traditions/turkish-makam/earTraining';
+import { audioEngine } from '../../../audio/audioEngine';
 import { useProgress } from '../../../hooks/useProgress';
 import { QUIZ_PASS_THRESHOLD, nextQuizLevel } from '../../../data/progress';
 import { COLORS, SPACING, RADIUS } from '../../../data/constants';
@@ -111,10 +113,25 @@ function HomeView({ onStartLevel, isUnlocked }: {
   onStartLevel: (level: QuizLevel) => void;
   isUnlocked: (level: QuizLevel) => boolean;
 }) {
+  // Quiz + "By ear" share this home. The ear flow (MakamEarFlow) plays scales
+  // through the ney engine and is fully self-contained.
+  const [section, setSection] = useState<'quiz' | 'ear'>('quiz');
+  const [earLevel, setEarLevel] = useState<EarLevel | null>(null);
+
+  if (earLevel) {
+    return <MakamEarFlow level={earLevel} onExit={() => setEarLevel(null)} />;
+  }
+
   const levels: { level: QuizLevel; label: string; desc: string; count: number }[] = [
     { level: 'beginner', label: 'Beginner', desc: 'Seyir, families, and character', count: countQuestionsAtLevel('beginner') },
     { level: 'intermediate', label: 'Intermediate', desc: 'Durak, relationships, and finer traits', count: countQuestionsAtLevel('intermediate') },
     { level: 'advanced', label: 'Advanced', desc: 'Subtle distinctions between makams', count: countQuestionsAtLevel('advanced') },
+  ];
+
+  const earLevels: { level: EarLevel; label: string; desc: string }[] = [
+    { level: 'beginner', label: 'Beginner', desc: 'Common makams, three choices' },
+    { level: 'intermediate', label: 'Intermediate', desc: 'More makams, four choices' },
+    { level: 'advanced', label: 'Advanced', desc: 'Same-family makams — a real ear test' },
   ];
 
   return (
@@ -123,40 +140,327 @@ function HomeView({ onStartLevel, isUnlocked }: {
       <ScrollView contentContainerStyle={styles.homeContent} showsVerticalScrollIndicator={false}>
         <View style={styles.homeHeader}>
           <Text style={styles.heading}>Practice</Text>
-          <Text style={styles.subheading}>Three levels. Pass one to unlock the next.</Text>
+          <Text style={styles.subheading}>
+            {section === 'quiz'
+              ? 'Three levels. Pass one to unlock the next.'
+              : 'Listen to the ney, then name the makam. Replay as often as you like.'}
+          </Text>
         </View>
 
-        <View style={styles.levelList}>
-          {levels.map(({ level, label, desc, count }, i) => {
-            const unlocked = isUnlocked(level);
-            const prev = i > 0 ? levels[i - 1].label : null;
-            return (
+        <View style={styles.segmented}>
+          <TouchableOpacity
+            style={[styles.segment, section === 'quiz' && styles.segmentActive]}
+            onPress={() => setSection('quiz')}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="list" size={15} color={section === 'quiz' ? COLORS.background : COLORS.textSecondary} />
+            <Text style={[styles.segmentText, section === 'quiz' && styles.segmentTextActive]}>Quiz</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.segment, section === 'ear' && styles.segmentActive]}
+            onPress={() => setSection('ear')}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="ear" size={15} color={section === 'ear' ? COLORS.background : COLORS.textSecondary} />
+            <Text style={[styles.segmentText, section === 'ear' && styles.segmentTextActive]}>By ear</Text>
+          </TouchableOpacity>
+        </View>
+
+        {section === 'quiz' ? (
+          <View style={styles.levelList}>
+            {levels.map(({ level, label, desc, count }, i) => {
+              const unlocked = isUnlocked(level);
+              const prev = i > 0 ? levels[i - 1].label : null;
+              return (
+                <TouchableOpacity
+                  key={level}
+                  style={[styles.levelCard, !unlocked && styles.levelCardLocked]}
+                  activeOpacity={unlocked ? 0.8 : 1}
+                  onPress={() => unlocked && onStartLevel(level)}
+                  disabled={!unlocked}
+                >
+                  <View style={styles.levelCardHeader}>
+                    <View style={styles.levelTitleRow}>
+                      <Text style={[styles.levelLabel, !unlocked && styles.levelLabelLocked]}>{label}</Text>
+                      {!unlocked && <Ionicons name="lock-closed" size={14} color={COLORS.textTertiary} />}
+                    </View>
+                    <Text style={styles.levelCount}>{count} questions</Text>
+                  </View>
+                  <Text style={[styles.levelDesc, !unlocked && styles.levelLabelLocked]}>
+                    {unlocked ? desc : `Score 70% on ${prev} to unlock`}
+                  </Text>
+                  {unlocked && (
+                    <View style={styles.levelStartRow}>
+                      <Text style={styles.levelStartText}>Start</Text>
+                      <Ionicons name="arrow-forward" size={15} color={COLORS.accent} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : !EAR_TRAINING_AVAILABLE ? (
+          <View style={styles.levelCard}>
+            <Text style={styles.levelDesc}>Ear training is unavailable — no playable makams found.</Text>
+          </View>
+        ) : (
+          <View style={styles.levelList}>
+            {earLevels.map(({ level, label, desc }) => (
               <TouchableOpacity
                 key={level}
-                style={[styles.levelCard, !unlocked && styles.levelCardLocked]}
-                activeOpacity={unlocked ? 0.8 : 1}
-                onPress={() => unlocked && onStartLevel(level)}
-                disabled={!unlocked}
+                style={styles.levelCard}
+                activeOpacity={0.8}
+                onPress={() => setEarLevel(level)}
               >
                 <View style={styles.levelCardHeader}>
                   <View style={styles.levelTitleRow}>
-                    <Text style={[styles.levelLabel, !unlocked && styles.levelLabelLocked]}>{label}</Text>
-                    {!unlocked && <Ionicons name="lock-closed" size={14} color={COLORS.textTertiary} />}
+                    <Ionicons name="musical-notes" size={15} color={COLORS.accent} />
+                    <Text style={styles.levelLabel}>{label}</Text>
                   </View>
-                  <Text style={styles.levelCount}>{count} questions</Text>
                 </View>
-                <Text style={[styles.levelDesc, !unlocked && styles.levelLabelLocked]}>
-                  {unlocked ? desc : `Score 70% on ${prev} to unlock`}
-                </Text>
-                {unlocked && (
-                  <View style={styles.levelStartRow}>
-                    <Text style={styles.levelStartText}>Start</Text>
-                    <Ionicons name="arrow-forward" size={15} color={COLORS.accent} />
-                  </View>
+                <Text style={styles.levelDesc}>{desc}</Text>
+                <View style={styles.levelStartRow}>
+                  <Text style={styles.levelStartText}>Start listening</Text>
+                  <Ionicons name="arrow-forward" size={15} color={COLORS.accent} />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ear training: "Name that makam by ear". Self-contained — drives the shared
+// ney engine (audio/audioEngine.ts) via playScale. The ney is the *only* engine
+// makam ear training uses. Only makams the engine can anchor at a correct root
+// are eligible (see earTraining.ts / PLAYABLE_MAKAM_IDS).
+// ─────────────────────────────────────────────────────────────────────────────
+const EAR_SESSION_LENGTH = 8;
+
+function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }) {
+  const { recordQuizAnswer } = useProgress();
+
+  const [questions, setQuestions] = useState<MakamEarQuestion[]>(() => buildMakamEarSession(level, EAR_SESSION_LENGTH));
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
+
+  const question = questions[index];
+
+  // Stop the ney when leaving the flow.
+  useEffect(() => () => { audioEngine.stop(); }, []);
+
+  // Auto-play each new question's scale.
+  useEffect(() => {
+    if (done || !question) return;
+    const t = setTimeout(() => play(), 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, done]);
+
+  const play = async () => {
+    if (!question) return;
+    setIsPlaying(true);
+    setHasPlayed(true);
+    await audioEngine.playScale(question.makamId, question.cents, (state) => {
+      if (state === 'stopped') setIsPlaying(false);
+    });
+  };
+
+  const stop = async () => {
+    await audioEngine.stop();
+    setIsPlaying(false);
+  };
+
+  const handleSelect = (answer: string) => {
+    if (showAnswer) return;
+    audioEngine.stop();
+    setIsPlaying(false);
+    setSelected(answer);
+    setShowAnswer(true);
+    const correct = answer === question.correctAnswer;
+    if (correct) setScore(s => s + 1);
+    recordQuizAnswer('turkish-makam', question.makamId, correct);
+  };
+
+  const handleNext = () => {
+    audioEngine.stop();
+    setIsPlaying(false);
+    if (index < questions.length - 1) {
+      setIndex(index + 1);
+      setSelected(null);
+      setShowAnswer(false);
+      setHasPlayed(false);
+    } else {
+      setDone(true);
+    }
+  };
+
+  const restart = () => {
+    audioEngine.stop();
+    setIsPlaying(false);
+    setQuestions(buildMakamEarSession(level, EAR_SESSION_LENGTH));
+    setIndex(0);
+    setSelected(null);
+    setShowAnswer(false);
+    setScore(0);
+    setDone(false);
+    setHasPlayed(false);
+  };
+
+  if (done) {
+    return <EarResultView score={score} total={questions.length} onRestart={onExit} onRetry={restart} />;
+  }
+
+  const progress = (index + 1) / questions.length;
+  const isCorrect = selected === question.correctAnswer;
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.navBar}>
+        <TouchableOpacity onPress={() => { audioEngine.stop(); onExit(); }} style={styles.quitButton}>
+          <Ionicons name="close" size={22} color={COLORS.textPrimary} />
+        </TouchableOpacity>
+        <Text style={styles.questionCount}>{index + 1} / {questions.length}</Text>
+        <Text style={styles.scoreDisplay}>{score} ✓</Text>
+      </View>
+
+      <View style={styles.progressTrack}>
+        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
+        <Text style={styles.earKicker}>Name that makam</Text>
+        <Text style={styles.prompt}>Which makam is this?</Text>
+
+        <TouchableOpacity
+          style={[styles.playButton, isPlaying && styles.playButtonActive]}
+          onPress={isPlaying ? stop : play}
+          activeOpacity={0.85}
+        >
+          <Ionicons
+            name={isPlaying ? 'stop' : hasPlayed ? 'refresh' : 'play'}
+            size={26}
+            color={COLORS.background}
+          />
+          <Text style={styles.playButtonText}>
+            {isPlaying ? 'Playing…' : hasPlayed ? 'Replay' : 'Play'}
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.earHint}>
+          {showAnswer ? `That was ${question.correctAnswer}` : 'Played on the ney. Tap replay as needed.'}
+        </Text>
+
+        <View style={styles.optionsGrid}>
+          {question.options.map((option) => {
+            const isSelected = selected === option;
+            const isCorrectOption = option === question.correctAnswer;
+            let optionStyle = styles.option;
+            let textStyle = styles.optionText;
+            if (showAnswer) {
+              if (isCorrectOption) {
+                optionStyle = { ...styles.option, ...styles.optionCorrect };
+                textStyle = { ...styles.optionText, color: COLORS.success };
+              } else if (isSelected && !isCorrectOption) {
+                optionStyle = { ...styles.option, ...styles.optionWrong };
+                textStyle = { ...styles.optionText, color: COLORS.warning };
+              } else {
+                optionStyle = { ...styles.option, ...styles.optionDim };
+              }
+            } else if (isSelected) {
+              optionStyle = { ...styles.option, ...styles.optionSelected };
+            }
+            return (
+              <TouchableOpacity
+                key={option}
+                style={optionStyle}
+                onPress={() => handleSelect(option)}
+                activeOpacity={showAnswer ? 1 : 0.8}
+              >
+                {showAnswer && isCorrectOption && (
+                  <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
                 )}
+                {showAnswer && isSelected && !isCorrectOption && (
+                  <Ionicons name="close-circle" size={16} color={COLORS.warning} />
+                )}
+                <Text style={textStyle}>{option}</Text>
               </TouchableOpacity>
             );
           })}
+        </View>
+
+        {showAnswer && (
+          <View style={[styles.explanationCard, { borderLeftColor: isCorrect ? COLORS.success : COLORS.warning }]}>
+            <View style={styles.explanationHeader}>
+              <Ionicons
+                name={isCorrect ? 'checkmark-circle' : 'information-circle'}
+                size={16}
+                color={isCorrect ? COLORS.success : COLORS.warning}
+              />
+              <Text style={[styles.explanationLabel, { color: isCorrect ? COLORS.success : COLORS.warning }]}>
+                {isCorrect ? 'Correct' : 'Not quite'}
+              </Text>
+            </View>
+            <Text style={styles.explanationText}>That makam was {question.correctAnswer}.</Text>
+          </View>
+        )}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+
+      {showAnswer && (
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.nextButtonText}>
+              {index === questions.length - 1 ? 'See result' : 'Next'}
+            </Text>
+            <Ionicons name="arrow-forward" size={16} color={COLORS.background} />
+          </TouchableOpacity>
+        </View>
+      )}
+    </SafeAreaView>
+  );
+}
+
+function EarResultView({ score, total, onRestart, onRetry }: {
+  score: number; total: number; onRestart: () => void; onRetry: () => void;
+}) {
+  const percentage = Math.round((score / total) * 100);
+  const getMessage = () => {
+    if (percentage === 100) return 'Perfect. Your ear is developing.';
+    if (percentage >= 70) return 'Good. Keep listening.';
+    return 'Keep practicing. The ear takes time.';
+  };
+  const getColor = () => {
+    if (percentage === 100) return COLORS.success;
+    if (percentage >= 70) return COLORS.accent;
+    return COLORS.warning;
+  };
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.resultScroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.resultContainer}>
+          <View style={[styles.scoreCircle, { borderColor: getColor() }]}>
+            <Text style={[styles.scoreNumber, { color: getColor() }]}>{score}</Text>
+            <Text style={styles.scoreTotal}>of {total}</Text>
+          </View>
+          <Text style={styles.percentage}>{percentage}%</Text>
+          <Text style={styles.resultMessage}>{getMessage()}</Text>
+
+          <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
+            <Text style={styles.restartText}>Back to practice</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
+            <Ionicons name="refresh" size={16} color={COLORS.accent} />
+            <Text style={styles.retryText}>New ears</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -480,4 +784,32 @@ const styles = StyleSheet.create({
   restartText: { fontSize: 15, fontWeight: '600', color: COLORS.background },
   retryButton: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: SPACING.md },
   retryText: { fontSize: 14, color: COLORS.accent },
+  // Ear-training additions
+  segmented: {
+    flexDirection: 'row', backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border,
+    padding: 4, marginBottom: SPACING.lg, gap: 4,
+  },
+  segment: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 6, paddingVertical: 10, borderRadius: RADIUS.sm,
+  },
+  segmentActive: { backgroundColor: COLORS.accent },
+  segmentText: { fontSize: 14, fontWeight: '600', color: COLORS.textSecondary },
+  segmentTextActive: { color: COLORS.background },
+  earKicker: {
+    fontSize: 11, fontWeight: '600', color: COLORS.textTertiary,
+    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: SPACING.sm,
+  },
+  playButton: {
+    backgroundColor: COLORS.accent, borderRadius: RADIUS.lg,
+    paddingVertical: 22, alignItems: 'center', justifyContent: 'center',
+    flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.sm,
+  },
+  playButtonActive: { backgroundColor: COLORS.success },
+  playButtonText: { fontSize: 18, fontWeight: '600', color: COLORS.background },
+  earHint: {
+    fontSize: 12, color: COLORS.textTertiary, textAlign: 'center',
+    marginBottom: SPACING.xl,
+  },
 });

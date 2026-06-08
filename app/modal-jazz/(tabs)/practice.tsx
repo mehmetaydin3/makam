@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { buildLeveledQuizSession, countQuestionsAtLevel, QuizQuestion, QuizLevel, getRandomVideoId } from '../../../data/traditions/modal-jazz/quiz';
+import { buildEarSession, EarQuestion, EarLevel } from '../../../data/traditions/modal-jazz/earTraining';
+import RhodesEngine, { RhodesEngineRef } from '../../../data/traditions/modal-jazz/RhodesEngine';
 import { useProgress } from '../../../hooks/useProgress';
 import { QUIZ_PASS_THRESHOLD, nextQuizLevel } from '../../../data/progress';
 import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
@@ -123,10 +125,26 @@ function HomeView({ onStartLevel, isUnlocked }: {
   onStartLevel: (level: QuizLevel) => void;
   isUnlocked: (level: QuizLevel) => boolean;
 }) {
+  // Two practice modes share the home screen: the multiple-choice Quiz and the
+  // new "By ear" ear-training. The ear flow is self-contained (EarTrainingFlow)
+  // and owns its own Rhodes engine, so it never disturbs the quiz.
+  const [section, setSection] = useState<'quiz' | 'ear'>('quiz');
+  const [earLevel, setEarLevel] = useState<EarLevel | null>(null);
+
+  if (earLevel) {
+    return <EarTrainingFlow level={earLevel} onExit={() => setEarLevel(null)} />;
+  }
+
   const levels: { level: QuizLevel; label: string; desc: string; count: number }[] = [
     { level: 'beginner', label: 'Beginner', desc: 'The core modes and their colors', count: countQuestionsAtLevel('beginner') },
     { level: 'intermediate', label: 'Intermediate', desc: 'Chord context and finer distinctions', count: countQuestionsAtLevel('intermediate') },
     { level: 'advanced', label: 'Advanced', desc: 'Subtle theory and modal interchange', count: countQuestionsAtLevel('advanced') },
+  ];
+
+  const earLevels: { level: EarLevel; label: string; desc: string }[] = [
+    { level: 'beginner', label: 'Beginner', desc: 'Core modes, three choices' },
+    { level: 'intermediate', label: 'Intermediate', desc: 'More modes, four choices' },
+    { level: 'advanced', label: 'Advanced', desc: 'Same-color modes — a real ear test' },
   ];
 
   return (
@@ -135,40 +153,331 @@ function HomeView({ onStartLevel, isUnlocked }: {
       <ScrollView contentContainerStyle={styles.homeContent} showsVerticalScrollIndicator={false}>
         <View style={styles.homeHeader}>
           <Text style={styles.heading}>Practice</Text>
-          <Text style={styles.subheading}>Three levels. Pass one to unlock the next.</Text>
+          <Text style={styles.subheading}>
+            {section === 'quiz'
+              ? 'Three levels. Pass one to unlock the next.'
+              : 'Listen, then name the mode. Replay as often as you like.'}
+          </Text>
         </View>
 
-        <View style={styles.levelList}>
-          {levels.map(({ level, label, desc, count }, i) => {
-            const unlocked = isUnlocked(level);
-            const prev = i > 0 ? levels[i - 1].label : null;
-            return (
+        {/* Segmented toggle: Quiz vs By ear */}
+        <View style={styles.segmented}>
+          <TouchableOpacity
+            style={[styles.segment, section === 'quiz' && styles.segmentActive]}
+            onPress={() => setSection('quiz')}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="list" size={15} color={section === 'quiz' ? JAZZ_COLORS.background : JAZZ_COLORS.textSecondary} />
+            <Text style={[styles.segmentText, section === 'quiz' && styles.segmentTextActive]}>Quiz</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.segment, section === 'ear' && styles.segmentActive]}
+            onPress={() => setSection('ear')}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="ear" size={15} color={section === 'ear' ? JAZZ_COLORS.background : JAZZ_COLORS.textSecondary} />
+            <Text style={[styles.segmentText, section === 'ear' && styles.segmentTextActive]}>By ear</Text>
+          </TouchableOpacity>
+        </View>
+
+        {section === 'quiz' ? (
+          <View style={styles.levelList}>
+            {levels.map(({ level, label, desc, count }, i) => {
+              const unlocked = isUnlocked(level);
+              const prev = i > 0 ? levels[i - 1].label : null;
+              return (
+                <TouchableOpacity
+                  key={level}
+                  style={[styles.levelCard, !unlocked && styles.levelCardLocked]}
+                  activeOpacity={unlocked ? 0.8 : 1}
+                  onPress={() => unlocked && onStartLevel(level)}
+                  disabled={!unlocked}
+                >
+                  <View style={styles.levelCardHeader}>
+                    <View style={styles.levelTitleRow}>
+                      <Text style={[styles.levelLabel, !unlocked && styles.levelLabelLocked]}>{label}</Text>
+                      {!unlocked && <Ionicons name="lock-closed" size={14} color={JAZZ_COLORS.textTertiary} />}
+                    </View>
+                    <Text style={styles.levelCount}>{count} questions</Text>
+                  </View>
+                  <Text style={[styles.levelDesc, !unlocked && styles.levelLabelLocked]}>
+                    {unlocked ? desc : `Score 70% on ${prev} to unlock`}
+                  </Text>
+                  {unlocked && (
+                    <View style={styles.levelStartRow}>
+                      <Text style={styles.levelStartText}>Start</Text>
+                      <Ionicons name="arrow-forward" size={15} color={JAZZ_COLORS.accent} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : (
+          <View style={styles.levelList}>
+            {earLevels.map(({ level, label, desc }) => (
               <TouchableOpacity
                 key={level}
-                style={[styles.levelCard, !unlocked && styles.levelCardLocked]}
-                activeOpacity={unlocked ? 0.8 : 1}
-                onPress={() => unlocked && onStartLevel(level)}
-                disabled={!unlocked}
+                style={styles.levelCard}
+                activeOpacity={0.8}
+                onPress={() => setEarLevel(level)}
               >
                 <View style={styles.levelCardHeader}>
                   <View style={styles.levelTitleRow}>
-                    <Text style={[styles.levelLabel, !unlocked && styles.levelLabelLocked]}>{label}</Text>
-                    {!unlocked && <Ionicons name="lock-closed" size={14} color={JAZZ_COLORS.textTertiary} />}
+                    <Ionicons name="musical-notes" size={15} color={JAZZ_COLORS.accent} />
+                    <Text style={styles.levelLabel}>{label}</Text>
                   </View>
-                  <Text style={styles.levelCount}>{count} questions</Text>
                 </View>
-                <Text style={[styles.levelDesc, !unlocked && styles.levelLabelLocked]}>
-                  {unlocked ? desc : `Score 70% on ${prev} to unlock`}
-                </Text>
-                {unlocked && (
-                  <View style={styles.levelStartRow}>
-                    <Text style={styles.levelStartText}>Start</Text>
-                    <Ionicons name="arrow-forward" size={15} color={JAZZ_COLORS.accent} />
-                  </View>
+                <Text style={styles.levelDesc}>{desc}</Text>
+                <View style={styles.levelStartRow}>
+                  <Text style={styles.levelStartText}>Start listening</Text>
+                  <Ionicons name="arrow-forward" size={15} color={JAZZ_COLORS.accent} />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ear training: "Name that mode by ear". Self-contained — mounts its own
+// RhodesEngine and runs an 8-question session generated at runtime from MODES.
+// The Rhodes synth is the *only* engine jazz ear training uses.
+// ─────────────────────────────────────────────────────────────────────────────
+const EAR_SESSION_LENGTH = 8;
+
+function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => void }) {
+  const { recordQuizAnswer } = useProgress();
+  const engineRef = useRef<RhodesEngineRef>(null);
+
+  const [questions, setQuestions] = useState<EarQuestion[]>(() => buildEarSession(level, EAR_SESSION_LENGTH));
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
+
+  const question = questions[index];
+
+  // Stop audio when leaving the flow.
+  useEffect(() => () => { engineRef.current?.stop(); }, []);
+
+  // Auto-play each new question's scale once it appears.
+  useEffect(() => {
+    if (done || !question) return;
+    const t = setTimeout(() => play(), 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, done]);
+
+  const play = () => {
+    if (!question) return;
+    setIsPlaying(true);
+    setHasPlayed(true);
+    engineRef.current?.playScale(
+      question.midiNotes,
+      undefined,
+      () => setIsPlaying(false),
+    );
+  };
+
+  const handleSelect = (answer: string) => {
+    if (showAnswer) return;
+    engineRef.current?.stop();
+    setIsPlaying(false);
+    setSelected(answer);
+    setShowAnswer(true);
+    const correct = answer === question.correctAnswer;
+    if (correct) setScore(s => s + 1);
+    // Feed the same mastery model the quiz uses, tagged by mode.
+    recordQuizAnswer('modal-jazz', question.modeId, correct);
+  };
+
+  const handleNext = () => {
+    engineRef.current?.stop();
+    if (index < questions.length - 1) {
+      setIndex(index + 1);
+      setSelected(null);
+      setShowAnswer(false);
+      setHasPlayed(false);
+    } else {
+      setDone(true);
+    }
+  };
+
+  const restart = () => {
+    engineRef.current?.stop();
+    setQuestions(buildEarSession(level, EAR_SESSION_LENGTH));
+    setIndex(0);
+    setSelected(null);
+    setShowAnswer(false);
+    setScore(0);
+    setDone(false);
+    setHasPlayed(false);
+  };
+
+  if (done) {
+    return (
+      <>
+        <RhodesEngine ref={engineRef} />
+        <EarResultView score={score} total={questions.length} onRestart={onExit} onRetry={restart} />
+      </>
+    );
+  }
+
+  const progress = (index + 1) / questions.length;
+  const isCorrect = selected === question.correctAnswer;
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <RhodesEngine ref={engineRef} />
+      <View style={styles.navBar}>
+        <TouchableOpacity onPress={() => { engineRef.current?.stop(); onExit(); }} style={styles.quitButton}>
+          <Ionicons name="close" size={22} color={JAZZ_COLORS.textPrimary} />
+        </TouchableOpacity>
+        <Text style={styles.questionCount}>{index + 1} / {questions.length}</Text>
+        <Text style={styles.scoreDisplay}>{score} ✓</Text>
+      </View>
+
+      <View style={styles.progressTrack}>
+        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
+        <Text style={styles.earKicker}>Name that mode</Text>
+        <Text style={styles.prompt}>Which mode is this?</Text>
+
+        {/* Big Play / Replay control */}
+        <TouchableOpacity
+          style={[styles.playButton, isPlaying && styles.playButtonActive]}
+          onPress={isPlaying ? () => { engineRef.current?.stop(); setIsPlaying(false); } : play}
+          activeOpacity={0.85}
+        >
+          <Ionicons
+            name={isPlaying ? 'stop' : hasPlayed ? 'refresh' : 'play'}
+            size={26}
+            color={JAZZ_COLORS.background}
+          />
+          <Text style={styles.playButtonText}>
+            {isPlaying ? 'Playing…' : hasPlayed ? 'Replay' : 'Play'}
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.earHint}>
+          {showAnswer
+            ? `Played in ${question.rootLabel}`
+            : 'Played on the Rhodes. Tap replay as needed.'}
+        </Text>
+
+        <View style={styles.optionsGrid}>
+          {question.options.map((option) => {
+            const isSelected = selected === option;
+            const isCorrectOption = option === question.correctAnswer;
+            let optionStyle = styles.option;
+            let textStyle = styles.optionText;
+            if (showAnswer) {
+              if (isCorrectOption) {
+                optionStyle = { ...styles.option, ...styles.optionCorrect };
+                textStyle = { ...styles.optionText, color: JAZZ_COLORS.success };
+              } else if (isSelected && !isCorrectOption) {
+                optionStyle = { ...styles.option, ...styles.optionWrong };
+                textStyle = { ...styles.optionText, color: JAZZ_COLORS.warning };
+              } else {
+                optionStyle = { ...styles.option, ...styles.optionDim };
+              }
+            } else if (isSelected) {
+              optionStyle = { ...styles.option, ...styles.optionSelected };
+            }
+            return (
+              <TouchableOpacity
+                key={option}
+                style={optionStyle}
+                onPress={() => handleSelect(option)}
+                activeOpacity={showAnswer ? 1 : 0.8}
+              >
+                {showAnswer && isCorrectOption && (
+                  <Ionicons name="checkmark-circle" size={16} color={JAZZ_COLORS.success} />
                 )}
+                {showAnswer && isSelected && !isCorrectOption && (
+                  <Ionicons name="close-circle" size={16} color={JAZZ_COLORS.warning} />
+                )}
+                <Text style={textStyle}>{option}</Text>
               </TouchableOpacity>
             );
           })}
+        </View>
+
+        {showAnswer && (
+          <View style={[styles.explanationCard, { borderLeftColor: isCorrect ? JAZZ_COLORS.success : JAZZ_COLORS.warning }]}>
+            <View style={styles.explanationHeader}>
+              <Ionicons
+                name={isCorrect ? 'checkmark-circle' : 'information-circle'}
+                size={16}
+                color={isCorrect ? JAZZ_COLORS.success : JAZZ_COLORS.warning}
+              />
+              <Text style={[styles.explanationLabel, { color: isCorrect ? JAZZ_COLORS.success : JAZZ_COLORS.warning }]}>
+                {isCorrect ? 'Correct' : 'Not quite'}
+              </Text>
+            </View>
+            <Text style={styles.explanationText}>
+              That was {question.rootLabel} {question.correctAnswer}.
+            </Text>
+          </View>
+        )}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+
+      {showAnswer && (
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.nextButtonText}>
+              {index === questions.length - 1 ? 'See result' : 'Next'}
+            </Text>
+            <Ionicons name="arrow-forward" size={16} color={JAZZ_COLORS.background} />
+          </TouchableOpacity>
+        </View>
+      )}
+    </SafeAreaView>
+  );
+}
+
+function EarResultView({ score, total, onRestart, onRetry }: {
+  score: number; total: number; onRestart: () => void; onRetry: () => void;
+}) {
+  const percentage = Math.round((score / total) * 100);
+  const getMessage = () => {
+    if (percentage === 100) return 'Perfect. Your ear is developing.';
+    if (percentage >= 70) return 'Good. Keep listening.';
+    return 'Keep practicing. The ear takes time.';
+  };
+  const getColor = () => {
+    if (percentage === 100) return JAZZ_COLORS.success;
+    if (percentage >= 70) return JAZZ_COLORS.accent;
+    return JAZZ_COLORS.warning;
+  };
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.resultScroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.resultContainer}>
+          <View style={[styles.scoreCircle, { borderColor: getColor() }]}>
+            <Text style={[styles.scoreNumber, { color: getColor() }]}>{score}</Text>
+            <Text style={styles.scoreTotal}>of {total}</Text>
+          </View>
+          <Text style={styles.percentage}>{percentage}%</Text>
+          <Text style={styles.resultMessage}>{getMessage()}</Text>
+
+          <TouchableOpacity style={styles.restartButton} onPress={onRestart}>
+            <Text style={styles.restartText}>Back to practice</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
+            <Ionicons name="refresh" size={16} color={JAZZ_COLORS.accent} />
+            <Text style={styles.retryText}>New ears</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -508,4 +817,32 @@ const styles = StyleSheet.create({
   restartText: { fontSize: 15, fontWeight: '600', color: JAZZ_COLORS.background },
   retryButton: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: SPACING.md },
   retryText: { fontSize: 14, color: JAZZ_COLORS.accent },
+  // Ear-training additions
+  segmented: {
+    flexDirection: 'row', backgroundColor: JAZZ_COLORS.surface,
+    borderRadius: RADIUS.md, borderWidth: 1, borderColor: JAZZ_COLORS.border,
+    padding: 4, marginBottom: SPACING.lg, gap: 4,
+  },
+  segment: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 6, paddingVertical: 10, borderRadius: RADIUS.sm,
+  },
+  segmentActive: { backgroundColor: JAZZ_COLORS.accent },
+  segmentText: { fontSize: 14, fontWeight: '600', color: JAZZ_COLORS.textSecondary },
+  segmentTextActive: { color: JAZZ_COLORS.background },
+  earKicker: {
+    fontSize: 11, fontWeight: '600', color: JAZZ_COLORS.textTertiary,
+    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: SPACING.sm,
+  },
+  playButton: {
+    backgroundColor: JAZZ_COLORS.accent, borderRadius: RADIUS.lg,
+    paddingVertical: 22, alignItems: 'center', justifyContent: 'center',
+    flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.sm,
+  },
+  playButtonActive: { backgroundColor: JAZZ_COLORS.success },
+  playButtonText: { fontSize: 18, fontWeight: '600', color: JAZZ_COLORS.background },
+  earHint: {
+    fontSize: 12, color: JAZZ_COLORS.textTertiary, textAlign: 'center',
+    marginBottom: SPACING.xl,
+  },
 });

@@ -27,6 +27,10 @@ const ROOT_OFFSETS: Record<string, number> = {
   kurd:     -200,
 };
 
+// Makams the ney engine can place at a correct sounding root. Ear training
+// draws only from these so a played scale is always anchored properly.
+export const PLAYABLE_MAKAM_IDS = Object.keys(ROOT_OFFSETS);
+
 const AVAILABLE_CENTS = [-900, -810, -765, -749, -700, -696, -650, -610, -606, -565, -550, -549, -514, -496, -492, -480, -470, -450, -406, -402, -400, -350, -334, -314, -310, -292, -280, -270, -265, -249, -202, -200, -198, -196, -150, -134, -110, -108, -106, -65, -50, -49, -47, -16, -14, 2, 4, 6, 8, 20, 30, 41, 50, 86, 92, 94, 96, 98, 100, 102, 150, 151, 153, 155, 166, 184, 186, 188, 201, 206, 208, 210, 220, 230, 245, 296, 298, 300, 301, 302, 337, 359, 366, 371, 381, 388, 392, 410, 449, 451, 453, 484, 500, 502, 506, 517, 592, 596, 600, 651, 653, 684, 688, 706, 710, 743, 796, 800, 802, 804, 835, 857, 888, 910, 947, 951, 1000, 1039, 1061, 1151];
 
 // Each ney sample is roughly this long; used as a timeout fallback in case
