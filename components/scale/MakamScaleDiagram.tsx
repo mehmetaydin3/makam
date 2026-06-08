@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SPACING } from '../../data/constants';
+import { SPACING, RADIUS } from '../../data/constants';
 import { useTheme } from '../../context/ThemeContext';
 import { audioEngine } from '../../audio/audioEngine';
 
@@ -233,7 +233,7 @@ export function MakamScaleDiagram({ makamId, scale, accentColor, noteNames }: Pr
 const makeStyles = (COLORS: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     backgroundColor: COLORS.surface,
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
     padding: SPACING.md,

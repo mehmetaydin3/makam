@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { SPACING } from '../../data/constants';
+import { SPACING, RADIUS } from '../../data/constants';
 import { useTheme } from '../../context/ThemeContext';
 import { useProgress } from '../../hooks/useProgress';
 import { MAKAMS } from '../../data/makams';
@@ -34,7 +34,7 @@ export default function SkyScreen() {
 
   const {
     modeMasteryLevel, isModeCovered, countModesAtLevel,
-    totalXp, currentStreak, streakActiveToday, isDailyChallengeDone,
+    totalXp, currentStreak, streakActiveToday,
   } = useProgress();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [reward, setReward] = useState<{ title: string; subtitle: string } | null>(null);
@@ -76,7 +76,6 @@ export default function SkyScreen() {
   const selected = selectedId ? stars.find((s) => s.id === selectedId) : null;
   const traditionName = isMakam ? 'Turkish Makam' : 'Modal Jazz';
   const unit = isMakam ? 'makams' : 'modes';
-  const dailyDone = isDailyChallengeDone(traditionId);
 
   const openStar = (id: string) => {
     const path = isMakam ? `/turkish-makam/makam/${id}` : `/modal-jazz/mode/${id}`;
@@ -143,27 +142,6 @@ export default function SkyScreen() {
           </View>
         )}
 
-        {/* Daily challenge entry */}
-        <TouchableOpacity
-          style={[styles.dailyCard, { borderColor: dailyDone ? COLORS.success : accent }]}
-          activeOpacity={0.85}
-          onPress={() => router.push(`/journey/daily?tradition=${traditionId}` as any)}
-        >
-          <View style={[styles.dailyIcon, { backgroundColor: (dailyDone ? COLORS.success : accent) + '22' }]}>
-            <Ionicons
-              name={dailyDone ? 'checkmark-done' : 'sparkles'}
-              size={20}
-              color={dailyDone ? COLORS.success : accent}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.dailyTitle}>Daily challenge</Text>
-            <Text style={styles.dailyMeta}>
-              {dailyDone ? 'Done today - streak safe. Back tomorrow.' : 'A fresh set, today only. Keep your streak alive.'}
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
-        </TouchableOpacity>
       </ScrollView>
 
       <RewardBurst
@@ -198,8 +176,8 @@ const makeStyles = (COLORS: ReturnType<typeof useTheme>['colors']) => StyleSheet
   openBtn: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 999, borderWidth: 1 },
   openBtnText: { fontSize: 13, fontWeight: '600' },
   hint: { fontSize: 13, color: COLORS.textTertiary, textAlign: 'center' },
-  dailyCard: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginHorizontal: SPACING.xl, marginTop: SPACING.sm, padding: SPACING.md, borderRadius: 16, borderWidth: 1, backgroundColor: COLORS.surface },
-  dailyIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  dailyCard: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginHorizontal: SPACING.xl, marginTop: SPACING.sm, padding: SPACING.md, borderRadius: RADIUS.lg, borderWidth: 1, backgroundColor: COLORS.surface },
+  dailyIcon: { width: 40, height: 40, borderRadius: RADIUS.md, alignItems: 'center', justifyContent: 'center' },
   dailyTitle: { fontSize: 15, fontWeight: '600', color: COLORS.textPrimary },
   dailyMeta: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2, lineHeight: 17 },
 });

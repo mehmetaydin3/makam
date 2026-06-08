@@ -64,13 +64,6 @@ export function Chrome({ traditionName, accent }: Props) {
         >
           <Ionicons name="settings-outline" size={22} color={colors.textSecondary} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.avatar}
-          activeOpacity={0.7}
-          onPress={() => router.push('/journey' as any)}
-        >
-          <Ionicons name="person-circle-outline" size={28} color={accent} />
-        </TouchableOpacity>
       </View>
 
       <Modal

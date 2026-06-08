@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SPACING, RADIUS } from '../../data/constants';
 
 /**
  * Accordion — a small, theme-aware, tap-to-expand section used to collapse the
@@ -74,31 +75,31 @@ const makeStyles = (c: AccordionColors) =>
   StyleSheet.create({
     wrap: {
       backgroundColor: c.surface,
-      borderRadius: 12,
+      borderRadius: RADIUS.md,
       borderWidth: 1,
       borderColor: c.border,
-      marginBottom: 10,
+      marginBottom: SPACING.sm,
       overflow: 'hidden',
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      gap: 12,
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.md - 2,
+      gap: SPACING.sm,
     },
     title: {
-      fontSize: 13,
+      fontSize: 12,
       fontWeight: '600',
-      color: c.textPrimary,
-      letterSpacing: 1,
+      color: c.textSecondary,
+      letterSpacing: 1.5,
       textTransform: 'uppercase',
       flex: 1,
     },
     body: {
-      paddingHorizontal: 16,
-      paddingBottom: 16,
+      paddingHorizontal: SPACING.md,
+      paddingBottom: SPACING.md,
       paddingTop: 2,
     },
   });

@@ -8,11 +8,11 @@ import { getMakamById, AudioExample } from '../../../data/makams';
 import { useLanguage } from '../../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../../components/ShareableCard';
-import { SPACING, ColorScheme } from '../../../data/constants';
+import { SPACING, RADIUS, ColorScheme } from '../../../data/constants';
 import { useTheme } from '../../../context/ThemeContext';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
-import { audioEngine, PlaybackState } from '../../../audio/audioEngine';
+import { audioEngine, PlaybackState, PLAYABLE_MAKAM_IDS } from '../../../audio/audioEngine';
 import { MakamScaleDiagram } from '../../../components/scale/MakamScaleDiagram';
 import { Accordion } from '../../../components/common/Accordion';
 import { CharacterBand } from '../../../components/common/CharacterBand';
@@ -203,6 +203,25 @@ export default function MakamDetailScreen() {
         />
         {makam.characterNote ? <Text style={styles.characterNote}>{makam.characterNote}</Text> : null}
 
+        {/* DRONE / PLAY ALONG — hold the durak and sing/play the makam over it.
+            Only for makams the ney engine can voice at a correct root. */}
+        {PLAYABLE_MAKAM_IDS.includes(makam.id) && (
+          <TouchableOpacity
+            style={[styles.droneEntry, { borderColor: accent + '55' }]}
+            onPress={() => { audioEngine.stop(); router.push(('/turkish-makam/makam/drone?id=' + makam.id) as any); }}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.droneEntryIcon, { backgroundColor: accent + '22', borderColor: accent + '55' }]}>
+              <Ionicons name="radio-outline" size={18} color={accent} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.droneEntryTitle}>{language === 'tr' ? 'Dem (Drone) ile çal' : 'Drone · Play along'}</Text>
+              <Text style={styles.droneEntrySub}>{language === 'tr' ? 'Durağı tut, üzerine söyle ya da çal' : 'Hold the durak and sing or play over it'}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+          </TouchableOpacity>
+        )}
+
         {/* CHARACTER BAND — color + time + mood, compact */}
         <CharacterBand
           swatch={makam.color}
@@ -268,7 +287,7 @@ export default function MakamDetailScreen() {
 
         {/* USUL PAIRINGS (collapsed) */}
         <Accordion title="Rhythmic Cycles (Usul)" accent={accent} colors={COLORS}>
-          <View style={{ backgroundColor: accent + '11', borderRadius: 12, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
+          <View style={{ backgroundColor: accent + '11', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
             <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
               A makam without its usul is just a scale. The rhythmic cycle gives it life — pulse, momentum, and form. Tap any usul below to hear how it sounds and feel how it moves.
             </Text>
@@ -291,7 +310,7 @@ export default function MakamDetailScreen() {
                 <TouchableOpacity
                   key={usul}
                   onPress={() => setSelectedUsul(usulId)}
-                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, gap: SPACING.md }}
+                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, gap: SPACING.md }}
                 >
                   <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: accent + '22', borderWidth: 1, borderColor: accent + '55', alignItems: 'center', justifyContent: 'center' }}>
                     <Ionicons name="play" size={15} color={accent} />
@@ -376,7 +395,7 @@ export default function MakamDetailScreen() {
                   <Text style={{ color: COLORS.textSecondary, fontSize: 15, lineHeight: 24, marginBottom: 20 }}>{selectedUsulData.description}</Text>
                   <TouchableOpacity
                     onPress={playUsul}
-                    style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: accent + '22', borderWidth: 1, borderColor: accent + '55', borderRadius: 12, padding: 14 }}
+                    style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, backgroundColor: accent + '22', borderWidth: 1, borderColor: accent + '55', borderRadius: RADIUS.md, padding: 14 }}
                   >
                     <Ionicons name={usulPlaying ? "stop" : "play"} size={15} color={accent} />
                     <Text style={{ color: accent, fontSize: 14, fontWeight: '600' }}>{usulPlaying ? 'Stop' : 'Hear this usul'}</Text>
@@ -412,17 +431,17 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   section: { marginBottom: SPACING.xl },
   sectionLabel: { fontSize: 11, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md },
   description: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 24 },
-  analogyCard: { backgroundColor: COLORS.accentMuted, borderRadius: 12, padding: SPACING.md, marginBottom: SPACING.xl, borderWidth: 1, borderColor: COLORS.accent + '33', borderLeftWidth: 3, borderLeftColor: COLORS.accent },
+  analogyCard: { backgroundColor: COLORS.accentMuted, borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.xl, borderWidth: 1, borderColor: COLORS.accent + '33', borderLeftWidth: 3, borderLeftColor: COLORS.accent },
   analogyLabel: { fontSize: 10, color: COLORS.accent, letterSpacing: 2, marginBottom: 6 },
   analogyText: { fontSize: 14, color: COLORS.textPrimary, lineHeight: 22 },
   infoRow: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.xl },
-  infoCard: { flex: 1, backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
+  infoCard: { flex: 1, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
   infoLabel: { fontSize: 10, color: COLORS.textTertiary, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 },
   infoValue: { fontSize: 13, color: COLORS.textPrimary, fontWeight: '500', textAlign: 'center' },
   moodRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   moodTag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: COLORS.surfaceRaised, borderWidth: 1, borderColor: COLORS.border },
   moodText: { fontSize: 13, color: COLORS.textSecondary },
-  audioCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, marginBottom: SPACING.lg },
+  audioCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, marginBottom: SPACING.lg },
   audioCardLabel: { fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.sm, fontWeight: '600' },
   explainerBox: { backgroundColor: COLORS.background, borderRadius: 8, padding: SPACING.sm, marginBottom: SPACING.md, borderWidth: 1, borderColor: COLORS.border },
   explainerText: { fontSize: 12, color: COLORS.textTertiary, lineHeight: 18, fontStyle: 'italic' },
@@ -433,16 +452,20 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   playButton: { alignSelf: 'flex-start', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 999, borderWidth: 1.5, marginBottom: SPACING.md },
   playButtonText: { fontSize: 14, fontWeight: '500', color: COLORS.textPrimary },
   degreeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-  degreeItem: { width: '22%', backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.sm, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
+  degreeItem: { width: '22%', backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.sm, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center' },
   degreeNote: { fontSize: 15, color: COLORS.textPrimary, fontWeight: '600', textAlign: 'center' },
   degreeInterp: { fontSize: 10, color: COLORS.textSecondary, marginTop: 3, textAlign: 'center' },
   degreeDev: { fontSize: 10, color: COLORS.textTertiary, marginTop: 2, textAlign: 'center' },
   degreeCentsSmall: { fontSize: 9, color: COLORS.textTertiary, marginTop: 1, textAlign: 'center' },
   scaleHint: { fontSize: 12, color: COLORS.textTertiary, marginTop: SPACING.md, lineHeight: 18, fontStyle: 'italic' },
-  characterNote: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 20, fontStyle: 'italic', marginTop: SPACING.sm, marginBottom: SPACING.sm },
-  phraseCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, borderLeftColor: COLORS.accent },
+  characterNote: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 20, fontStyle: 'italic', marginTop: SPACING.xs, marginBottom: SPACING.md, paddingHorizontal: SPACING.xs },
+  droneEntry: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, marginBottom: SPACING.lg },
+  droneEntryIcon: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  droneEntryTitle: { fontSize: 15, fontWeight: '600', color: COLORS.textPrimary },
+  droneEntrySub: { fontSize: 12, color: COLORS.textTertiary, marginTop: 2 },
+  phraseCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, borderLeftWidth: 3, borderLeftColor: COLORS.accent },
   phraseText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22, fontStyle: 'italic' },
-  seyirCard: { backgroundColor: COLORS.surface, borderRadius: 12, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border },
+  seyirCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border },
   seyirType: { fontSize: 15, fontWeight: '500', color: COLORS.textPrimary },
   relatedRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   relatedTag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border },

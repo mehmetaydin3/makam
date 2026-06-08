@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { buildLeveledQuizSession, countQuestionsAtLevel, QuizQuestion, QuizLevel } from '../../../data/traditions/turkish-makam/quiz';
-import { buildMakamEarSession, MakamEarQuestion, EarLevel, EAR_TRAINING_AVAILABLE } from '../../../data/traditions/turkish-makam/earTraining';
+import { buildMakamEarSession, EarQuestion, EarOption, EarLevel, EAR_TRAINING_AVAILABLE } from '../../../data/traditions/turkish-makam/earTraining';
 import { audioEngine } from '../../../audio/audioEngine';
 import { useProgress } from '../../../hooks/useProgress';
 import { QUIZ_PASS_THRESHOLD, nextQuizLevel } from '../../../data/progress';
@@ -129,9 +129,9 @@ function HomeView({ onStartLevel, isUnlocked }: {
   ];
 
   const earLevels: { level: EarLevel; label: string; desc: string }[] = [
-    { level: 'beginner', label: 'Beginner', desc: 'Common makams, three choices' },
-    { level: 'intermediate', label: 'Intermediate', desc: 'More makams, four choices' },
-    { level: 'advanced', label: 'Advanced', desc: 'Same-family makams — a real ear test' },
+    { level: 'beginner', label: 'Beginner', desc: 'Two contrasting makams — which did you hear?' },
+    { level: 'intermediate', label: 'Intermediate', desc: 'Three makams, anchored on the durak' },
+    { level: 'advanced', label: 'Advanced', desc: 'Full ID, same-family cousins — a real ear test' },
   ];
 
   return (
@@ -239,60 +239,113 @@ function HomeView({ onStartLevel, isUnlocked }: {
 // are eligible (see earTraining.ts / PLAYABLE_MAKAM_IDS).
 // ─────────────────────────────────────────────────────────────────────────────
 const EAR_SESSION_LENGTH = 8;
+const ANCHOR_TO_PHRASE_GAP = 520;   // ms of silence between the durak and the scale
+const AB_GAP = 650;                 // ms of silence between A/B candidates
 
 function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }) {
   const { recordQuizAnswer } = useProgress();
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  const [questions, setQuestions] = useState<MakamEarQuestion[]>(() => buildMakamEarSession(level, EAR_SESSION_LENGTH));
+  const [questions, setQuestions] = useState<EarQuestion[]>(() => buildMakamEarSession(level, EAR_SESSION_LENGTH));
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [done, setDone] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [activity, setActivity] = useState<'idle' | 'anchor' | 'phrase' | 'compare'>('idle');
   const [hasPlayed, setHasPlayed] = useState(false);
 
   const question = questions[index];
 
-  // Stop the ney when leaving the flow.
-  useEffect(() => () => { audioEngine.stop(); }, []);
+  const clearTimers = () => {
+    timersRef.current.forEach((t) => clearTimeout(t));
+    timersRef.current = [];
+  };
+  const stopAll = () => {
+    clearTimers();
+    audioEngine.stop();
+    setActivity('idle');
+  };
 
-  // Auto-play each new question's scale.
+  // Stop the ney + timers when leaving the flow.
+  useEffect(() => () => { clearTimers(); audioEngine.stop(); }, []);
+
+  // Play the durak anchor ("home"), then after a breath of silence the scale.
+  // Both go through audioEngine.playScale with the makam's id, so the engine
+  // places them at the makam's true sounding root (ROOT_OFFSETS).
+  const playAnchoredPhrase = (makamId: string, anchor: number[], phrase: number[], onEnd?: () => void) => {
+    setActivity('anchor');
+    audioEngine.playScale(makamId, anchor, (state) => {
+      if (state !== 'stopped') return;
+      const t = setTimeout(() => {
+        setActivity('phrase');
+        audioEngine.playScale(makamId, phrase, (s2) => {
+          if (s2 === 'stopped') { setActivity('idle'); onEnd?.(); }
+        });
+      }, ANCHOR_TO_PHRASE_GAP);
+      timersRef.current.push(t);
+    });
+  };
+
+  // The main Play / Replay: durak first, then the makam you must identify.
+  const playItem = () => {
+    if (!question) return;
+    stopAll();
+    setHasPlayed(true);
+    playAnchoredPhrase(question.makamId, question.anchorCents, question.phraseCents);
+  };
+
+  // Auto-play "durak → scale" once each new question appears.
   useEffect(() => {
     if (done || !question) return;
-    const t = setTimeout(() => play(), 350);
+    const t = setTimeout(() => playItem(), 350);
+    timersRef.current.push(t);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, done]);
 
-  const play = async () => {
+  // A/B compare: play each candidate's scale (each prefixed by the SAME durak
+  // anchor, placed at that candidate's own root) so they can be weighed.
+  const compareOptions = () => {
     if (!question) return;
-    setIsPlaying(true);
+    stopAll();
     setHasPlayed(true);
-    await audioEngine.playScale(question.makamId, question.cents, (state) => {
-      if (state === 'stopped') setIsPlaying(false);
-    });
+    setActivity('compare');
+    const opts = question.options;
+    const runFrom = (i: number) => {
+      if (i >= opts.length) { setActivity('idle'); return; }
+      const opt = opts[i];
+      setActivity('anchor');
+      audioEngine.playScale(opt.makamId, question.anchorCents, (state) => {
+        if (state !== 'stopped') return;
+        const t1 = setTimeout(() => {
+          setActivity('phrase');
+          audioEngine.playScale(opt.makamId, opt.cents, (s2) => {
+            if (s2 !== 'stopped') return;
+            const t2 = setTimeout(() => runFrom(i + 1), AB_GAP);
+            timersRef.current.push(t2);
+          });
+        }, ANCHOR_TO_PHRASE_GAP);
+        timersRef.current.push(t1);
+      });
+    };
+    runFrom(0);
   };
 
-  const stop = async () => {
-    await audioEngine.stop();
-    setIsPlaying(false);
-  };
-
-  const handleSelect = (answer: string) => {
+  const handleSelect = (value: string) => {
     if (showAnswer) return;
-    audioEngine.stop();
-    setIsPlaying(false);
-    setSelected(answer);
+    stopAll();
+    setSelected(value);
     setShowAnswer(true);
-    const correct = answer === question.correctAnswer;
-    if (correct) setScore(s => s + 1);
+    const correct = value === question.correctAnswer;
+    if (correct) { setScore((s) => s + 1); setStreak((s) => s + 1); }
+    else setStreak(0);
     recordQuizAnswer('turkish-makam', question.makamId, correct);
   };
 
   const handleNext = () => {
-    audioEngine.stop();
-    setIsPlaying(false);
+    stopAll();
     if (index < questions.length - 1) {
       setIndex(index + 1);
       setSelected(null);
@@ -304,13 +357,13 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   };
 
   const restart = () => {
-    audioEngine.stop();
-    setIsPlaying(false);
+    stopAll();
     setQuestions(buildMakamEarSession(level, EAR_SESSION_LENGTH));
     setIndex(0);
     setSelected(null);
     setShowAnswer(false);
     setScore(0);
+    setStreak(0);
     setDone(false);
     setHasPlayed(false);
   };
@@ -321,15 +374,29 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
 
   const progress = (index + 1) / questions.length;
   const isCorrect = selected === question.correctAnswer;
+  const isBusy = activity !== 'idle';
+  const playLabel =
+    activity === 'anchor' ? 'Durak…' :
+    activity === 'phrase' ? 'Listen…' :
+    activity === 'compare' ? 'Comparing…' :
+    hasPlayed ? 'Replay' : 'Play';
+
+  const kicker =
+    question.task === 'ab' ? 'Which makam?'
+    : question.task === 'three' ? 'Name that makam'
+    : 'Name that makam';
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => { audioEngine.stop(); onExit(); }} style={styles.quitButton}>
+        <TouchableOpacity onPress={() => { stopAll(); onExit(); }} style={styles.quitButton}>
           <Ionicons name="close" size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.questionCount}>{index + 1} / {questions.length}</Text>
-        <Text style={styles.scoreDisplay}>{score} ✓</Text>
+        <View style={styles.scorePillRow}>
+          {streak >= 2 && <Text style={styles.streakPill}>{streak}🔥</Text>}
+          <Text style={styles.scoreDisplay}>{score} ✓</Text>
+        </View>
       </View>
 
       <View style={styles.progressTrack}>
@@ -337,31 +404,45 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
       </View>
 
       <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.earKicker}>Name that makam</Text>
-        <Text style={styles.prompt}>Which makam is this?</Text>
+        <Text style={styles.earKicker}>{kicker}</Text>
+        <Text style={styles.prompt}>{question.prompt}</Text>
 
         <TouchableOpacity
-          style={[styles.playButton, isPlaying && styles.playButtonActive]}
-          onPress={isPlaying ? stop : play}
+          style={[styles.playButton, isBusy && styles.playButtonActive]}
+          onPress={isBusy ? stopAll : playItem}
           activeOpacity={0.85}
         >
           <Ionicons
-            name={isPlaying ? 'stop' : hasPlayed ? 'refresh' : 'play'}
+            name={isBusy ? 'stop' : hasPlayed ? 'refresh' : 'play'}
             size={26}
             color={COLORS.background}
           />
-          <Text style={styles.playButtonText}>
-            {isPlaying ? 'Playing…' : hasPlayed ? 'Replay' : 'Play'}
+          <Text style={styles.playButtonText}>{isBusy ? 'Stop' : playLabel}</Text>
+        </TouchableOpacity>
+
+        {/* A/B compare — hear every candidate, each anchored on its durak */}
+        <TouchableOpacity
+          style={styles.compareButton}
+          onPress={compareOptions}
+          activeOpacity={0.85}
+          disabled={isBusy}
+        >
+          <Ionicons name="git-compare" size={16} color={isBusy ? COLORS.textTertiary : COLORS.accent} />
+          <Text style={[styles.compareButtonText, isBusy && { color: COLORS.textTertiary }]}>
+            {question.task === 'ab' ? 'Compare the two' : 'Compare the options'}
           </Text>
         </TouchableOpacity>
+
         <Text style={styles.earHint}>
-          {showAnswer ? `That was ${question.correctAnswer}` : 'Played on the ney. Tap replay as needed.'}
+          {showAnswer
+            ? `Played on the ney, anchored on the durak (${question.durak}).`
+            : 'You hear the durak first, then the makam. Replay or compare as needed.'}
         </Text>
 
         <View style={styles.optionsGrid}>
-          {question.options.map((option) => {
-            const isSelected = selected === option;
-            const isCorrectOption = option === question.correctAnswer;
+          {question.options.map((opt: EarOption) => {
+            const isSelected = selected === opt.value;
+            const isCorrectOption = opt.value === question.correctAnswer;
             let optionStyle = styles.option;
             let textStyle = styles.optionText;
             if (showAnswer) {
@@ -379,9 +460,9 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
             }
             return (
               <TouchableOpacity
-                key={option}
+                key={opt.value}
                 style={optionStyle}
-                onPress={() => handleSelect(option)}
+                onPress={() => handleSelect(opt.value)}
                 activeOpacity={showAnswer ? 1 : 0.8}
               >
                 {showAnswer && isCorrectOption && (
@@ -390,7 +471,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
                 {showAnswer && isSelected && !isCorrectOption && (
                   <Ionicons name="close-circle" size={16} color={COLORS.warning} />
                 )}
-                <Text style={textStyle}>{option}</Text>
+                <Text style={textStyle}>{opt.label}</Text>
               </TouchableOpacity>
             );
           })}
@@ -400,15 +481,24 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
           <View style={[styles.explanationCard, { borderLeftColor: isCorrect ? COLORS.success : COLORS.warning }]}>
             <View style={styles.explanationHeader}>
               <Ionicons
-                name={isCorrect ? 'checkmark-circle' : 'information-circle'}
+                name={isCorrect ? 'sparkles' : 'information-circle'}
                 size={16}
                 color={isCorrect ? COLORS.success : COLORS.warning}
               />
               <Text style={[styles.explanationLabel, { color: isCorrect ? COLORS.success : COLORS.warning }]}>
-                {isCorrect ? 'Correct' : 'Not quite'}
+                {isCorrect ? (streak >= 3 ? `Nice — ${streak} in a row!` : 'You heard it!') : 'Not quite'}
               </Text>
             </View>
-            <Text style={styles.explanationText}>That makam was {question.correctAnswer}.</Text>
+            <View style={styles.revealRow}>
+              <Text style={styles.revealMakam}>{question.makamName}</Text>
+              <View style={styles.revealTag}>
+                <Text style={styles.revealTagText}>{question.family} family · {question.seyir}</Text>
+              </View>
+            </View>
+            <Text style={styles.explanationText}>{question.teaching}</Text>
+            {question.mood.length > 0 && (
+              <Text style={styles.revealMood}>{question.mood.slice(0, 3).join(' · ')}</Text>
+            )}
           </View>
         )}
         <View style={{ height: 100 }} />
@@ -427,6 +517,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
     </SafeAreaView>
   );
 }
+
 
 function EarResultView({ score, total, onRestart, onRetry }: {
   score: number; total: number; onRestart: () => void; onRetry: () => void;
@@ -812,4 +903,18 @@ const styles = StyleSheet.create({
     fontSize: 12, color: COLORS.textTertiary, textAlign: 'center',
     marginBottom: SPACING.xl,
   },
+  scorePillRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  streakPill: { fontSize: 13, fontWeight: '700', color: COLORS.warning },
+  compareButton: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 8, paddingVertical: 12, borderRadius: RADIUS.md,
+    borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface,
+    marginBottom: SPACING.sm,
+  },
+  compareButtonText: { fontSize: 14, fontWeight: '600', color: COLORS.accent },
+  revealRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginBottom: SPACING.sm, flexWrap: 'wrap' },
+  revealMakam: { fontSize: 16, fontWeight: '600', color: COLORS.textPrimary },
+  revealTag: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: RADIUS.full, backgroundColor: COLORS.accentMuted, borderWidth: 1, borderColor: COLORS.accent + '33' },
+  revealTagText: { fontSize: 11, color: COLORS.accent, fontWeight: '600' },
+  revealMood: { fontSize: 12, color: COLORS.textTertiary, marginTop: SPACING.sm, fontStyle: 'italic' },
 });

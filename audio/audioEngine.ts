@@ -174,6 +174,46 @@ export const audioEngine = {
     try { player.play(); } catch { finish(); }
   },
 
+  // Hold a makam's durak as a sustained drone the user can sing/play over.
+  // The ney samples are short, so we loop the single durak note (cents 0, placed
+  // at the makam's real root via ROOT_OFFSETS) until stop() is called. A small
+  // overlap between successive notes hides the seam so it reads as a held tone.
+  // `callback('playing')` fires on start; `callback('stopped')` when it ends.
+  async playDrone(
+    makamId: string,
+    callback: (state: PlaybackState) => void,
+  ) {
+    await this.stop();
+    const myGen = ++generation;
+    isPlaying = true;
+    const rootOffset = ROOT_OFFSETS[makamId.toLowerCase()] ?? 0;
+    const closest = findClosest(rootOffset); // the durak is cents 0 + offset
+    const filename = `ney_c${closest}.wav`;
+    const moduleId = AUDIO_SAMPLES[filename];
+    if (moduleId == null) {
+      console.warn('Drone sample not found:', filename);
+      isPlaying = false;
+      callback('stopped');
+      return;
+    }
+    callback('playing');
+    // Re-trigger the durak note slightly before the previous one would end, so
+    // the drone sounds continuous. The loop self-cancels when generation moves.
+    const RETRIGGER_MS = 1900; // < NOTE_MAX_MS sample length, for a seamless loop
+    while (myGen === generation) {
+      if (currentPlayer) {
+        try { currentPlayer.pause(); } catch {}
+        try { currentPlayer.remove(); } catch {}
+        currentPlayer = null;
+      }
+      const player = createAudioPlayer(moduleId);
+      currentPlayer = player;
+      try { player.play(); } catch {}
+      await delay(RETRIGGER_MS);
+    }
+    // Superseded by stop()/another playback; leave cleanup to whoever bumped gen.
+  },
+
   async stop() {
     generation++;        // invalidate any in-flight playScale loop / usul
     isPlaying = false;

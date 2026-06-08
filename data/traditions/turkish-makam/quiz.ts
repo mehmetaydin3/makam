@@ -787,12 +787,53 @@ export type QuizLevel = 'beginner' | 'intermediate' | 'advanced';
  * Build a quiz session for a specific difficulty level — only that level's
  * questions, shuffled, with options shuffled too.
  */
+// Easier, more intuitive question types first so a session eases in.
+const TYPE_EASE: Record<QuestionType, number> = {
+  seyir: 0,
+  emotion: 0,
+  family: 1,
+  durak: 1,
+  feature: 2,
+  relationship: 2,
+};
+
+/**
+ * Pick `count` questions that feel VARIED: cap how many of one question-type a
+ * single session can have (so it isn't five "which seyir?" in a row), at most
+ * two about the same makam, and never the exact same makam+type twice.
+ */
+function pickVaried(questions: QuizQuestion[], count: number): QuizQuestion[] {
+  const maxPerType = Math.max(2, Math.ceil(count * 0.35));
+  const seen = new Set<string>();
+  const typeCount: Record<string, number> = {};
+  const makamCount: Record<string, number> = {};
+  const out: QuizQuestion[] = [];
+  const consider = (enforce: boolean) => {
+    for (const q of questions) {
+      if (out.length >= count) break;
+      const key = (q.makamId ?? '') + '|' + q.type;
+      if (seen.has(key)) continue;
+      if (enforce) {
+        if ((typeCount[q.type] ?? 0) >= maxPerType) continue;
+        const mk = q.makamId ?? '';
+        if (mk && (makamCount[mk] ?? 0) >= 2) continue;
+      }
+      seen.add(key);
+      typeCount[q.type] = (typeCount[q.type] ?? 0) + 1;
+      if (q.makamId) makamCount[q.makamId] = (makamCount[q.makamId] ?? 0) + 1;
+      out.push(q);
+    }
+  };
+  consider(true);
+  if (out.length < count) consider(false); // backfill, still no exact makam+type repeat
+  return out;
+}
+
 export function buildLeveledQuizSession(level: QuizLevel, questionCount = 10): QuizQuestion[] {
-  const pool = QUIZ_QUESTIONS.filter((q) => q.difficulty === level);
-  return shuffle(pool).slice(0, questionCount).map((q) => ({
-    ...q,
-    options: shuffle(q.options),
-  }));
+  const pool = shuffle(QUIZ_QUESTIONS.filter((q) => q.difficulty === level));
+  return pickVaried(pool, questionCount)
+    .sort((a, b) => (TYPE_EASE[a.type] - TYPE_EASE[b.type]) || Math.random() - 0.5)
+    .map((q) => ({ ...q, options: shuffle(q.options) }));
 }
 
 export function countQuestionsAtLevel(level: QuizLevel): number {

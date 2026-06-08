@@ -254,8 +254,12 @@ function HomeView({ onStartLevel, isUnlocked }: {
 // Rhodes is the *only* engine jazz ear training uses.
 // ─────────────────────────────────────────────────────────────────────────────
 const EAR_SESSION_LENGTH = 8;
-const ANCHOR_TO_PHRASE_GAP = 520;   // ms of silence between "home" and the phrase
-const AB_GAP = 700;                 // ms of silence between A/B candidates
+// Within an item: the anchor (root–5th→root) needs a clear breath before the
+// phrase so the ear resets to "home" yet still holds it — ~600ms reads as a
+// deliberate pause without dragging. Between A/B candidates the gap is longer so
+// each anchored candidate lands as its own unit (between-item breath > within).
+const ANCHOR_TO_PHRASE_GAP = 600;   // ms of silence between "home" and the phrase
+const AB_GAP = 850;                 // ms of silence between A/B candidates
 
 function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => void }) {
   const { recordQuizAnswer } = useProgress();
@@ -290,7 +294,7 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
   // Auto-play "home → phrase" once each new question appears.
   useEffect(() => {
     if (done || !question) return;
-    const t = setTimeout(() => playItem(), 350);
+    const t = setTimeout(() => playItem(), 450); // brief settle before "home" sounds
     timersRef.current.push(t);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps

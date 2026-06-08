@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo } from 'react';
-import { SPACING, ColorScheme } from '../../data/constants';
+import { SPACING, RADIUS, ColorScheme } from '../../data/constants';
 import { useTheme } from '../../context/ThemeContext';
 import { useProgress } from '../../hooks/useProgress';
 import { MAKAMS } from '../../data/makams';
@@ -59,7 +59,7 @@ export default function JourneyScreen() {
   const {
     traditionState, progress, traditionCoverage, traditionMastery, countModesAtLevel,
     modeMasteryLevel, isModeCovered,
-    totalXp, currentStreak, streakActiveToday, isDailyChallengeDone,
+    totalXp, currentStreak, streakActiveToday,
   } = useProgress();
 
   const makamState = traditionState('turkish-makam', MAKAMS.length, LESSONS.length);
@@ -208,22 +208,6 @@ export default function JourneyScreen() {
                 </TouchableOpacity>
               </View>
 
-              {/* Daily challenge chip */}
-              <TouchableOpacity
-                style={[styles.dailyChip, { borderColor: isDailyChallengeDone(tr.id) ? COLORS.success : tr.accent }]}
-                activeOpacity={0.8}
-                onPress={() => router.push((`/journey/daily?tradition=${tr.id}`) as any)}
-              >
-                <Ionicons
-                  name={isDailyChallengeDone(tr.id) ? 'checkmark-done' : 'flame'}
-                  size={14}
-                  color={isDailyChallengeDone(tr.id) ? COLORS.success : tr.accent}
-                />
-                <Text style={[styles.dailyChipText, { color: isDailyChallengeDone(tr.id) ? COLORS.success : tr.accent }]}>
-                  {isDailyChallengeDone(tr.id) ? 'Daily done today' : 'Daily challenge'}
-                </Text>
-                <Ionicons name="chevron-forward" size={13} color={COLORS.textTertiary} style={{ marginLeft: 'auto' }} />
-              </TouchableOpacity>
             </View>
           ))}
         </View>
@@ -289,7 +273,7 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   subheading: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22 },
   divider: { width: 40, height: 2, backgroundColor: COLORS.accent, borderRadius: 999, marginVertical: SPACING.xl },
   badgeRow: { flexDirection: 'row', gap: SPACING.sm, marginTop: SPACING.lg },
-  dailyChip: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: SPACING.sm, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1 },
+  dailyChip: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.sm, paddingVertical: 10, paddingHorizontal: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1 },
   dailyChipText: { fontSize: 13, fontWeight: '600' },
   sectionLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md, marginTop: SPACING.sm },
   traditionList: { gap: SPACING.sm, marginBottom: SPACING.xl },
@@ -299,9 +283,9 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   coverageFill: { height: 5, borderRadius: 999 },
   summaryText: { fontSize: 11, color: COLORS.textTertiary },
   masteryText: { fontSize: 12, marginTop: 6, fontWeight: '500' },
-  traditionCard: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, gap: SPACING.sm },
+  traditionCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, gap: SPACING.sm },
   cardTop: { flexDirection: 'row', gap: SPACING.md, alignItems: 'flex-start' },
-  previewWrap: { alignItems: 'center', marginVertical: SPACING.xs, overflow: 'hidden', borderRadius: 12, backgroundColor: '#0C0C0F' },
+  previewWrap: { alignItems: 'center', marginVertical: SPACING.xs, overflow: 'hidden', borderRadius: RADIUS.md, backgroundColor: '#0C0C0F' },
   cardActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: SPACING.sm },
   skyBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, borderWidth: 1 },
   skyBtnText: { fontSize: 13, fontWeight: '600' },
@@ -316,12 +300,12 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   statePillText: { fontSize: 10, color: COLORS.textSecondary, letterSpacing: 0.5, textTransform: 'uppercase' },
   crossroadsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   comingSoonWrap: { gap: SPACING.sm, marginBottom: SPACING.sm },
-  comingCard: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md, backgroundColor: COLORS.surface, borderRadius: 14, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, opacity: 0.75 },
+  comingCard: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, opacity: 0.75 },
   comingDiamond: { width: 10, height: 10, borderRadius: 3, transform: [{ rotate: '45deg' }], marginTop: 4, opacity: 0.6 },
   comingNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   comingName: { fontSize: 16, fontWeight: '500', color: COLORS.textSecondary },
   comingBadge: { fontSize: 9, fontWeight: '700', letterSpacing: 1, color: COLORS.textTertiary, borderWidth: 1, borderColor: COLORS.border, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 },
   comingBlurb: { fontSize: 12, color: COLORS.textTertiary, lineHeight: 18, marginTop: 3 },
-  crossroadsCard: { backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.lg },
+  crossroadsCard: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.lg },
   crossroadsText: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22 },
 });

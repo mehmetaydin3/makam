@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SPACING, RADIUS } from '../../data/constants';
 import { ProgressRing } from './ProgressRing';
 import { xpToNextLevel } from '../../data/progress';
 
@@ -51,8 +52,8 @@ export function XpBadge({ xp, colors }: { xp: number; colors: Palette }) {
 
 const styles = StyleSheet.create({
   chip: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14, borderWidth: 1,
+    flexDirection: 'row', alignItems: 'center', gap: SPACING.sm,
+    paddingHorizontal: SPACING.md - 2, paddingVertical: SPACING.sm, borderRadius: RADIUS.md, borderWidth: 1,
   },
   bigNum: { fontSize: 18, fontWeight: '600', lineHeight: 20 },
   label: { fontSize: 10, letterSpacing: 0.4, textTransform: 'uppercase', marginTop: 1 },
