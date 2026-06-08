@@ -25,6 +25,10 @@ export default function ModalJazzTabLayout() {
         name="practice"
         options={{ title: 'Practice', tabBarIcon: ({ color, size }) => <Ionicons name="musical-note-outline" size={size} color={color} /> }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{ title: 'Profile', tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} /> }}
+      />
     </Tabs>
   );
 }
