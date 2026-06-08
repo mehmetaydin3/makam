@@ -1,6 +1,7 @@
 import { LanguageProvider } from '../context/LanguageContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import { Stack } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 /**
  * Root layout. First-launch onboarding + the tradition picker now live in
@@ -12,10 +13,12 @@ import { Stack } from 'expo-router';
  */
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </LanguageProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </LanguageProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
