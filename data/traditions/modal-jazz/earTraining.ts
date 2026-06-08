@@ -97,6 +97,47 @@ function buildOptions(target: Mode, level: EarLevel): string[] {
   return shuffle([target.name, ...distractors]);
 }
 
+
+// ── Musical phrases (replaces the plain ascending scale) ─────────────────────
+// Index of each mode's COLOR note within its 8-note `intervals` array (incl. the
+// octave), so phrases can land on / hammer the note that defines the mode.
+const COLOR_INDEX: Record<string, number> = {
+  ionian: 6, dorian: 5, phrygian: 1, lydian: 3, mixolydian: 6, aeolian: 5, locrian: 4,
+};
+
+type Phrase = (c: number) => number[];
+
+// Simpler, clearer shapes for beginners.
+const PHRASES_EASY: Phrase[] = [
+  () => [0, 1, 2, 3, 4, 5, 6, 7],          // ascending run
+  () => [0, 2, 4, 6, 7],                   // arpeggio up
+  (c) => [0, c, 0, c, 7, c, 0],            // pivot: root <-> color note, resolve
+];
+
+// Add trickier, more melodic shapes once past beginner.
+const PHRASES_HARD: Phrase[] = [
+  ...PHRASES_EASY,
+  () => [7, 6, 5, 4, 3, 2, 1, 0],          // descending run
+  () => [0, 2, 4, 6, 7, 6, 4, 2, 0],       // arpeggio up & down
+  (c) => {                                  // run up to the color note and resolve
+    const up: number[] = [];
+    for (let i = 0; i <= c; i++) up.push(i);
+    const down = [...up].reverse().slice(1);
+    return [...up, c, ...down];
+  },
+  (c) => [0, 2, 1, 3, c, 2, 0],            // weaving thirds landing on the color note
+];
+
+// Build the MIDI for a short, randomly-chosen phrase (not just the scale), so
+// every question sounds different and the color note is foregrounded.
+function phraseMidiFor(mode: Mode, rootSemitone: number, level: EarLevel): number[] {
+  const rootMidi = ROOT_MIDI[rootSemitone] ?? 60;
+  const c = COLOR_INDEX[mode.id] ?? 4;
+  const pool = level === 'beginner' ? PHRASES_EASY : PHRASES_HARD;
+  const seq = pool[Math.floor(Math.random() * pool.length)](c);
+  return seq.map((i) => rootMidi + mode.intervals[i]);
+}
+
 let counter = 0;
 
 export function buildEarQuestion(level: EarLevel): EarQuestion {
@@ -109,12 +150,21 @@ export function buildEarQuestion(level: EarLevel): EarQuestion {
     modeName: target.name,
     rootSemitone,
     rootLabel: rootLabel(rootSemitone),
-    midiNotes: midiNotesFor(target, rootSemitone),
+    midiNotes: phraseMidiFor(target, rootSemitone, level),
     options: buildOptions(target, level),
     correctAnswer: target.name,
   };
 }
 
 export function buildEarSession(level: EarLevel, count = 8): EarQuestion[] {
-  return Array.from({ length: count }, () => buildEarQuestion(level));
+  // Never play the same mode twice in a row, so a session feels varied.
+  const out: EarQuestion[] = [];
+  let last: string | null = null;
+  for (let i = 0; i < count; i++) {
+    let q = buildEarQuestion(level);
+    for (let tries = 0; q.modeId === last && tries < 6; tries++) q = buildEarQuestion(level);
+    last = q.modeId;
+    out.push(q);
+  }
+  return out;
 }
