@@ -9,6 +9,25 @@ export type CrossroadsPiece = Lesson & {
   // Optional links to the mode/makam a pairing compares (for future cross-linking)
   modeId?: string;
   makamId?: string;
+  // When a piece links a concrete modeId + a playable makamId, it can drive the
+  // interactive A/B comparison screen (app/journey/comparison). Optional fields
+  // below let a pairing be both audible and accurate even when the linked
+  // `modeId` is a gentler cousin of the sound the essay actually describes.
+  comparison?: {
+    /** One-line label for the jazz side (defaults to the mode's name). */
+    jazzLabel?: string;
+    /** One-line label for the makam side (defaults to the makam's name). */
+    makamLabel?: string;
+    /**
+     * Semitone intervals to sound on the Rhodes side, root-relative (0 = root).
+     * Overrides the linked mode's own intervals when the essay describes a
+     * close relative — e.g. Phrygian dominant for the Hicaz pairing, which the
+     * plain Phrygian mode cannot voice.
+     */
+    jazzIntervals?: number[];
+    /** A short "what to listen for" line shown between the two panels. */
+    listenFor: string;
+  };
 };
 
 export const CROSSROADS: CrossroadsPiece[] = [
@@ -53,6 +72,15 @@ export const CROSSROADS: CrossroadsPiece[] = [
     subtitle: 'Hicaz ↔ Phrygian dominant',
     makamId: 'hicaz',
     modeId: 'phrygian',
+    comparison: {
+      jazzLabel: 'Phrygian dominant — the augmented-second leap',
+      makamLabel: 'Hicaz — the same leap, as grammar',
+      // Phrygian dominant (5th mode of harmonic minor): the true twin of Hicaz,
+      // which plain Phrygian can't voice. Root-relative semitones.
+      jazzIntervals: [0, 1, 4, 5, 7, 8, 10, 12],
+      listenFor:
+        'Both climb through the same dramatic leap between the 2nd and 3rd degrees. Hear how the makam leans into that gap as its home grammar, where jazz treats it as a colour.',
+    },
     pages: [
       {
         id: 'cx-hp-1',
@@ -87,6 +115,12 @@ export const CROSSROADS: CrossroadsPiece[] = [
     subtitle: 'Aeolian ↔ Nihavend',
     makamId: 'nihavend',
     modeId: 'aeolian',
+    comparison: {
+      jazzLabel: 'Aeolian — the plain natural minor',
+      makamLabel: 'Nihavend — minor with a path',
+      listenFor:
+        'Nearly the same notes, the same gravity. Listen for what the makam adds: a leaning, a shape of descent that the bare mode leaves open.',
+    },
     pages: [
       {
         id: 'cx-an-1',
@@ -121,6 +155,12 @@ export const CROSSROADS: CrossroadsPiece[] = [
     subtitle: 'Dorian ↔ the Uşşak family',
     makamId: 'huseyni',
     modeId: 'dorian',
+    comparison: {
+      jazzLabel: 'Dorian — minor that faces up',
+      makamLabel: 'Hüseyni — the neutral second',
+      listenFor:
+        'Both are a minor that refuses to droop. Listen to Hüseyni\'s second degree sit in the crack between the piano keys — the neutral second Dorian cannot reach.',
+    },
     pages: [
       {
         id: 'cx-du-1',
@@ -186,6 +226,12 @@ export const CROSSROADS: CrossroadsPiece[] = [
     subtitle: 'Saba ↔ Locrian — resolution denied',
     makamId: 'saba',
     modeId: 'locrian',
+    comparison: {
+      jazzLabel: 'Locrian — the home that never arrives',
+      makamLabel: 'Saba — resolution withheld',
+      listenFor:
+        'Two roads to grief by the same trick: a resolution denied. Hear how neither scale lets the ear settle — Locrian through its flat 5th, Saba by refusing its own octave.',
+    },
     pages: [
       {
         id: 'cx-gr-1',

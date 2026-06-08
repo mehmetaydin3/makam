@@ -49,12 +49,22 @@ export default function CrossroadsScreen() {
 
         <Text style={styles.sectionLabel}>PAIRINGS</Text>
         {pairings.map((p) => (
-          <PieceCard key={p.id} piece={p} onPress={() => setSelected(p)} />
+          <PieceCard
+            key={p.id}
+            piece={p}
+            onPress={() => setSelected(p)}
+            onCompare={p.comparison ? () => router.push(`/journey/comparison?id=${p.id}` as any) : undefined}
+          />
         ))}
 
         <Text style={[styles.sectionLabel, { marginTop: SPACING.xl }]}>ESSAYS</Text>
         {essays.map((p) => (
-          <PieceCard key={p.id} piece={p} onPress={() => setSelected(p)} />
+          <PieceCard
+            key={p.id}
+            piece={p}
+            onPress={() => setSelected(p)}
+            onCompare={p.comparison ? () => router.push(`/journey/comparison?id=${p.id}` as any) : undefined}
+          />
         ))}
 
         <View style={{ height: 80 }} />
@@ -63,21 +73,36 @@ export default function CrossroadsScreen() {
   );
 }
 
-function PieceCard({ piece, onPress }: { piece: CrossroadsPiece; onPress: () => void }) {
+function PieceCard({
+  piece, onPress, onCompare,
+}: {
+  piece: CrossroadsPiece;
+  onPress: () => void;
+  onCompare?: () => void;
+}) {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
-      <Ionicons
-        name={piece.kind === 'pairing' ? 'git-compare-outline' : 'book-outline'}
-        size={18}
-        color={COLORS.accent}
-        style={styles.cardIcon}
-      />
-      <View style={styles.cardBody}>
-        <Text style={styles.cardTitle}>{piece.title}</Text>
-        <Text style={styles.cardSubtitle}>{piece.subtitle}</Text>
-      </View>
-      <Ionicons name="chevron-forward" size={16} color={COLORS.textTertiary} />
-    </TouchableOpacity>
+    <View style={styles.card}>
+      <TouchableOpacity style={styles.cardMain} onPress={onPress} activeOpacity={0.8}>
+        <Ionicons
+          name={piece.kind === 'pairing' ? 'git-compare-outline' : 'book-outline'}
+          size={18}
+          color={COLORS.accent}
+          style={styles.cardIcon}
+        />
+        <View style={styles.cardBody}>
+          <Text style={styles.cardTitle}>{piece.title}</Text>
+          <Text style={styles.cardSubtitle}>{piece.subtitle}</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={16} color={COLORS.textTertiary} />
+      </TouchableOpacity>
+
+      {onCompare && (
+        <TouchableOpacity style={styles.compareRow} onPress={onCompare} activeOpacity={0.8}>
+          <Ionicons name="play-circle-outline" size={16} color={COLORS.accent} />
+          <Text style={styles.compareText}>Hear them side by side</Text>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
@@ -91,11 +116,19 @@ const styles = StyleSheet.create({
   intro: { fontSize: 14, color: COLORS.textSecondary, lineHeight: 22, marginTop: SPACING.md, marginBottom: SPACING.xl },
   sectionLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.md },
   card: {
-    flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
     backgroundColor: COLORS.surface, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border,
-    padding: SPACING.lg, marginBottom: SPACING.md,
+    marginBottom: SPACING.md, overflow: 'hidden',
+  },
+  cardMain: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACING.md, padding: SPACING.lg,
   },
   cardIcon: {},
+  compareRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+    borderTopWidth: 1, borderTopColor: COLORS.border,
+  },
+  compareText: { fontSize: 13, fontWeight: '600', color: COLORS.accent },
   cardBody: { flex: 1 },
   cardTitle: { fontSize: 17, fontWeight: '500', color: COLORS.textPrimary },
   cardSubtitle: { fontSize: 13, color: COLORS.textSecondary, marginTop: 3, fontStyle: 'italic' },
