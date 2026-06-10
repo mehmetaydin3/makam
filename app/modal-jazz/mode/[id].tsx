@@ -19,6 +19,8 @@ import { YOUTUBE_IDS } from '../../../data/traditions/modal-jazz/youtubeIds';
 import ScaleDiagram from '../../../components/lessons/ScaleDiagram';
 import { Accordion } from '../../../components/common/Accordion';
 import { CharacterBand } from '../../../components/common/CharacterBand';
+import { ArtistLink } from '../../../components/common/ArtistLink';
+import { isKnownArtist, getArtistByName } from '../../../data/artists';
 
 const brightnessColor = (c: JazzColorScheme): Record<string, string> => ({
   bright: c.bright,
@@ -164,7 +166,7 @@ export default function ModalJazzModeDetail() {
                   <Text style={styles.tuneTitle}>{tune.title}</Text>
                   <Text style={styles.tuneYear}>{tune.year}</Text>
                 </View>
-                <Text style={[styles.tuneArtist, { color: accentColor }]}>{tune.artist}</Text>
+                <ArtistLink name={tune.artist} accent={accentColor} style={[styles.tuneArtist, { color: accentColor }]} />
                 <Text style={styles.tuneWhy}>{tune.whyThisTune}</Text>
                 {videoId && (
                   <View style={styles.playerWrapper}>
@@ -179,11 +181,27 @@ export default function ModalJazzModeDetail() {
         {/* ── Notable players (collapsed) ── */}
         <Accordion title="Notable players" accent={accentColor} colors={JAZZ_COLORS}>
           <View style={styles.playersRow}>
-            {mode.notablePlayers.map((p, i) => (
-              <View key={i} style={styles.playerPill}>
-                <Text style={styles.playerText}>{p}</Text>
-              </View>
-            ))}
+            {mode.notablePlayers.map((p, i) => {
+              const known = isKnownArtist(p);
+              if (!known) {
+                return (
+                  <View key={i} style={styles.playerPill}>
+                    <Text style={styles.playerText}>{p}</Text>
+                  </View>
+                );
+              }
+              return (
+                <TouchableOpacity
+                  key={i}
+                  style={[styles.playerPill, { borderColor: accentColor + '66', flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                  activeOpacity={0.8}
+                  onPress={() => router.push(('/artist/' + getArtistByName(p)!.id) as any)}
+                >
+                  <Text style={[styles.playerText, { color: accentColor }]}>{p}</Text>
+                  <Ionicons name="arrow-forward" size={12} color={accentColor} />
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </Accordion>
 

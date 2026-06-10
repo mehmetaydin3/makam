@@ -16,6 +16,7 @@ import { audioEngine, PlaybackState, PLAYABLE_MAKAM_IDS } from '../../../audio/a
 import { MakamScaleDiagram } from '../../../components/scale/MakamScaleDiagram';
 import { Accordion } from '../../../components/common/Accordion';
 import { CharacterBand } from '../../../components/common/CharacterBand';
+import { ArtistLink } from '../../../components/common/ArtistLink';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
@@ -53,8 +54,13 @@ function AudioCard({
 
       <Text style={styles.audioTitle}>{example.title}</Text>
       <Text style={styles.audioMeta}>
-        {example.composer}
-        {example.performer !== example.composer ? ' · ' + example.performer : ''}
+        <ArtistLink name={example.composer} accent={color} />
+        {example.performer !== example.composer ? (
+          <Text>
+            {' · '}
+            <ArtistLink name={example.performer} accent={color} />
+          </Text>
+        ) : null}
         {example.year ? ' · ' + example.year : ''}
       </Text>
       <Text style={styles.audioDescription}>{example.description}</Text>
