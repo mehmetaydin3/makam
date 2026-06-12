@@ -279,6 +279,8 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   const [reward, setReward] = useState<{ kind: 'streak' | 'daily'; title: string; subtitle?: string } | null>(null);
   // Teach-first: meet the session's first sound before being quizzed on anything.
   const [phase, setPhase] = useState<'teach' | 'quiz'>('teach');
+  // A real drone: sustains on its own channel until toggled off.
+  const [droneOn, setDroneOn] = useState(false);
 
   const question = questions[index];
 
@@ -293,7 +295,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   };
 
   // Stop the ney + timers when leaving the flow.
-  useEffect(() => () => { clearTimers(); audioEngine.stop(); }, []);
+  useEffect(() => () => { clearTimers(); audioEngine.stop(); audioEngine.stopDrone(); }, []);
 
   // Play the durak anchor ("home"), then after a breath of silence the scale.
   // Both go through audioEngine.playScale with the makam's id, so the engine
@@ -329,15 +331,24 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, done, phase]);
 
-  // "Hear home": just the durak, any time — the reference the ear needs.
-  const playHome = () => {
+  // The drone: a continuously sustained durak on its own audio channel — it
+  // keeps sounding UNDER phrase playback (like a tambura) until toggled off.
+  const toggleDrone = async () => {
     if (!question) return;
-    stopAll();
-    setActivity('anchor');
-    audioEngine.playScale(question.makamId, question.anchorCents, (state) => {
-      if (state === 'stopped') setActivity('idle');
-    });
+    if (droneOn) {
+      audioEngine.stopDrone();
+      setDroneOn(false);
+      return;
+    }
+    const ok = await audioEngine.startDrone(question.makamId);
+    if (ok) setDroneOn(true);
   };
+
+  // Keep the drone pinned to the current question's durak as questions advance.
+  useEffect(() => {
+    if (droneOn && question) audioEngine.startDrone(question.makamId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
 
   // After a wrong answer: play YOUR pick, then the right one, back to back —
   // the mistake becomes a lesson in sound, not a red cross.
@@ -413,6 +424,8 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
       if (score / questions.length >= 0.7) {
         setReward({ kind: 'daily', title: 'Good ears', subtitle: `${score} of ${questions.length} by ear.` });
       }
+      audioEngine.stopDrone();
+      setDroneOn(false);
       setDone(true);
     }
   };
@@ -441,7 +454,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.navBar}>
-          <TouchableOpacity onPress={() => { stopAll(); onExit(); }} style={styles.quitButton}>
+          <TouchableOpacity onPress={() => { stopAll(); audioEngine.stopDrone(); setDroneOn(false); onExit(); }} style={styles.quitButton}>
             <Ionicons name="close" size={22} color={COLORS.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.questionCount}>Warm up</Text>
@@ -464,6 +477,16 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
               <Text style={styles.playButtonText}>{isTeachBusy ? 'Stop' : hasPlayed ? 'Hear it again' : 'Play it'}</Text>
             </TouchableOpacity>
           </BreathingView>
+          <TouchableOpacity
+            style={[styles.compareButton, droneOn && { backgroundColor: COLORS.accent + '22', borderColor: COLORS.accent + '66', borderWidth: 1, borderRadius: 999 }]}
+            onPress={toggleDrone}
+            activeOpacity={0.85}
+          >
+            <Ionicons name={droneOn ? 'radio' : 'radio-outline'} size={15} color={COLORS.accent} />
+            <Text style={styles.compareButtonText}>
+              {droneOn ? `Drone on — ${question.durak} · tap to stop` : `Drone · hold home (${question.durak})`}
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.earHint}>{question.teaching}</Text>
         </ScrollView>
         <View style={styles.footer}>
@@ -490,7 +513,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => { stopAll(); onExit(); }} style={styles.quitButton}>
+        <TouchableOpacity onPress={() => { stopAll(); audioEngine.stopDrone(); setDroneOn(false); onExit(); }} style={styles.quitButton}>
           <Ionicons name="close" size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.questionCount}>{index + 1} / {questions.length}</Text>
@@ -542,14 +565,13 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.compareButton}
-          onPress={playHome}
+          style={[styles.compareButton, droneOn && { backgroundColor: COLORS.accent + '22', borderColor: COLORS.accent + '66', borderWidth: 1, borderRadius: 999 }]}
+          onPress={toggleDrone}
           activeOpacity={0.85}
-          disabled={isBusy}
         >
-          <Ionicons name="home" size={15} color={isBusy ? COLORS.textTertiary : COLORS.accent} />
-          <Text style={[styles.compareButtonText, isBusy && { color: COLORS.textTertiary }]}>
-            Hear home ({question.durak})
+          <Ionicons name={droneOn ? 'radio' : 'radio-outline'} size={15} color={COLORS.accent} />
+          <Text style={styles.compareButtonText}>
+            {droneOn ? `Drone on — ${question.durak} · tap to stop` : `Drone · hold home (${question.durak})`}
           </Text>
         </TouchableOpacity>
 
