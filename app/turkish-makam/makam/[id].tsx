@@ -2,6 +2,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getUsulById } from '../../../data/usuls';
+import { getSongsByMakam, GENRE_LABEL } from '../../../data/songs';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, getMakamByName, AudioExample } from '../../../data/makams';
@@ -310,6 +311,30 @@ export default function MakamDetailScreen() {
                 <Text style={styles.pieceComposer}>
                   <ArtistLink name={piece.composer} accent={accent} />
                 </Text>
+              </View>
+            ))}
+          </Accordion>
+        )}
+
+        {/* IN THE WILD — songs people already know, carried by this makam */}
+        {getSongsByMakam(makam.id).length > 0 && (
+          <Accordion title={language === 'tr' ? 'Bu Makamda Şarkılar' : 'Songs in this Makam'} accent={accent} colors={COLORS}>
+            <View style={{ backgroundColor: accent + '11', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
+              <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
+                {language === 'tr'
+                  ? 'Bu makam, bildiğiniz şarkıların içinde yaşıyor — klasikten arabeske ve rock\'a.'
+                  : 'This makam lives inside songs you may already know — from classical to arabesk to rock.'}
+              </Text>
+            </View>
+            {getSongsByMakam(makam.id).map((song, i, arr) => (
+              <View key={song.title + i} style={[styles.pieceRow, i === arr.length - 1 && { borderBottomWidth: 0 }]}>
+                <View style={styles.pieceTitleRow}>
+                  <Text style={styles.pieceTitle}>{song.title}</Text>
+                  <View style={styles.pieceUsulBadge}>
+                    <Text style={styles.pieceUsulText}>{GENRE_LABEL[song.genre]}</Text>
+                  </View>
+                </View>
+                <Text style={styles.pieceComposer}>{song.artist}</Text>
               </View>
             ))}
           </Accordion>
