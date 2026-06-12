@@ -256,6 +256,27 @@ export default function JourneyScreen() {
           </View>
         )}
 
+        {/* REFERENCE — app-wide lookup tools, reachable outside the Learn tabs */}
+        <Text style={styles.sectionLabel}>REFERENCE</Text>
+        <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+          <TouchableOpacity
+            style={[styles.crossroadsCard, { flex: 1, marginBottom: 0 }]}
+            activeOpacity={0.8}
+            onPress={() => router.push('/glossary' as any)}
+          >
+            <Ionicons name="book-outline" size={20} color={COLORS.accent} style={{ marginBottom: SPACING.sm }} />
+            <Text style={styles.crossroadsText}>Glossary — the vocabulary of both traditions</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.crossroadsCard, { flex: 1, marginBottom: 0 }]}
+            activeOpacity={0.8}
+            onPress={() => router.push('/artist' as any)}
+          >
+            <Ionicons name="people-outline" size={20} color={COLORS.accent} style={{ marginBottom: SPACING.sm }} />
+            <Text style={styles.crossroadsText}>Musicians — the people behind the recordings</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={{ height: 60 }} />
       </ScrollView>
     </SafeAreaView>
