@@ -262,3 +262,18 @@ export const CROSSROADS: CrossroadsPiece[] = [
 export function getCrossroadsPiece(id: string): CrossroadsPiece | undefined {
   return CROSSROADS.find((p) => p.id === id);
 }
+
+// Reverse lookups so a makam/mode detail screen can surface its bridge to the
+// other tradition. A piece "belongs" to a makam/mode if it links that id; we
+// prefer pairings (which carry the interactive A/B comparison) over essays.
+function byPairingFirst(pieces: CrossroadsPiece[]): CrossroadsPiece[] {
+  return [...pieces].sort((a, b) => (a.kind === 'pairing' ? 0 : 1) - (b.kind === 'pairing' ? 0 : 1));
+}
+
+export function getCrossroadsForMakam(makamId: string): CrossroadsPiece | undefined {
+  return byPairingFirst(CROSSROADS.filter((p) => p.makamId === makamId))[0];
+}
+
+export function getCrossroadsForMode(modeId: string): CrossroadsPiece | undefined {
+  return byPairingFirst(CROSSROADS.filter((p) => p.modeId === modeId))[0];
+}

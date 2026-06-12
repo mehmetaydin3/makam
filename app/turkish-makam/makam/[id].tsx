@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getUsulById } from '../../../data/usuls';
 import { getSongsByMakam, GENRE_LABEL } from '../../../data/songs';
+import { getCrossroadsForMakam } from '../../../data/crossroads';
+import { CrossroadsBridge } from '../../../components/common/CrossroadsBridge';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { getMakamById, getMakamByName, AudioExample } from '../../../data/makams';
@@ -88,7 +90,7 @@ export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { t, language, noteNames } = useLanguage();
-  const { colors } = useTheme();
+  const { colors, jazzColors } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const COLORS = colors;
   const [showShare, setShowShare] = useState(false);
@@ -284,6 +286,21 @@ export default function MakamDetailScreen() {
             />
           )}
         </View>
+
+        {/* CROSS-TRADITION BRIDGE — this makam's twin in the jazz world */}
+        {getCrossroadsForMakam(makam.id) && (
+          <CrossroadsBridge
+            piece={getCrossroadsForMakam(makam.id)!}
+            fromSide="makam"
+            makamColor={accent}
+            jazzColor={jazzColors.accent}
+            surface={COLORS.surface}
+            textPrimary={COLORS.textPrimary}
+            textSecondary={COLORS.textSecondary}
+            textTertiary={COLORS.textTertiary}
+            border={COLORS.border}
+          />
+        )}
 
         {/* NOTABLE PIECES — core repertoire in this makam (collapsed) */}
         {(makam.notablePieces || []).length > 0 && (

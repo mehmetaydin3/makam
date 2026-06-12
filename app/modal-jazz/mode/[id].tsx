@@ -10,6 +10,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getModeById, getRelatedModes } from '../../../data/traditions/modal-jazz/modes';
+import { getCrossroadsForMode } from '../../../data/crossroads';
+import { getMakamById } from '../../../data/makams';
+import { CrossroadsBridge } from '../../../components/common/CrossroadsBridge';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { JAZZ_COLORS, JazzColorScheme, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
@@ -178,6 +181,21 @@ export default function ModalJazzModeDetail() {
             );
           })}
         </Section>
+        )}
+
+        {/* ── CROSS-TRADITION BRIDGE — this mode's twin in the makam world ── */}
+        {getCrossroadsForMode(mode.id) && (
+          <CrossroadsBridge
+            piece={getCrossroadsForMode(mode.id)!}
+            fromSide="jazz"
+            makamColor={getMakamById(getCrossroadsForMode(mode.id)!.makamId || '')?.color ?? accentColor}
+            jazzColor={accentColor}
+            surface={JAZZ_COLORS.surface}
+            textPrimary={JAZZ_COLORS.textPrimary}
+            textSecondary={JAZZ_COLORS.textSecondary}
+            textTertiary={JAZZ_COLORS.textTertiary}
+            border={JAZZ_COLORS.border}
+          />
         )}
 
         {/* ── Notable players (collapsed) ── */}
