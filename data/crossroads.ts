@@ -1,6 +1,40 @@
 // Crossroads — comparative pieces that live between the two traditions.
 // Each piece is shaped like a Lesson so it renders in the shared LessonReader.
 // Content is expert-grounded (ethnomusicology + modal-jazz history).
+//
+// ─── ARCHITECTURE NOTE: scaling to more traditions ──────────────────────────
+// The current model is deliberately two-tradition-shaped: a piece links one
+// `makamId` + one `modeId`, and `comparison` hardcodes a jazz side (Rhodes)
+// against a makam side (ney). This is the right size while exactly two
+// traditions are live — do NOT generalize speculatively.
+//
+// WHEN the third tradition lands (e.g. Indian raga, already stubbed in the
+// registry), migrate to a tradition-agnostic shape as the FIRST step of that
+// work:
+//
+//   type BridgeSide = {
+//     traditionId: string;       // 'turkish-makam' | 'modal-jazz' | 'indian-raga'
+//     refId: string;             // makam / mode / raga id
+//     label: string;             // one-line label for this side
+//     pitches:                   // what to sound, in that tradition's terms
+//       | { kind: 'cents'; values: number[] }
+//       | { kind: 'semitones'; values: number[] };
+//     engine: 'ney' | 'rhodes' | 'tanpura';
+//   };
+//   type CrossroadsPiece = Lesson & { sides: BridgeSide[]; listenFor: string };
+//
+// Then:
+//  • getCrossroadsForMakam/getCrossroadsForMode collapse into one
+//    getBridgesFor(traditionId, refId) — and can return MULTIPLE bridges
+//    (a makam may have both a jazz cousin and a raga cousin).
+//  • CrossroadsBridge (components/common) already takes generic fromSide +
+//    colors; it just reads "the other side(s)" from the array.
+//  • The comparison screen iterates sides[] and picks the engine per side
+//    instead of hardcoding Rhodes-vs-ney.
+//
+// Today's reverse lookups and the bridge card were kept thin precisely so
+// this migration is a data reshape, not a UI rewrite.
+// ─────────────────────────────────────────────────────────────────────────────
 
 import { Lesson } from './education';
 
