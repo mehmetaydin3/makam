@@ -297,6 +297,8 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
   const [hasPlayed, setHasPlayed] = useState(false);
   // Celebratory overlay: streak milestones + a strong finish.
   const [reward, setReward] = useState<{ kind: 'streak' | 'daily'; title: string; subtitle?: string } | null>(null);
+  // Teach-first: meet the session's first sound before being quizzed on anything.
+  const [phase, setPhase] = useState<'teach' | 'quiz'>('teach');
 
   const question = questions[index];
 
@@ -315,12 +317,12 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
 
   // Auto-play "home → phrase" once each new question appears.
   useEffect(() => {
-    if (done || !question) return;
+    if (done || !question || phase !== 'quiz') return;
     const t = setTimeout(() => playItem(), 450); // brief settle before "home" sounds
     timersRef.current.push(t);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, done]);
+  }, [index, done, phase]);
 
   // Play the anchor ("home"), then after a breath of silence the given phrase.
   const playAnchoredPhrase = (phrase: number[], onEnd?: () => void) => {
@@ -343,6 +345,27 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
     stopAll();
     setHasPlayed(true);
     playAnchoredPhrase(question.phraseNotes);
+  };
+
+  // "Hear home": just the anchor (root -> 5th -> root), any time.
+  const playHome = () => {
+    if (!question) return;
+    stopAll();
+    setActivity('anchor');
+    engineRef.current?.playScale(question.anchorNotes, undefined, () => setActivity('idle'));
+  };
+
+  // After a wrong answer: play YOUR pick, then the right one, back to back.
+  const playDifference = () => {
+    if (!question || !selected) return;
+    const mine = question.options.find((o) => o.value === selected);
+    const right = question.options.find((o) => o.isCorrect);
+    if (!mine || !right) return;
+    stopAll();
+    playAnchoredPhrase(mine.phraseNotes, () => {
+      const t = setTimeout(() => playAnchoredPhrase(right.phraseNotes), AB_GAP);
+      timersRef.current.push(t);
+    });
   };
 
   // A/B compare: play each option's phrase (each prefixed by home) in turn, so
@@ -428,6 +451,51 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
     );
   }
 
+  const isTeachBusy = activity !== 'idle';
+
+  // ── TEACH: meet the first sound before any question ────────────────────────
+  if (phase === 'teach' && question) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <RhodesEngine ref={engineRef} />
+        <View style={styles.navBar}>
+          <TouchableOpacity onPress={() => { stopAll(); onExit(); }} style={styles.quitButton}>
+            <Ionicons name="close" size={22} color={JAZZ_COLORS.textPrimary} />
+          </TouchableOpacity>
+          <Text style={styles.questionCount}>Warm up</Text>
+          <View style={{ width: 22 }} />
+        </View>
+        <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
+          <Text style={styles.earKicker}>Meet the sound</Text>
+          <Text style={styles.prompt}>{question.rootLabel} {question.modeName}</Text>
+          <Text style={styles.earInstruction}>
+            Before you're asked anything, just listen. Home plays first, then the mode.
+            {'\n'}Listen for {question.colorNote}.
+          </Text>
+          <BreathingView active={!isTeachBusy}>
+            <TouchableOpacity
+              style={[styles.playButton, isTeachBusy && styles.playButtonActive]}
+              onPress={isTeachBusy ? stopAll : playItem}
+              activeOpacity={0.85}
+            >
+              <Ionicons name={isTeachBusy ? 'stop' : 'play'} size={26} color={JAZZ_COLORS.background} />
+              <Text style={styles.playButtonText}>{isTeachBusy ? 'Stop' : hasPlayed ? 'Hear it again' : 'Play it'}</Text>
+            </TouchableOpacity>
+          </BreathingView>
+          <Text style={styles.earHint}>
+            {`That ${question.colorNote} floating over home — that's the sound that makes it ${question.modeName}.`}
+          </Text>
+        </ScrollView>
+        <View style={styles.footer}>
+          <PressableScale style={styles.nextButton} onPress={() => { stopAll(); setHasPlayed(false); setPhase('quiz'); }}>
+            <Text style={styles.nextButtonText}>I'm ready — quiz me</Text>
+            <Ionicons name="arrow-forward" size={16} color={JAZZ_COLORS.background} />
+          </PressableScale>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const progress = (index + 1) / questions.length;
   const isCorrect = selected === question.correctAnswer;
   const isBusy = activity !== 'idle';
@@ -498,6 +566,18 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
           <Ionicons name="git-compare" size={16} color={isBusy ? JAZZ_COLORS.textTertiary : JAZZ_COLORS.accent} />
           <Text style={[styles.compareButtonText, isBusy && { color: JAZZ_COLORS.textTertiary }]}>
             {question.mode === 'brightness' ? 'Hear bright vs dark' : 'Hear each option'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.compareButton}
+          onPress={playHome}
+          activeOpacity={0.85}
+          disabled={isBusy}
+        >
+          <Ionicons name="home" size={15} color={isBusy ? JAZZ_COLORS.textTertiary : JAZZ_COLORS.accent} />
+          <Text style={[styles.compareButtonText, isBusy && { color: JAZZ_COLORS.textTertiary }]}>
+            Hear home ({question.rootLabel})
           </Text>
         </TouchableOpacity>
 
@@ -577,6 +657,14 @@ function EarTrainingFlow({ level, onExit }: { level: EarLevel; onExit: () => voi
             <Text style={styles.explanationText}>
               {`That ${question.colorNote} you heard floating over home — that's what makes it ${question.modeName}.`}
             </Text>
+            {!isCorrect && (
+              <TouchableOpacity style={styles.compareButton} onPress={playDifference} activeOpacity={0.85} disabled={isBusy}>
+                <Ionicons name="swap-horizontal" size={15} color={isBusy ? JAZZ_COLORS.textTertiary : JAZZ_COLORS.accent} />
+                <Text style={[styles.compareButtonText, isBusy && { color: JAZZ_COLORS.textTertiary }]}>
+                  Hear the difference — yours, then {question.modeName}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
         <View style={{ height: 100 }} />
