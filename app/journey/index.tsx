@@ -133,7 +133,7 @@ export default function JourneyScreen() {
           <Ionicons name="chevron-back" size={22} color={COLORS.accent} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push('/journey/settings' as any)} style={styles.settingsButton}>
-          <Ionicons name="settings-outline" size={20} color={COLORS.textSecondary} />
+          <Ionicons name="settings-outline" size={22} color={COLORS.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -285,9 +285,9 @@ export default function JourneyScreen() {
 
 const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: SPACING.xs },
   backButton: { marginLeft: -4 },
-  settingsButton: { padding: 4 },
+  settingsButton: { padding: 2 },
   scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
   eyebrow: { fontSize: 12, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 },
   heading: { fontSize: 36, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, lineHeight: 42, marginBottom: SPACING.md },
