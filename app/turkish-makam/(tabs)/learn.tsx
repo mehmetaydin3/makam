@@ -107,34 +107,25 @@ export default function LearnScreen() {
         <Text style={styles.subheading}>Your path through the makam tradition.</Text>
       </View>
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-        <TouchableOpacity
-          style={styles.glossaryCard}
-          activeOpacity={0.85}
-          onPress={() => router.push('/glossary?tradition=turkish-makam' as any)}
-        >
-          <View style={styles.glossaryIcon}>
-            <Ionicons name="book-outline" size={18} color={COLORS.accent} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.glossaryTitle}>Glossary</Text>
-            <Text style={styles.glossarySub}>Look up any term — taksim, seyir, perde…</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.glossaryCard, { marginTop: SPACING.sm }]}
-          activeOpacity={0.85}
-          onPress={() => router.push('/artist?tradition=turkish-makam' as any)}
-        >
-          <View style={styles.glossaryIcon}>
-            <Ionicons name="people-outline" size={18} color={COLORS.accent} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.glossaryTitle}>Musicians</Text>
-            <Text style={styles.glossarySub}>The composers & performers behind the music</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
-        </TouchableOpacity>
+        {/* Reference toolbox — compact, subordinate to the lesson path below. */}
+        <View style={styles.refRow}>
+          <TouchableOpacity
+            style={styles.refTile}
+            activeOpacity={0.8}
+            onPress={() => router.push('/glossary?tradition=turkish-makam' as any)}
+          >
+            <Ionicons name="book-outline" size={15} color={COLORS.accent} />
+            <Text style={styles.refTileText}>Glossary</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.refTile}
+            activeOpacity={0.8}
+            onPress={() => router.push('/artist?tradition=turkish-makam' as any)}
+          >
+            <Ionicons name="people-outline" size={15} color={COLORS.accent} />
+            <Text style={styles.refTileText}>Musicians</Text>
+          </TouchableOpacity>
+        </View>
         {CATEGORY_ORDER.map((cat) => {
           const lessonsInCat = LESSONS.filter((l) => l.category === cat);
           if (lessonsInCat.length === 0) return null;
@@ -174,10 +165,9 @@ const styles = StyleSheet.create({
   heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
   list: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
-  glossaryCard: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: COLORS.surface, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, marginTop: SPACING.md },
-  glossaryIcon: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55' },
-  glossaryTitle: { fontSize: 16, fontWeight: '600', color: COLORS.textPrimary },
-  glossarySub: { fontSize: 12, color: COLORS.textTertiary, marginTop: 2 },
+  refRow: { flexDirection: 'row', gap: SPACING.sm, marginTop: SPACING.xs },
+  refTile: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingVertical: 11, backgroundColor: COLORS.surface, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border },
+  refTileText: { fontSize: 13, fontWeight: '600', color: COLORS.textSecondary },
   categoryHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingTop: SPACING.lg, paddingBottom: SPACING.sm },
   categoryLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase' },
   card: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: SPACING.md },
