@@ -1,5 +1,6 @@
 # Privacy Policy — The Modality
 
+_Published at: https://themodality.app/privacy_
 _Last updated: 12 June 2026_
 
 The Modality ("the app") is designed to respect your privacy. This policy
