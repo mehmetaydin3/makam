@@ -112,6 +112,14 @@ export const MODES: Mode[] = [
           'The definitive Dorian tune. The entire A section is a D Dorian vamp.',
         youtubeId: 'ylXk1LBvIqU',
       },
+      {
+        title: 'Maiden Voyage',
+        artist: 'Herbie Hancock',
+        year: 1965,
+        whyThisTune:
+          'Herbie\'s signature tune floats on suspended Dorian harmony — the ' +
+          'natural 6th over the m7 chords gives it that open, oceanic calm.',
+      },
     ],
     notablePlayers: ['Miles Davis', 'John Coltrane', 'Herbie Hancock'],
     brightness: 'neutral',
@@ -151,6 +159,14 @@ export const MODES: Mode[] = [
         year: 1963,
         whyThisTune:
           'The B section moves to Eb Phrygian against D Dorian in the A section.',
+      },
+      {
+        title: 'Spain',
+        artist: 'Chick Corea',
+        year: 1972,
+        whyThisTune:
+          'Its flamenco-tinged theme leans on the Phrygian "Spanish" color — ' +
+          'the half-step from the root that flamenco guitar is built on.',
       },
     ],
     notablePlayers: ['John Coltrane', 'Chick Corea', 'Wayne Shorter'],
@@ -271,6 +287,14 @@ export const MODES: Mode[] = [
         whyThisTune:
           'The A section descends through Aeolian harmony. ' +
           'The descending chromatic bass line is an Aeolian signature.',
+      },
+      {
+        title: 'Summertime',
+        artist: 'Michel Petrucciani',
+        year: 1993,
+        whyThisTune:
+          'Gershwin\'s standard sits squarely in Aeolian (natural minor); ' +
+          'Petrucciani leans into its descending minor harmony.',
       },
     ],
     notablePlayers: ['Chet Baker', 'Bill Evans', 'Keith Jarrett'],
