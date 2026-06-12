@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { SPACING, RADIUS, ColorScheme } from '../../data/constants';
-import { ARTISTS, getArtistAppearances, ArtistTradition } from '../../data/artists';
+import { ARTISTS, getArtistAppearances, getArtistImage, ArtistTradition } from '../../data/artists';
 
 type Filter = 'all' | ArtistTradition;
 
@@ -106,9 +106,13 @@ export default function ArtistDirectoryScreen() {
                 activeOpacity={0.85}
                 onPress={() => router.push(('/artist/' + a.id) as any)}
               >
-                <View style={[styles.avatar, { backgroundColor: c + '1A', borderColor: c + '55' }]}>
-                  <Text style={[styles.avatarText, { color: c }]}>{a.name.charAt(0)}</Text>
-                </View>
+                {getArtistImage(a.id) ? (
+                  <Image source={{ uri: getArtistImage(a.id) }} style={[styles.avatar, { borderColor: c + '55' }]} resizeMode="cover" />
+                ) : (
+                  <View style={[styles.avatar, styles.avatarFallback, { backgroundColor: c + '1A', borderColor: c + '55' }]}>
+                    <Text style={[styles.avatarText, { color: c }]}>{a.name.charAt(0)}</Text>
+                  </View>
+                )}
                 <View style={{ flex: 1 }}>
                   <Text style={styles.name}>{a.name}</Text>
                   <Text style={styles.meta} numberOfLines={1}>
@@ -178,7 +182,8 @@ const makeStyles = (COLORS: ColorScheme) =>
       padding: SPACING.md,
       marginBottom: SPACING.sm,
     },
-    avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+    avatar: { width: 44, height: 44, borderRadius: 22, borderWidth: 1 },
+    avatarFallback: { alignItems: 'center', justifyContent: 'center' },
     avatarText: { fontSize: 18, fontWeight: '400' },
     name: { fontSize: 16, fontWeight: '500', color: COLORS.textPrimary, marginBottom: 2 },
     meta: { fontSize: 12, color: COLORS.textSecondary },

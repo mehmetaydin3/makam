@@ -207,7 +207,7 @@ export const MODES: Mode[] = [
           'each one the raised-4th color in pure form. Joe Henderson built the sound into the composition itself.',
       },
     ],
-    notablePlayers: ['Joe Henderson', 'Wayne Shorter', 'Herbie Hancock'],
+    notablePlayers: ['Joe Henderson', 'Wayne Shorter', 'Herbie Hancock', 'George Russell'],
     brightness: 'bright',
     difficulty: 'intermediate',
     relatedModes: ['ionian'],

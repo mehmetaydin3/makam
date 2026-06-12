@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getArtistById, getArtistAppearances } from '../../data/artists';
+import { getArtistById, getArtistAppearances, getArtistImage } from '../../data/artists';
 import { useTheme } from '../../context/ThemeContext';
 import { SPACING, RADIUS, ColorScheme } from '../../data/constants';
 
@@ -46,6 +46,17 @@ export default function ArtistDetailScreen() {
         {/* HERO */}
         <View style={styles.hero}>
           <View style={[styles.colorBar, { backgroundColor: accent }]} />
+          {getArtistImage(artist.id) ? (
+            <Image
+              source={{ uri: getArtistImage(artist.id) }}
+              style={[styles.portrait, { borderColor: accent + '55' }]}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.portrait, styles.portraitFallback, { borderColor: accent + '55', backgroundColor: accent + '1A' }]}>
+              <Text style={[styles.portraitInitial, { color: accent }]}>{artist.name.charAt(0)}</Text>
+            </View>
+          )}
           <Text style={[styles.eyebrow, { color: accent }]}>{traditionLabel}</Text>
           <Text style={styles.name}>{artist.name}</Text>
           <Text style={styles.role}>{artist.role}</Text>
@@ -136,6 +147,9 @@ const makeStyles = (COLORS: ColorScheme) =>
     scroll: { paddingHorizontal: SPACING.lg },
     hero: { marginBottom: SPACING.lg, paddingTop: SPACING.sm },
     colorBar: { width: 32, height: 3, borderRadius: 999, marginBottom: SPACING.md },
+    portrait: { width: 96, height: 96, borderRadius: 48, borderWidth: 2, marginBottom: SPACING.md },
+    portraitFallback: { alignItems: 'center', justifyContent: 'center' },
+    portraitInitial: { fontSize: 36, fontWeight: '300' },
     eyebrow: { fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', marginBottom: SPACING.sm },
     name: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
     role: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 22, marginBottom: SPACING.md },
