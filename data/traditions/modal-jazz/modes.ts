@@ -110,7 +110,6 @@ export const MODES: Mode[] = [
         year: 1959,
         whyThisTune:
           'The definitive Dorian tune. The entire A section is a D Dorian vamp.',
-        youtubeId: 'ylXk1LBvIqU',
       },
       {
         title: 'Maiden Voyage',
@@ -206,7 +205,6 @@ export const MODES: Mode[] = [
         whyThisTune:
           'The definitive Lydian jazz tune — the head moves through a chain of maj7#11 chords, ' +
           'each one the raised-4th color in pure form. Joe Henderson built the sound into the composition itself.',
-        youtubeId: 'N233dJw7GH4',
       },
     ],
     notablePlayers: ['Joe Henderson', 'Wayne Shorter', 'Herbie Hancock'],
@@ -246,7 +244,6 @@ export const MODES: Mode[] = [
         whyThisTune:
           'From Kind of Blue — a G dominant vamp that never resolves, the flat 7th ringing through ' +
           'the whole tune. The recording that turned the Mixolydian sound into modal jazz.',
-        youtubeId: '-488UORrfJ0',
       },
     ],
     notablePlayers: ['Miles Davis', 'Wes Montgomery', 'Cannonball Adderley'],
