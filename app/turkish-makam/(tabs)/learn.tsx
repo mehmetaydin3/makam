@@ -121,6 +121,20 @@ export default function LearnScreen() {
           </View>
           <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.glossaryCard, { marginTop: SPACING.sm }]}
+          activeOpacity={0.85}
+          onPress={() => router.push('/artist?tradition=turkish-makam' as any)}
+        >
+          <View style={styles.glossaryIcon}>
+            <Ionicons name="people-outline" size={18} color={COLORS.accent} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.glossaryTitle}>Musicians</Text>
+            <Text style={styles.glossarySub}>The composers & performers behind the music</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+        </TouchableOpacity>
         {CATEGORY_ORDER.map((cat) => {
           const lessonsInCat = LESSONS.filter((l) => l.category === cat);
           if (lessonsInCat.length === 0) return null;

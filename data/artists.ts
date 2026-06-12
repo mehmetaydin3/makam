@@ -523,6 +523,19 @@ export const ARTISTS: Artist[] = [
     ],
   },
   {
+    id: 'michel-petrucciani',
+    name: 'Michel Petrucciani',
+    tradition: 'modal-jazz',
+    born: '1962',
+    died: '1999',
+    instrument: 'Piano',
+    role: 'A lyrical virtuoso who played with overwhelming joy',
+    era: 'Post-bop',
+    bio: [
+      'Born with a brittle-bone condition that left him small in stature, Michel Petrucciani became one of the most expressive pianists in jazz — a player of dazzling technique and singing lyricism. His live recordings from Montreux are landmarks of solo and trio jazz, full of swing, tenderness, and an almost overflowing joy.',
+    ],
+  },
+  {
     id: 'erroll-garner',
     name: 'Erroll Garner',
     tradition: 'modal-jazz',
