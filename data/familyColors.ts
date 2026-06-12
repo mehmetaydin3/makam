@@ -17,6 +17,7 @@ export const FAMILY_BASE: Record<string, string> = {
   Nihavend:  '#5FA39A', // muted teal — melancholic minor
   Buselik:   '#6F8FB0', // steel blue — earnest, grounded
   Cargah:    '#D4B94E', // clear yellow — bright, uncomplicated, major-like
+  'Çargah':  '#D4B94E', // same family — data spells it with the cedilla
   Other:     '#8A8A99', // neutral fallback
 };
 
