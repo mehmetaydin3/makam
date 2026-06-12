@@ -157,6 +157,7 @@ export default function ModalJazzModeDetail() {
         </Accordion>
 
         {/* ── Hear it (kept visible — audio) ── */}
+        {mode.classicTunes.length > 0 && (
         <Section label="Hear it in action">
           {mode.classicTunes.map((tune, i) => {
             const videoId = tune.youtubeId || YOUTUBE_IDS[tune.title];
@@ -177,6 +178,7 @@ export default function ModalJazzModeDetail() {
             );
           })}
         </Section>
+        )}
 
         {/* ── Notable players (collapsed) ── */}
         <Accordion title="Notable players" accent={accentColor} colors={JAZZ_COLORS}>
