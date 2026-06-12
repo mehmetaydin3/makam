@@ -20,7 +20,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png",
         "backgroundImage": "./assets/android-icon-background.png"
       },
-      "package": "com.makam.app"
+      "package": "com.mehmetaydin.makam"
     },
     "plugins": [
       "expo-router",
