@@ -543,6 +543,9 @@ export const ARTISTS: Artist[] = [
 function normalize(name: string): string {
   return name
     .toLowerCase()
+    // Turkish dotless ı (U+0131) has no NFD decomposition, so it would be
+    // stripped below — fold it to "i" so "Hacı" and "Haci" match.
+    .replace(/ı/g, 'i')
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')

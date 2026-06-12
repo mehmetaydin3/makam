@@ -284,6 +284,37 @@ export default function MakamDetailScreen() {
           )}
         </View>
 
+        {/* NOTABLE PIECES — core repertoire in this makam (collapsed) */}
+        {(makam.notablePieces || []).length > 0 && (
+          <Accordion title={language === 'tr' ? 'Önemli Eserler' : 'Notable Pieces'} accent={accent} colors={COLORS}>
+            <View style={{ backgroundColor: accent + '11', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
+              <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
+                {language === 'tr'
+                  ? 'Bu makamın dağarındaki temel eserler. Bestecisine dokunarak müzisyeni keşfedin.'
+                  : 'Cornerstone works composed in this makam. Tap a composer to explore the musician.'}
+              </Text>
+            </View>
+            {(makam.notablePieces || []).map((piece, i) => (
+              <View
+                key={piece.title + i}
+                style={[styles.pieceRow, i === (makam.notablePieces.length - 1) && { borderBottomWidth: 0 }]}
+              >
+                <View style={styles.pieceTitleRow}>
+                  <Text style={styles.pieceTitle}>{piece.title}</Text>
+                  {piece.usul ? (
+                    <View style={styles.pieceUsulBadge}>
+                      <Text style={styles.pieceUsulText}>{piece.usul}</Text>
+                    </View>
+                  ) : null}
+                </View>
+                <Text style={styles.pieceComposer}>
+                  <ArtistLink name={piece.composer} accent={accent} />
+                </Text>
+              </View>
+            ))}
+          </Accordion>
+        )}
+
         {/* CHARACTERISTIC MOVEMENT (collapsed) */}
         <Accordion title="Characteristic Movement" accent={accent} colors={COLORS}>
           <View style={[styles.phraseCard, { borderLeftColor: accent }]}>

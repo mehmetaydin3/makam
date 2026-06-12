@@ -900,6 +900,7 @@ export const getMakamById = (id: string): Makam | undefined =>
 const normalizeMakamName = (s: string): string =>
   s
     .toLowerCase()
+    .replace(/ı/g, 'i') // Turkish dotless ı has no NFD decomposition; fold to "i".
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '')
