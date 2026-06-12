@@ -2,6 +2,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { Lesson } from '../../../data/education';
 import { LESSONS, JAZZ_CATEGORY_ORDER, JAZZ_CATEGORY_LABELS, JazzCategory } from '../../../data/traditions/modal-jazz/lessons';
 import { LessonReader } from '../../../components/lessons/LessonReader';
@@ -71,6 +72,7 @@ function LessonCard({ lesson, completed, unlocked, isLast, onPress }: CardProps)
 }
 
 export default function LearnScreen() {
+  const router = useRouter();
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const { isLessonComplete, isLessonUnlocked, isCategoryUnlocked, markLessonComplete } = useProgress();
 
@@ -117,6 +119,20 @@ export default function LearnScreen() {
         <Text style={styles.subheading}>Your path through the modes.</Text>
       </View>
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity
+          style={styles.glossaryCard}
+          activeOpacity={0.85}
+          onPress={() => router.push('/glossary?tradition=modal-jazz' as any)}
+        >
+          <View style={styles.glossaryIcon}>
+            <Ionicons name="book-outline" size={18} color={COLORS.accent} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.glossaryTitle}>Glossary</Text>
+            <Text style={styles.glossarySub}>Look up any term — mode, voicing, vamp…</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
+        </TouchableOpacity>
         {JAZZ_CATEGORY_ORDER.map((cat) => {
           const lessonsInCat = LESSONS.filter((l) => l.category === cat);
           if (lessonsInCat.length === 0) return null;
@@ -156,6 +172,10 @@ const styles = StyleSheet.create({
   heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
   list: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
+  glossaryCard: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, backgroundColor: COLORS.surface, borderRadius: 12, borderWidth: 1, borderColor: COLORS.border, padding: SPACING.md, marginTop: SPACING.md },
+  glossaryIcon: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.accent + '22', borderWidth: 1, borderColor: COLORS.accent + '55' },
+  glossaryTitle: { fontSize: 16, fontWeight: '600', color: COLORS.textPrimary },
+  glossarySub: { fontSize: 12, color: COLORS.textTertiary, marginTop: 2 },
   categoryHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingTop: SPACING.lg, paddingBottom: SPACING.sm },
   categoryLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase' },
   card: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: SPACING.md },
