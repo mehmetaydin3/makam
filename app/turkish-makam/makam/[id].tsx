@@ -268,7 +268,7 @@ export default function MakamDetailScreen() {
         </Accordion>
 
         {/* LISTENING SECTION */}
-        <View style={styles.section}>
+        <View style={[styles.section, { marginBottom: 0 }]}>
           <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Dinle' : 'Listen'}</Text>
           {makam.listening.sarki.youtubeId && (
             <AudioCard

@@ -95,7 +95,9 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     borderWidth: 1,
     padding: SPACING.md,
-    marginTop: SPACING.lg,
+    // Small top margin only — the preceding section already provides spacing,
+    // so this avoids the gap stacking into an oversized void.
+    marginTop: SPACING.sm,
     overflow: 'hidden',
   },
   seam: {
