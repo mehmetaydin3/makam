@@ -204,16 +204,19 @@ export const audioEngine = {
     callback('playing');
     // Re-trigger the durak note slightly before the previous one would end, so
     // the drone sounds continuous. The loop self-cancels when generation moves.
-    const RETRIGGER_MS = 1900; // < NOTE_MAX_MS sample length, for a seamless loop
+    // True overlap: the next durak note starts while the previous still rings,
+    // and each player is cleaned up only after its natural decay. (Previously
+    // the old player was killed before the new one started — an audible gap.)
+    const RETRIGGER_MS = 1500;
+    const CLEANUP_MS = 3600;
     while (myGen === generation) {
-      if (currentPlayer) {
-        try { currentPlayer.pause(); } catch {}
-        try { currentPlayer.remove(); } catch {}
-        currentPlayer = null;
-      }
       const player = createAudioPlayer(moduleId);
       currentPlayer = player;
       try { player.play(); } catch {}
+      setTimeout(() => {
+        try { player.pause(); } catch {}
+        try { player.remove(); } catch {}
+      }, CLEANUP_MS);
       await delay(RETRIGGER_MS);
     }
     // Superseded by stop()/another playback; leave cleanup to whoever bumped gen.
@@ -234,18 +237,21 @@ export const audioEngine = {
       console.warn('Drone sample not found for', makamId);
       return false;
     }
-    const RETRIGGER_MS = 1900; // < sample length: overlap hides the seam
+    // True overlap: start the next note while the previous is still sounding,
+    // and let the old one decay naturally before cleanup. Killing the previous
+    // player first (the old approach) guaranteed an audible gap.
+    const RETRIGGER_MS = 1500;   // start next note well inside the current one
+    const CLEANUP_MS = 3600;     // remove a player only after it has decayed
     (async () => {
       while (myGen === droneGen) {
-        if (dronePlayer) {
-          try { dronePlayer.pause(); } catch {}
-          try { dronePlayer.remove(); } catch {}
-          dronePlayer = null;
-        }
         const player = createAudioPlayer(moduleId);
         dronePlayer = player;
         try { player.volume = 0.5; } catch {} // sit under the phrase, not on it
         try { player.play(); } catch {}
+        setTimeout(() => {
+          try { player.pause(); } catch {}
+          try { player.remove(); } catch {}
+        }, CLEANUP_MS);
         await delay(RETRIGGER_MS);
       }
     })();
