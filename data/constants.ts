@@ -108,3 +108,13 @@ export const SEYIR_DESCRIPTIONS: Record<string, string> = {
   descending: 'Melody descends from high to root',
   undulating: 'Melody moves in both directions',
 };
+
+// ─── Feature Flags ───────────────────────────────────────────────────────────
+// Ship switches for features that exist but aren't ready for users yet.
+// Flip to true to restore the UI entry points — no other changes needed.
+export const FEATURES = {
+  /** "Dem · Play along" drone on makam detail screens. */
+  dronePlayAlong: false,
+  /** "By ear" ear-training sections in both Practice tabs. */
+  earTraining: false,
+} as const;

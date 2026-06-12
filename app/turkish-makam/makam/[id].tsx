@@ -8,7 +8,7 @@ import { getMakamById, getMakamByName, AudioExample } from '../../../data/makams
 import { useLanguage } from '../../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../../components/ShareableCard';
-import { SPACING, RADIUS, ColorScheme } from '../../../data/constants';
+import { SPACING, RADIUS, ColorScheme , FEATURES } from '../../../data/constants';
 import { useTheme } from '../../../context/ThemeContext';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
@@ -211,7 +211,7 @@ export default function MakamDetailScreen() {
 
         {/* DRONE / PLAY ALONG — hold the durak and sing/play the makam over it.
             Only for makams the ney engine can voice at a correct root. */}
-        {PLAYABLE_MAKAM_IDS.includes(makam.id) && (
+        {FEATURES.dronePlayAlong && PLAYABLE_MAKAM_IDS.includes(makam.id) && (
           <TouchableOpacity
             style={[styles.droneEntry, { borderColor: accent + '55' }]}
             onPress={() => { audioEngine.stop(); router.push(('/turkish-makam/makam/drone?id=' + makam.id) as any); }}

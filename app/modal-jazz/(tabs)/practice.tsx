@@ -15,6 +15,7 @@ import { useProgress } from '../../../hooks/useProgress';
 import { QUIZ_PASS_THRESHOLD, nextQuizLevel } from '../../../data/progress';
 import { JAZZ_COLORS, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
 import { Chrome } from '../../../components/chrome';
+import { FEATURES } from '../../../data/constants';
 import { RewardBurst } from '../../../components/rewards';
 import { PressableScale, Pop, Bounce, BreathingView } from '../../../components/common/motion';
 import YoutubePlayer from 'react-native-youtube-iframe';
@@ -181,6 +182,7 @@ function HomeView({ onStartLevel, isUnlocked }: {
         </View>
 
         {/* Segmented toggle: Quiz vs By ear */}
+        {FEATURES.earTraining && (
         <View style={styles.segmented}>
           <TouchableOpacity
             style={[styles.segment, section === 'quiz' && styles.segmentActive]}
@@ -199,6 +201,7 @@ function HomeView({ onStartLevel, isUnlocked }: {
             <Text style={[styles.segmentText, section === 'ear' && styles.segmentTextActive]}>By ear</Text>
           </TouchableOpacity>
         </View>
+        )}
 
         {section === 'quiz' ? (
           <View style={styles.levelList}>
