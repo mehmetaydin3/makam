@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getUsulById } from '../../../data/usuls';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { getMakamById, AudioExample } from '../../../data/makams';
+import { getMakamById, getMakamByName, AudioExample } from '../../../data/makams';
 import { useLanguage } from '../../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../../components/ShareableCard';
@@ -343,25 +343,27 @@ export default function MakamDetailScreen() {
         <View style={{ marginBottom: 80 }}>
           <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'İlgili Makamlar' : 'Related Makams'}</Text>
           <View style={styles.relatedRow}>
-            {(makam.relatedMakams || []).map((name) => (
-              <TouchableOpacity
-                key={name}
-                style={styles.relatedTag}
-                onPress={() => {
-                const nameToId: Record<string, string> = {
-                  'Rast': 'rast', 'Uşşak': 'ussak', 'Ussak': 'ussak',
-                  'Hicaz': 'hicaz', 'Hüseyni': 'huseyni', 'Huseyni': 'huseyni',
-                  'Saba': 'saba', 'Segah': 'segah', 'Kurd': 'kurd',
-                  'Neva': 'neva', 'Buselik': 'buselik', 'Çargah': 'cargah',
-                  'Nihavend': 'nihavend',
-                };
-                const targetId = nameToId[name] || name.toLowerCase();
-                router.push(('/turkish-makam/makam/' + targetId) as any);
-              }}
-              >
-                <Text style={styles.relatedText}>{name}</Text>
-              </TouchableOpacity>
-            ))}
+            {(makam.relatedMakams || []).map((name) => {
+              const target = getMakamByName(name);
+              // Only link makams that actually exist in the guide; others are
+              // shown as plain tags so a tap never lands on a "not found" screen.
+              if (!target) {
+                return (
+                  <View key={name} style={[styles.relatedTag, styles.relatedTagInactive]}>
+                    <Text style={[styles.relatedText, styles.relatedTextInactive]}>{name}</Text>
+                  </View>
+                );
+              }
+              return (
+                <TouchableOpacity
+                  key={name}
+                  style={[styles.relatedTag, { borderColor: accent + '55' }]}
+                  onPress={() => router.push(('/turkish-makam/makam/' + target.id) as any)}
+                >
+                  <Text style={[styles.relatedText, { color: accent }]}>{name}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -475,7 +477,9 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   seyirType: { fontSize: 15, fontWeight: '500', color: COLORS.textPrimary },
   relatedRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   relatedTag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border },
+  relatedTagInactive: { borderStyle: 'dashed', opacity: 0.55 },
   relatedText: { fontSize: 13, color: COLORS.textSecondary },
+  relatedTextInactive: { color: COLORS.textTertiary },
   usulRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginBottom: SPACING.lg },
   usulTag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: COLORS.accent + '55', backgroundColor: COLORS.surface },
   usulTagText: { fontSize: 13, color: COLORS.accent, fontWeight: '500' },

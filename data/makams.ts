@@ -9,7 +9,7 @@ export type ScaleDegree = {
 };
 
 export type AudioExample = {
-  youtubeId: string;
+  youtubeId: string | null;
   title: string;
   composer: string;
   performer: string;
@@ -678,8 +678,8 @@ export const MAKAMS: Makam[] = [
     relatedMakams: ['Kurd', 'Hicazkar', 'Hicaz'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
-      sarki: { youtubeId: '1RDE9OIlG8Y', title: 'Beni Kor Kuyularda Merdivensiz Biraktin', composer: 'Munir Nurettin Selcuk', performer: 'Munir Nurettin Selcuk', year: '1940s', description: 'A definitive Kurdilihicazkar şarkı — the melody traces the makam\'s characteristic arc from the plaintive lower register to its rich, dramatic upper range.' },
-      taksim: { youtubeId: '7yH6o7YGG4c', title: 'Kurdilihicazkar Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s distinctive style brings out the emotional depth of Kurdilihicazkar.' },
+      sarki: { youtubeId: null, title: 'Beni Kor Kuyularda Merdivensiz Biraktin', composer: 'Munir Nurettin Selcuk', performer: 'Munir Nurettin Selcuk', year: '1940s', description: 'A definitive Kurdilihicazkar şarkı — the melody traces the makam\'s characteristic arc from the plaintive lower register to its rich, dramatic upper range.' },
+      taksim: { youtubeId: '7yH6o7YGG4c', title: 'Kurdilihicazkar Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Cemil Bey\'s playing brings out the emotional depth of Kurdilihicazkar, tracing its arc from the plaintive lower register to its rich, dramatic upper range.' },
     },
     notablePieces: [{ title: 'Kurdilihicazkar Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
     color: '#8B5A8B',
@@ -747,7 +747,7 @@ export const MAKAMS: Makam[] = [
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: { youtubeId: null, title: 'Beyati Sarki', composer: 'Hammamizade Ismail Dede Efendi', performer: 'Hafiz Burhan', year: '1930s', description: 'A classic Beyati şarkı capturing the makam\'s essential warmth and tender nostalgia.' },
-      taksim: { youtubeId: 'LAN7T_LGMjQ', title: 'Beyati Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s oud improvisation in Beyati is a masterclass in the makam\'s emotional range.' },
+      taksim: { youtubeId: 'LAN7T_LGMjQ', title: 'Beyati Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Cemil Bey\'s improvisation in Beyati is a masterclass in the makam\'s emotional range.' },
     },
     notablePieces: [{ title: 'Beyati Araban Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
     color: '#8B7A5A',
@@ -849,7 +849,7 @@ export const MAKAMS: Makam[] = [
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: { youtubeId: null, title: 'Uzzal Sarki', composer: 'Sadettin Kaynak', performer: 'Zeki Muren', year: '1960s', description: 'A passionate Uzzal şarkı — the double augmented seconds give the melody a restless, searching quality.' },
-      taksim: { youtubeId: null, title: 'Uzzal Taksim', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s oud captures Uzzal\'s restless energy.' },
+      taksim: { youtubeId: null, title: 'Uzzal Taksim', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Cemil Bey\'s playing captures Uzzal\'s restless energy.' },
     },
     notablePieces: [{ title: 'Uzzal Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
     color: '#C8705A',
@@ -892,6 +892,34 @@ export const MAKAMS: Makam[] = [
 
 export const getMakamById = (id: string): Makam | undefined =>
   MAKAMS.find((m) => m.id === id);
+
+// Resolve a makam *name* (as used in relatedMakams, song credits, etc.) to its
+// entry — diacritic- and spacing-insensitive, so "Uşşak", "Ussak" and "uşşak"
+// all match. Names that don't correspond to a real makam in the guide return
+// undefined, so callers can avoid linking to a "not found" screen.
+const normalizeMakamName = (s: string): string =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+
+// Spelling variants in the data that don't normalize to their id on their own.
+const MAKAM_NAME_ALIASES: Record<string, string> = {
+  bayati: 'beyati',
+};
+
+const MAKAM_BY_NORMALIZED_NAME: Record<string, Makam> = {};
+for (const m of MAKAMS) {
+  MAKAM_BY_NORMALIZED_NAME[normalizeMakamName(m.name)] = m;
+  MAKAM_BY_NORMALIZED_NAME[normalizeMakamName(m.id)] = m;
+}
+
+export const getMakamByName = (name: string): Makam | undefined => {
+  const key = normalizeMakamName(name);
+  return MAKAM_BY_NORMALIZED_NAME[key] ?? MAKAM_BY_NORMALIZED_NAME[MAKAM_NAME_ALIASES[key]];
+};
 
 export const getMakamsByFamily = (family: string): Makam[] =>
   MAKAMS.filter((m) => m.family === family);
