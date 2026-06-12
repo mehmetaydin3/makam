@@ -17,6 +17,10 @@ android/
 .kotlin/
 *.orig.*
 *.jks
+
+# Secrets — never commit
+google-play-service-account.json
+*.keystore
 *.p8
 *.p12
 *.key

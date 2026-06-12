@@ -9,7 +9,7 @@ export type ScaleDegree = {
 };
 
 export type AudioExample = {
-  youtubeId: string;
+  youtubeId: string | null;
   title: string;
   composer: string;
   performer: string;
@@ -678,8 +678,8 @@ export const MAKAMS: Makam[] = [
     relatedMakams: ['Kurd', 'Hicazkar', 'Hicaz'],
     audio: { toneFile: null, sampleFile: null },
     listening: {
-      sarki: { youtubeId: '1RDE9OIlG8Y', title: 'Beni Kor Kuyularda Merdivensiz Biraktin', composer: 'Munir Nurettin Selcuk', performer: 'Munir Nurettin Selcuk', year: '1940s', description: 'A definitive Kurdilihicazkar şarkı — the melody traces the makam\'s characteristic arc from the plaintive lower register to its rich, dramatic upper range.' },
-      taksim: { youtubeId: '7yH6o7YGG4c', title: 'Kurdilihicazkar Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s distinctive style brings out the emotional depth of Kurdilihicazkar.' },
+      sarki: { youtubeId: null, title: 'Beni Kor Kuyularda Merdivensiz Biraktin', composer: 'Munir Nurettin Selcuk', performer: 'Munir Nurettin Selcuk', year: '1940s', description: 'A definitive Kurdilihicazkar şarkı — the melody traces the makam\'s characteristic arc from the plaintive lower register to its rich, dramatic upper range.' },
+      taksim: { youtubeId: '7yH6o7YGG4c', title: 'Kurdilihicazkar Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Cemil Bey\'s playing brings out the emotional depth of Kurdilihicazkar, tracing its arc from the plaintive lower register to its rich, dramatic upper range.' },
     },
     notablePieces: [{ title: 'Kurdilihicazkar Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
     color: '#8B5A8B',
@@ -747,7 +747,7 @@ export const MAKAMS: Makam[] = [
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: { youtubeId: null, title: 'Beyati Sarki', composer: 'Hammamizade Ismail Dede Efendi', performer: 'Hafiz Burhan', year: '1930s', description: 'A classic Beyati şarkı capturing the makam\'s essential warmth and tender nostalgia.' },
-      taksim: { youtubeId: 'LAN7T_LGMjQ', title: 'Beyati Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s oud improvisation in Beyati is a masterclass in the makam\'s emotional range.' },
+      taksim: { youtubeId: 'LAN7T_LGMjQ', title: 'Beyati Pesrev', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Cemil Bey\'s improvisation in Beyati is a masterclass in the makam\'s emotional range.' },
     },
     notablePieces: [{ title: 'Beyati Araban Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
     color: '#8B7A5A',
@@ -849,7 +849,7 @@ export const MAKAMS: Makam[] = [
     audio: { toneFile: null, sampleFile: null },
     listening: {
       sarki: { youtubeId: null, title: 'Uzzal Sarki', composer: 'Sadettin Kaynak', performer: 'Zeki Muren', year: '1960s', description: 'A passionate Uzzal şarkı — the double augmented seconds give the melody a restless, searching quality.' },
-      taksim: { youtubeId: null, title: 'Uzzal Taksim', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Udi Hrant\'s oud captures Uzzal\'s restless energy.' },
+      taksim: { youtubeId: null, title: 'Uzzal Taksim', composer: 'Tanburi Cemil Bey', performer: 'Tanburi Cemil Bey', year: '1910', description: 'Cemil Bey\'s playing captures Uzzal\'s restless energy.' },
     },
     notablePieces: [{ title: 'Uzzal Saz Semaisi', composer: 'Tanburi Cemil Bey', usul: 'Aksak Semai' }],
     color: '#C8705A',
@@ -888,10 +888,365 @@ export const MAKAMS: Makam[] = [
     notablePieces: [{ title: 'Irak Beste', composer: 'Dede Efendi', usul: 'Devr-i Hindi' }],
     color: '#7A8B5A',
   },
+  {
+    id: 'karcigar',
+    name: 'Karcığar',
+    pronunciation: 'kar-juh-AR',
+    family: 'Uşşak',
+    commonUsuls: ['Aksak', 'Curcuna', 'Düyek'],
+    seyir: 'undulating',
+    durak: 'La (A)',
+    guclu: 'Re (D)',
+    scale: [
+      { degree: 1, name: 'La', cents: 0, westernNearest: 'A' },
+      { degree: 2, name: 'Si♭ koma+', cents: 151, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 3, name: 'Do', cents: 294, westernNearest: 'C' },
+      { degree: 4, name: 'Re', cents: 498, westernNearest: 'D' },
+      { degree: 5, name: 'Mi♭', cents: 588, westernNearest: 'E♭', isCharacteristic: true },
+      { degree: 6, name: 'Fa#', cents: 906, westernNearest: 'F#', isCharacteristic: true },
+      { degree: 7, name: 'Sol', cents: 996, westernNearest: 'G' },
+      { degree: 8, name: 'La', cents: 1200, westernNearest: 'A' },
+    ],
+    mood: ['Spirited', 'Bittersweet', 'Earthy', 'Playful'],
+    timeOfDay: 'Evening',
+    season: 'Autumn',
+    description: 'Karcığar joins the tender lower half of Uşşak to the dramatic Hicaz colour above it — a makam that smiles and aches in the same breath. It is beloved in folk and Romani-tinged repertoire: dance music with a bruise in it. The neutral second below and the augmented second above pull in opposite emotional directions, and that tension is its character.',
+    characteristicPhrase: 'Rises gently through the Uşşak tetrachord, then flares on the augmented second above the fourth degree — tenderness below, fire above.',
+    westernAnalogy: 'Imagine Dorian for the first four notes, then a Phrygian-dominant flash above them. No single Western mode covers it — the seam is the point.',
+    relatedMakams: ['Uşşak', 'Hicaz', 'Hüseyni'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Karcığar Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'Karcığar carries much of the folk and fasıl dance repertoire — listen for the lift into the augmented second above the fourth degree.' },
+      taksim: { youtubeId: null, title: 'Karcığar Taksim', composer: 'Traditional', performer: 'Traditional', description: 'In a Karcığar taksim the player works the seam between the gentle lower tetrachord and the fiery upper one — the makam lives at that join.' },
+    },
+    notablePieces: [
+      { title: 'Karcığar Saz Semaisi', composer: 'Tatyos Efendi', usul: 'Aksak Semai' },
+    ],
+    color: '#B5654A',
+  },
+  {
+    id: 'suzinak',
+    name: 'Suzinak',
+    pronunciation: 'soo-zee-NAHK',
+    family: 'Rast',
+    commonUsuls: ['Aksak', 'Düyek', 'Semai'],
+    seyir: 'undulating',
+    durak: 'Sol (G)',
+    guclu: 'Re (D)',
+    scale: [
+      { degree: 1, name: 'Sol', cents: 0, westernNearest: 'G' },
+      { degree: 2, name: 'La', cents: 204, westernNearest: 'A' },
+      { degree: 3, name: 'Si Koma♭', cents: 350, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 4, name: 'Do', cents: 498, westernNearest: 'C' },
+      { degree: 5, name: 'Re', cents: 702, westernNearest: 'D' },
+      { degree: 6, name: 'Mi♭', cents: 792, westernNearest: 'E♭', isCharacteristic: true },
+      { degree: 7, name: 'Fa#', cents: 1088, westernNearest: 'F#', isCharacteristic: true },
+      { degree: 8, name: 'Sol', cents: 1200, westernNearest: 'G' },
+    ],
+    mood: ['Burning', 'Passionate', 'Refined', 'Yearning'],
+    timeOfDay: 'Night',
+    season: 'Summer',
+    description: 'Suzinak — the name suggests burning — sets the warm Rast pentachord alight with a Hicaz flavour above the dominant. The lower half is sunny and composed; the upper half leaps with an augmented second. The result is controlled passion: Rast\'s dignity with embers under it. It was a favourite of the late-Ottoman şarkı composers.',
+    characteristicPhrase: 'Establishes the warm Rast ground up to the dominant, then ignites — the flat sixth leaping to the raised seventh before settling back to rest.',
+    westernAnalogy: 'Close to the Western harmonic major scale: a major scale whose sixth is flattened, creating an exotic gap between the sixth and seventh degrees.',
+    relatedMakams: ['Rast', 'Hicazkar', 'Hicaz'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Suzinak Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'The şarkı repertoire is where Suzinak shines — late-Ottoman songs that smoulder rather than blaze.' },
+      taksim: { youtubeId: null, title: 'Suzinak Taksim', composer: 'Traditional', performer: 'Traditional', description: 'A Suzinak taksim typically settles into Rast warmth before revealing the burning upper tetrachord — listen for the moment it turns.' },
+    },
+    notablePieces: [],
+    color: '#B0566B',
+  },
+  {
+    id: 'nikriz',
+    name: 'Nikriz',
+    pronunciation: 'nee-KREEZ',
+    family: 'Rast',
+    commonUsuls: ['Düyek', 'Sofyan', 'Curcuna'],
+    seyir: 'undulating',
+    durak: 'Sol (G)',
+    guclu: 'Re (D)',
+    scale: [
+      { degree: 1, name: 'Sol', cents: 0, westernNearest: 'G' },
+      { degree: 2, name: 'La', cents: 204, westernNearest: 'A' },
+      { degree: 3, name: 'Si♭', cents: 294, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 4, name: 'Do#', cents: 588, westernNearest: 'C#', isCharacteristic: true },
+      { degree: 5, name: 'Re', cents: 702, westernNearest: 'D' },
+      { degree: 6, name: 'Mi', cents: 906, westernNearest: 'E' },
+      { degree: 7, name: 'Fa#', cents: 1088, westernNearest: 'F#' },
+      { degree: 8, name: 'Sol', cents: 1200, westernNearest: 'G' },
+    ],
+    mood: ['Mysterious', 'Vivid', 'Restless', 'Colorful'],
+    timeOfDay: 'Evening',
+    season: 'Autumn',
+    description: 'Nikriz is built on one of the most striking pentachords in the system: minor third below, raised fourth above, with an augmented second between them. It is vivid and slightly uncanny — neither major nor minor, always in motion. Folk dance forms like the longa adore it; so did the Crimean and Balkan repertoires that fed Istanbul\'s musical life.',
+    characteristicPhrase: 'Circles the raised fourth — the augmented second between the third and fourth degrees gives every phrase a flash of strangeness before resolving to the dominant.',
+    westernAnalogy: 'The lower pentachord matches the Ukrainian-Dorian / Misheberak sound familiar from klezmer: Dorian with a raised 4th. If you know that wail, you know Nikriz.',
+    relatedMakams: ['Rast', 'Hicaz', 'Hicazkar'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Nikriz Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'Nikriz turns up wherever the repertoire wants vivid colour — dance forms especially.' },
+      taksim: { youtubeId: null, title: 'Nikriz Taksim', composer: 'Traditional', performer: 'Traditional', description: 'In improvisation, Nikriz players circle the raised fourth — the note that makes the makam glint.' },
+    },
+    notablePieces: [
+      { title: 'Nikriz Longa', composer: 'Tanburi Cemil Bey', usul: 'Sofyan' },
+    ],
+    color: '#8A9A4A',
+  },
+  {
+    id: 'acemasiran',
+    name: 'Acemaşiran',
+    pronunciation: 'ah-jem-ah-shee-RAHN',
+    family: 'Çargah',
+    commonUsuls: ['Düyek', 'Aksak', 'Yürük Semai'],
+    seyir: 'descending',
+    durak: 'Fa (F)',
+    guclu: 'Do (C)',
+    characterNote: 'Like Çargah, Acemaşiran uses no microtones — its brilliance comes from pure intervals and a descending sweep from the top of the scale.',
+    scale: [
+      { degree: 1, name: 'Fa', cents: 0, westernNearest: 'F' },
+      { degree: 2, name: 'Sol', cents: 204, westernNearest: 'G' },
+      { degree: 3, name: 'La', cents: 408, westernNearest: 'A' },
+      { degree: 4, name: 'Si♭', cents: 498, westernNearest: 'B♭' },
+      { degree: 5, name: 'Do', cents: 702, westernNearest: 'C' },
+      { degree: 6, name: 'Re', cents: 906, westernNearest: 'D' },
+      { degree: 7, name: 'Mi', cents: 1110, westernNearest: 'E' },
+      { degree: 8, name: 'Fa', cents: 1200, westernNearest: 'F' },
+    ],
+    mood: ['Radiant', 'Festive', 'Noble', 'Open'],
+    timeOfDay: 'Morning',
+    season: 'Spring',
+    description: 'Acemaşiran is the makam of brilliance — major-scale material rooted on F, entered from the top and poured downward. Where Çargah states the major scale plainly from the root, Acemaşiran begins high and descends with ceremony, which gives the same notes an entirely different bearing: festive, expansive, a little regal. It has long been favoured for celebratory and virtuosic vocal writing.',
+    characteristicPhrase: 'Opens in the upper octave and cascades stepwise toward the root — arrival as celebration rather than rest.',
+    westernAnalogy: 'An F major scale, but performed as a descent from the octave — same letters as Western major, opposite gravity.',
+    relatedMakams: ['Çargah', 'Mahur', 'Rast'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Acemaşiran Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'Acemaşiran carries some of the most festive vocal writing in the classical repertoire — brightness with formal manners.' },
+      taksim: { youtubeId: null, title: 'Acemaşiran Taksim', composer: 'Traditional', performer: 'Traditional', description: 'Taksims in Acemaşiran tend to enter high and unfold downward — listen for how descent, not ascent, creates the drama.' },
+    },
+    notablePieces: [],
+    color: '#D4C26A',
+  },
+  {
+    id: 'sultaniyegah',
+    name: 'Sultanıyegah',
+    pronunciation: 'sool-tah-nuh-yeh-GYAH',
+    family: 'Nihavend',
+    commonUsuls: ['Düyek', 'Aksak', 'Semai'],
+    seyir: 'undulating',
+    durak: 'Re (D)',
+    guclu: 'La (A)',
+    scale: [
+      { degree: 1, name: 'Re', cents: 0, westernNearest: 'D' },
+      { degree: 2, name: 'Mi', cents: 204, westernNearest: 'E' },
+      { degree: 3, name: 'Fa', cents: 294, westernNearest: 'F' },
+      { degree: 4, name: 'Sol', cents: 498, westernNearest: 'G' },
+      { degree: 5, name: 'La', cents: 702, westernNearest: 'A' },
+      { degree: 6, name: 'Si♭', cents: 792, westernNearest: 'B♭' },
+      { degree: 7, name: 'Do#', cents: 1088, westernNearest: 'C#', isCharacteristic: true },
+      { degree: 8, name: 'Re', cents: 1200, westernNearest: 'D' },
+    ],
+    mood: ['Stately', 'Romantic', 'Melancholic', 'Grand'],
+    timeOfDay: 'Evening',
+    season: 'Winter',
+    description: 'Sultanıyegah is a young makam with an imperial birth certificate: Hammamizade İsmail Dede Efendi created it in the early 19th century in honour of Sultan Mahmud II, and composed its founding repertoire himself. Built low on yegah, it has a stately, romantic darkness — minor-scale gravity carried with court ceremony. Its very existence is a reminder that the makam system was never closed: masters kept inventing.',
+    characteristicPhrase: 'Moves with measured weight through the low minor tetrachord, rises to the dominant, and cadences with the raised leading tone — grandeur in minor.',
+    westernAnalogy: 'Very close to the Western harmonic and melodic minor on D. Of all the makams, this one will feel most like a European Romantic minor key — it was born in the same century.',
+    relatedMakams: ['Nihavend', 'Buselik', 'Ferahfeza'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Sultanıyegah Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'The Sultanıyegah songbook descends directly from Dede Efendi\'s founding set — stately minor-key writing with a courtly bearing.' },
+      taksim: { youtubeId: null, title: 'Sultanıyegah Taksim', composer: 'Traditional', performer: 'Traditional', description: 'Improvisers treat Sultanıyegah\'s low register as its home — the makam speaks from the depth of the instrument.' },
+    },
+    notablePieces: [
+      { title: 'Sultanıyegah Beste', composer: 'Hammamizade Ismail Dede Efendi', usul: 'Muhammes' },
+      { title: 'Sultanıyegah Yürük Semai', composer: 'Hammamizade Ismail Dede Efendi', usul: 'Yuruk Semai' },
+    ],
+    color: '#4A6A9B',
+  },
+  {
+    id: 'ferahfeza',
+    name: 'Ferahfeza',
+    pronunciation: 'feh-rah-feh-ZAH',
+    family: 'Nihavend',
+    commonUsuls: ['Devr-i Hindi', 'Aksak', 'Yürük Semai'],
+    seyir: 'descending',
+    durak: 'Re (D)',
+    guclu: 'Fa (F)',
+    scale: [
+      { degree: 1, name: 'Re', cents: 0, westernNearest: 'D' },
+      { degree: 2, name: 'Mi', cents: 204, westernNearest: 'E' },
+      { degree: 3, name: 'Fa', cents: 294, westernNearest: 'F', isCharacteristic: true },
+      { degree: 4, name: 'Sol', cents: 498, westernNearest: 'G' },
+      { degree: 5, name: 'La', cents: 702, westernNearest: 'A' },
+      { degree: 6, name: 'Si♭', cents: 792, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 7, name: 'Do', cents: 996, westernNearest: 'C' },
+      { degree: 8, name: 'Re', cents: 1200, westernNearest: 'D' },
+    ],
+    mood: ['Serene', 'Expansive', 'Wistful', 'Luminous'],
+    timeOfDay: 'Dawn',
+    season: 'Spring',
+    description: 'Ferahfeza — "expanding joy" — is one of the most admired compound makams: Acemaşiran\'s bright major material poured downward until it comes to rest, unexpectedly, on the low yegah. Light arriving at a dark landing. Dede Efendi\'s 1839 Mevlevi ayin in this makam, written at the request of Sultan Abdülmecid, is widely considered one of the summits of the entire tradition.',
+    characteristicPhrase: 'Descends through bright, open intervals and then settles a third lower than the ear expects — joy that lands in stillness.',
+    westernAnalogy: 'Like melodies in F major that insist on ending on D — relative-minor gravity under major light. The ambiguity is the beauty.',
+    relatedMakams: ['Sultanıyegah', 'Nihavend', 'Buselik'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Ferahfeza Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'Ferahfeza\'s songbook glows with its signature trick — major-scale light resolving onto an unexpected low tonic.' },
+      taksim: { youtubeId: null, title: 'Ferahfeza Taksim', composer: 'Traditional', performer: 'Traditional', description: 'A Ferahfeza taksim is a slow revelation of where home actually is — the final settling onto yegah should feel both surprising and inevitable.' },
+    },
+    notablePieces: [
+      { title: 'Ferahfeza Mevlevi Ayini', composer: 'Hammamizade Ismail Dede Efendi', usul: 'Devr-i Kebir' },
+      { title: 'Ferahfeza Peşrev', composer: 'Hammamizade Ismail Dede Efendi', usul: 'Devr-i Hindi' },
+    ],
+    color: '#5FA38A',
+  },
+  {
+    id: 'ferahnak', name: 'Ferahnak', pronunciation: 'feh-rah-NAHK', family: 'Segah',
+    commonUsuls: ['Düyek', 'Aksak', 'Devr-i Hindi'], seyir: 'ascending', durak: 'Mi Koma♭ (Eb+)', guclu: 'Si♭ koma+ (B♭+)',
+    scale: [
+      { degree: 1, name: 'Mi Koma♭', cents: 0, westernNearest: 'E♭', isCharacteristic: true },
+      { degree: 2, name: 'Fa', cents: 110, westernNearest: 'F' },
+      { degree: 3, name: 'Sol', cents: 314, westernNearest: 'G' },
+      { degree: 4, name: 'La', cents: 498, westernNearest: 'A' },
+      { degree: 5, name: 'Si♭ koma+', cents: 702, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 6, name: 'Do', cents: 906, westernNearest: 'C' },
+      { degree: 7, name: 'Re', cents: 1088, westernNearest: 'D' },
+      { degree: 8, name: 'Mi Koma♭', cents: 1200, westernNearest: 'E♭' },
+    ],
+    mood: ['Joyful', 'Elevated', 'Graceful', 'Light'],
+    timeOfDay: 'Morning', season: 'Spring',
+    description: 'Ferahnak — "abode of joy" — was created by the court composer Şakir Ağa in the early 19th century. It shares Segah\'s floating microtonal root but turns that otherworldliness toward delight rather than devotion: bright, ornamented, aristocratic. A young makam with a documented inventor, like Sultanıyegah.',
+    characteristicPhrase: 'Rises from the microtonal root with light, decorated steps — Segah\'s floating quality, but smiling.',
+    westernAnalogy: 'Like Segah, its tonic sits between piano keys; unlike Segah, it behaves like a major-mode melody that happens to live a quarter-tone off the grid.',
+    relatedMakams: ['Segah', 'Huzzam', 'Rast'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Ferahnak Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'The Ferahnak songbook descends from Şakir Ağa\'s own founding works.' },
+      taksim: { youtubeId: null, title: 'Ferahnak Taksim', composer: 'Traditional', performer: 'Traditional', description: 'Listen for Segah\'s floating root carried with a lighter, more playful gait.' },
+    },
+    notablePieces: [
+      { title: 'Ferahnak Beste', composer: 'Şakir Ağa', usul: 'Muhammes' },
+    ],
+    color: '#B89BD4',
+  },
+  {
+    id: 'acem-buselik', name: 'Acem Buselik', pronunciation: 'ah-JEM boo-seh-LIK', family: 'Buselik',
+    commonUsuls: ['Düyek', 'Aksak', 'Sofyan'], seyir: 'descending', durak: 'La (A)', guclu: 'Mi (E)',
+    scale: [
+      { degree: 1, name: 'La', cents: 0, westernNearest: 'A' },
+      { degree: 2, name: 'Si', cents: 204, westernNearest: 'B' },
+      { degree: 3, name: 'Do', cents: 294, westernNearest: 'C' },
+      { degree: 4, name: 'Re', cents: 498, westernNearest: 'D' },
+      { degree: 5, name: 'Mi', cents: 702, westernNearest: 'E' },
+      { degree: 6, name: 'Fa', cents: 792, westernNearest: 'F', isCharacteristic: true },
+      { degree: 7, name: 'Sol', cents: 996, westernNearest: 'G', isCharacteristic: true },
+      { degree: 8, name: 'La', cents: 1200, westernNearest: 'A' },
+    ],
+    mood: ['Wistful', 'Composed', 'Serious', 'Tender'],
+    timeOfDay: 'Evening', season: 'Autumn',
+    description: 'Acem Buselik is a compound makam: it opens in the bright Acem region high in the scale and resolves down into Buselik\'s earnest minor. The journey — brightness arriving at gravity — is the identity. A staple of the classical fasıl repertoire.',
+    characteristicPhrase: 'Enters high and bright, then steps down into the plain Buselik cadence — light spent into seriousness.',
+    westernAnalogy: 'Like beginning a melody in C major\'s upper register and ending it in A natural minor — relative-key gravity used as drama.',
+    relatedMakams: ['Buselik', 'Hüseyni', 'Acemaşiran'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Acem Buselik Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'Classical fasıl repertoire; the descent into Buselik is the signature.' },
+      taksim: { youtubeId: null, title: 'Acem Buselik Taksim', composer: 'Traditional', performer: 'Traditional', description: 'Improvisers begin in the bright upper region and earn the dark cadence.' },
+    },
+    notablePieces: [],
+    color: '#5A6E8E',
+  },
+  {
+    id: 'sehnaz', name: 'Şehnaz', pronunciation: 'sheh-NAHZ', family: 'Hicaz',
+    commonUsuls: ['Aksak', 'Düyek', 'Curcuna'], seyir: 'descending', durak: 'La (A)', guclu: 'Mi (E)',
+    scale: [
+      { degree: 1, name: 'La', cents: 0, westernNearest: 'A' },
+      { degree: 2, name: 'Si♭', cents: 90, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 3, name: 'Do#', cents: 420, westernNearest: 'C#', isCharacteristic: true },
+      { degree: 4, name: 'Re', cents: 498, westernNearest: 'D' },
+      { degree: 5, name: 'Mi', cents: 702, westernNearest: 'E' },
+      { degree: 6, name: 'Fa', cents: 792, westernNearest: 'F' },
+      { degree: 7, name: 'Sol#', cents: 1088, westernNearest: 'G#' },
+      { degree: 8, name: 'La', cents: 1200, westernNearest: 'A' },
+    ],
+    mood: ['Regal', 'Passionate', 'Ornate', 'Intense'],
+    timeOfDay: 'Night', season: 'Summer',
+    description: 'Şehnaz — a beloved\'s name, "the coquettish one" — stacks Hicaz colour through the octave and works it from the top down. It is Hicaz\'s drama raised to courtly splendour: descending phrases that arrive like a procession. The high entry and long descent make it a singer\'s showcase.',
+    characteristicPhrase: 'Begins at the octave and descends through two augmented-second flashes — drama unwinding downward to rest.',
+    westernAnalogy: 'Double harmonic colour handled from above: if Hicaz is a knife, Şehnaz is the whole ceremonial procession.',
+    relatedMakams: ['Hicaz', 'Hicazkar', 'Uzzal'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Şehnaz Şarkı', composer: 'Traditional', performer: 'Traditional', description: 'A showcase makam for great voices — the descent is everything.' },
+      taksim: { youtubeId: null, title: 'Şehnaz Taksim', composer: 'Traditional', performer: 'Traditional', description: 'Listen for the high entry — Şehnaz declares itself from the top of the scale.' },
+    },
+    notablePieces: [],
+    color: '#D46A8B',
+  },
+  {
+    id: 'evic', name: 'Eviç', pronunciation: 'eh-VEECH', family: 'Segah',
+    commonUsuls: ['Düyek', 'Devr-i Hindi', 'Aksak'], seyir: 'descending', durak: 'Fa# koma♭ (F#-)', guclu: 'Si♭ koma+ (B♭+)',
+    scale: [
+      { degree: 1, name: 'Fa# koma♭', cents: 0, westernNearest: 'F#', isCharacteristic: true },
+      { degree: 2, name: 'Sol', cents: 112, westernNearest: 'G' },
+      { degree: 3, name: 'La', cents: 316, westernNearest: 'A' },
+      { degree: 4, name: 'Si♭ koma+', cents: 467, westernNearest: 'B♭', isCharacteristic: true },
+      { degree: 5, name: 'Do', cents: 610, westernNearest: 'C' },
+      { degree: 6, name: 'Re', cents: 814, westernNearest: 'D' },
+      { degree: 7, name: 'Mi', cents: 1018, westernNearest: 'E' },
+      { degree: 8, name: 'Fa# koma♭', cents: 1200, westernNearest: 'F#' },
+    ],
+    mood: ['Lofty', 'Devotional', 'Ancient', 'Spacious'],
+    timeOfDay: 'Dawn', season: 'Winter',
+    description: 'Eviç sits high in the system — its very name is the perde at the top of the basic scale — and descends from that height with devotional gravity. Old, dignified, and closely tied to religious repertoire, it is the sound of something said from a minaret: far up, carrying down.',
+    characteristicPhrase: 'Speaks from its high microtonal root and unwinds downward in long, unhurried arcs.',
+    westernAnalogy: 'Its root, like Segah\'s, lives between piano keys — but where Segah floats in place, Eviç descends from altitude.',
+    relatedMakams: ['Segah', 'Irak', 'Huzzam'],
+    audio: { toneFile: null, sampleFile: null },
+    listening: {
+      sarki: { youtubeId: null, title: 'Eviç İlahi', composer: 'Traditional', performer: 'Traditional', description: 'Eviç is a home of the ilahi and the religious repertoire — height used as reverence.' },
+      taksim: { youtubeId: null, title: 'Eviç Taksim', composer: 'Traditional', performer: 'Traditional', description: 'The taksim begins where other makams peak, and spends itself descending.' },
+    },
+    notablePieces: [],
+    color: '#8E7AB8',
+  },
 ];
+
 
 export const getMakamById = (id: string): Makam | undefined =>
   MAKAMS.find((m) => m.id === id);
+
+// Resolve a makam *name* (as used in relatedMakams, song credits, etc.) to its
+// entry — diacritic- and spacing-insensitive, so "Uşşak", "Ussak" and "uşşak"
+// all match. Names that don't correspond to a real makam in the guide return
+// undefined, so callers can avoid linking to a "not found" screen.
+const normalizeMakamName = (s: string): string =>
+  s
+    .toLowerCase()
+    .replace(/ı/g, 'i') // Turkish dotless ı has no NFD decomposition; fold to "i".
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+    .trim();
+
+// Spelling variants in the data that don't normalize to their id on their own.
+const MAKAM_NAME_ALIASES: Record<string, string> = {
+  bayati: 'beyati',
+};
+
+const MAKAM_BY_NORMALIZED_NAME: Record<string, Makam> = {};
+for (const m of MAKAMS) {
+  MAKAM_BY_NORMALIZED_NAME[normalizeMakamName(m.name)] = m;
+  MAKAM_BY_NORMALIZED_NAME[normalizeMakamName(m.id)] = m;
+}
+
+export const getMakamByName = (name: string): Makam | undefined => {
+  const key = normalizeMakamName(name);
+  return MAKAM_BY_NORMALIZED_NAME[key] ?? MAKAM_BY_NORMALIZED_NAME[MAKAM_NAME_ALIASES[key]];
+};
 
 export const getMakamsByFamily = (family: string): Makam[] =>
   MAKAMS.filter((m) => m.family === family);

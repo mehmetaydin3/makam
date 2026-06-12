@@ -2,6 +2,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { Lesson } from '../../../data/education';
 import { LESSONS, JAZZ_CATEGORY_ORDER, JAZZ_CATEGORY_LABELS, JazzCategory } from '../../../data/traditions/modal-jazz/lessons';
 import { LessonReader } from '../../../components/lessons/LessonReader';
@@ -71,6 +72,7 @@ function LessonCard({ lesson, completed, unlocked, isLast, onPress }: CardProps)
 }
 
 export default function LearnScreen() {
+  const router = useRouter();
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const { isLessonComplete, isLessonUnlocked, isCategoryUnlocked, markLessonComplete } = useProgress();
 
@@ -117,6 +119,25 @@ export default function LearnScreen() {
         <Text style={styles.subheading}>Your path through the modes.</Text>
       </View>
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+        {/* Reference toolbox — compact, subordinate to the lesson path below. */}
+        <View style={styles.refRow}>
+          <TouchableOpacity
+            style={styles.refTile}
+            activeOpacity={0.8}
+            onPress={() => router.push('/glossary?tradition=modal-jazz' as any)}
+          >
+            <Ionicons name="book-outline" size={15} color={COLORS.accent} />
+            <Text style={styles.refTileText}>Glossary</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.refTile}
+            activeOpacity={0.8}
+            onPress={() => router.push('/artist?tradition=modal-jazz' as any)}
+          >
+            <Ionicons name="people-outline" size={15} color={COLORS.accent} />
+            <Text style={styles.refTileText}>Musicians</Text>
+          </TouchableOpacity>
+        </View>
         {JAZZ_CATEGORY_ORDER.map((cat) => {
           const lessonsInCat = LESSONS.filter((l) => l.category === cat);
           if (lessonsInCat.length === 0) return null;
@@ -156,6 +177,9 @@ const styles = StyleSheet.create({
   heading: { fontSize: 40, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
   list: { paddingHorizontal: SPACING.lg, paddingBottom: 120 },
+  refRow: { flexDirection: 'row', gap: SPACING.sm, marginTop: SPACING.xs },
+  refTile: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingVertical: 11, backgroundColor: COLORS.surface, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border },
+  refTileText: { fontSize: 13, fontWeight: '600', color: COLORS.textSecondary },
   categoryHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingTop: SPACING.lg, paddingBottom: SPACING.sm },
   categoryLabel: { fontSize: 11, color: COLORS.textTertiary, letterSpacing: 2, textTransform: 'uppercase' },
   card: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: SPACING.md },

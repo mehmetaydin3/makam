@@ -158,7 +158,7 @@ export default function ExploreScreen() {
   };
 
   // Family ordering — accessibility first for western audiences
-  const FAMILY_ORDER = ['Rast', 'Uşşak', 'Nihavend', 'Hicaz', 'Saba', 'Neva', 'Hüseyni', 'Buselik', 'Kurd', 'Cargah', 'Segah', 'Hicazkar'];
+  const FAMILY_ORDER = ['Rast', 'Uşşak', 'Nihavend', 'Hicaz', 'Saba', 'Neva', 'Hüseyni', 'Buselik', 'Kurd', 'Çargah', 'Segah', 'Hicazkar'];
   const FAMILY_DESC: Record<string, string> = {
     'Rast':       t('familyRast'),
     'Uşşak':      t('familyUssak'),
@@ -169,7 +169,7 @@ export default function ExploreScreen() {
     'Hüseyni':    t('familyHuseyni'),
     'Buselik':    t('familyBuselik'),
     'Kurd':       t('familyKurd'),
-    'Cargah':     t('familyCargah'),
+    'Çargah':     t('familyCargah'),
     'Segah':      t('familySegah'),
     'Hicazkar':   t('familyHicazkar'),
   };

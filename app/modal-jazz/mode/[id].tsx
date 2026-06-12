@@ -10,6 +10,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getModeById, getRelatedModes } from '../../../data/traditions/modal-jazz/modes';
+import { getCrossroadsForMode } from '../../../data/crossroads';
+import { getMakamById } from '../../../data/makams';
+import { CrossroadsBridge } from '../../../components/common/CrossroadsBridge';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
 import { JAZZ_COLORS, JazzColorScheme, SPACING, RADIUS } from '../../../data/traditions/modal-jazz/theme';
@@ -19,6 +22,8 @@ import { YOUTUBE_IDS } from '../../../data/traditions/modal-jazz/youtubeIds';
 import ScaleDiagram from '../../../components/lessons/ScaleDiagram';
 import { Accordion } from '../../../components/common/Accordion';
 import { CharacterBand } from '../../../components/common/CharacterBand';
+import { ArtistLink } from '../../../components/common/ArtistLink';
+import { isKnownArtist, getArtistByName } from '../../../data/artists';
 
 const brightnessColor = (c: JazzColorScheme): Record<string, string> => ({
   bright: c.bright,
@@ -155,6 +160,7 @@ export default function ModalJazzModeDetail() {
         </Accordion>
 
         {/* ── Hear it (kept visible — audio) ── */}
+        {mode.classicTunes.length > 0 && (
         <Section label="Hear it in action">
           {mode.classicTunes.map((tune, i) => {
             const videoId = tune.youtubeId || YOUTUBE_IDS[tune.title];
@@ -164,7 +170,7 @@ export default function ModalJazzModeDetail() {
                   <Text style={styles.tuneTitle}>{tune.title}</Text>
                   <Text style={styles.tuneYear}>{tune.year}</Text>
                 </View>
-                <Text style={[styles.tuneArtist, { color: accentColor }]}>{tune.artist}</Text>
+                <ArtistLink name={tune.artist} accent={accentColor} style={[styles.tuneArtist, { color: accentColor }]} />
                 <Text style={styles.tuneWhy}>{tune.whyThisTune}</Text>
                 {videoId && (
                   <View style={styles.playerWrapper}>
@@ -175,15 +181,47 @@ export default function ModalJazzModeDetail() {
             );
           })}
         </Section>
+        )}
+
+        {/* ── CROSS-TRADITION BRIDGE — this mode's twin in the makam world ── */}
+        {getCrossroadsForMode(mode.id) && (
+          <CrossroadsBridge
+            piece={getCrossroadsForMode(mode.id)!}
+            fromSide="jazz"
+            makamColor={getMakamById(getCrossroadsForMode(mode.id)!.makamId || '')?.color ?? accentColor}
+            jazzColor={accentColor}
+            surface={JAZZ_COLORS.surface}
+            textPrimary={JAZZ_COLORS.textPrimary}
+            textSecondary={JAZZ_COLORS.textSecondary}
+            textTertiary={JAZZ_COLORS.textTertiary}
+            border={JAZZ_COLORS.border}
+          />
+        )}
 
         {/* ── Notable players (collapsed) ── */}
         <Accordion title="Notable players" accent={accentColor} colors={JAZZ_COLORS}>
           <View style={styles.playersRow}>
-            {mode.notablePlayers.map((p, i) => (
-              <View key={i} style={styles.playerPill}>
-                <Text style={styles.playerText}>{p}</Text>
-              </View>
-            ))}
+            {mode.notablePlayers.map((p, i) => {
+              const known = isKnownArtist(p);
+              if (!known) {
+                return (
+                  <View key={i} style={styles.playerPill}>
+                    <Text style={styles.playerText}>{p}</Text>
+                  </View>
+                );
+              }
+              return (
+                <TouchableOpacity
+                  key={i}
+                  style={[styles.playerPill, { borderColor: accentColor + '66', flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                  activeOpacity={0.8}
+                  onPress={() => router.push(('/artist/' + getArtistByName(p)!.id) as any)}
+                >
+                  <Text style={[styles.playerText, { color: accentColor }]}>{p}</Text>
+                  <Ionicons name="arrow-forward" size={12} color={accentColor} />
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </Accordion>
 

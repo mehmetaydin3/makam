@@ -2,7 +2,7 @@
   "expo": {
     "name": "The Modality",
     "slug": "makam",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -20,7 +20,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png",
         "backgroundImage": "./assets/android-icon-background.png"
       },
-      "package": "com.makam.app"
+      "package": "com.mehmetaydin.makam"
     },
     "plugins": [
       "expo-router",
@@ -36,7 +36,7 @@
           "backgroundColor": "#06060E"
         }
       ],
-[
+      [
         "expo-audio",
         {
           "enableBackgroundPlayback": false

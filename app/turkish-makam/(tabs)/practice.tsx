@@ -13,7 +13,7 @@ import { buildMakamEarSession, EarQuestion, EarOption, EarLevel, EAR_TRAINING_AV
 import { audioEngine } from '../../../audio/audioEngine';
 import { useProgress } from '../../../hooks/useProgress';
 import { QUIZ_PASS_THRESHOLD, nextQuizLevel } from '../../../data/progress';
-import { COLORS, SPACING, RADIUS } from '../../../data/constants';
+import { COLORS, SPACING, RADIUS , FEATURES } from '../../../data/constants';
 import { Chrome } from '../../../components/chrome';
 import { RewardBurst } from '../../../components/rewards';
 import { PressableScale, Pop, Bounce, BreathingView } from '../../../components/common/motion';
@@ -167,6 +167,7 @@ function HomeView({ onStartLevel, isUnlocked }: {
           </Text>
         </View>
 
+        {FEATURES.earTraining && (
         <View style={styles.segmented}>
           <TouchableOpacity
             style={[styles.segment, section === 'quiz' && styles.segmentActive]}
@@ -185,6 +186,7 @@ function HomeView({ onStartLevel, isUnlocked }: {
             <Text style={[styles.segmentText, section === 'ear' && styles.segmentTextActive]}>By ear</Text>
           </TouchableOpacity>
         </View>
+        )}
 
         {section === 'quiz' ? (
           <View style={styles.levelList}>
@@ -277,6 +279,10 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   const [hasPlayed, setHasPlayed] = useState(false);
   // Celebratory overlay: streak milestones + a strong finish.
   const [reward, setReward] = useState<{ kind: 'streak' | 'daily'; title: string; subtitle?: string } | null>(null);
+  // Teach-first: meet the session's first sound before being quizzed on anything.
+  const [phase, setPhase] = useState<'teach' | 'quiz'>('teach');
+  // A real drone: sustains on its own channel until toggled off.
+  const [droneOn, setDroneOn] = useState(false);
 
   const question = questions[index];
 
@@ -291,7 +297,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   };
 
   // Stop the ney + timers when leaving the flow.
-  useEffect(() => () => { clearTimers(); audioEngine.stop(); }, []);
+  useEffect(() => () => { clearTimers(); audioEngine.stop(); audioEngine.stopDrone(); }, []);
 
   // Play the durak anchor ("home"), then after a breath of silence the scale.
   // Both go through audioEngine.playScale with the makam's id, so the engine
@@ -320,12 +326,47 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
 
   // Auto-play "durak → scale" once each new question appears.
   useEffect(() => {
-    if (done || !question) return;
+    if (done || !question || phase !== 'quiz') return;
     const t = setTimeout(() => playItem(), 350);
     timersRef.current.push(t);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, done]);
+  }, [index, done, phase]);
+
+  // The drone: a continuously sustained durak on its own audio channel — it
+  // keeps sounding UNDER phrase playback (like a tambura) until toggled off.
+  const toggleDrone = async () => {
+    if (!question) return;
+    if (droneOn) {
+      audioEngine.stopDrone();
+      setDroneOn(false);
+      return;
+    }
+    const ok = await audioEngine.startDrone(question.makamId);
+    if (ok) setDroneOn(true);
+  };
+
+  // Keep the drone pinned to the current question's durak as questions advance.
+  useEffect(() => {
+    if (droneOn && question) audioEngine.startDrone(question.makamId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
+
+  // After a wrong answer: play YOUR pick, then the right one, back to back —
+  // the mistake becomes a lesson in sound, not a red cross.
+  const playDifference = () => {
+    if (!question || !selected) return;
+    const mine = question.options.find((o) => o.value === selected);
+    const right = question.options.find((o) => o.isCorrect);
+    if (!mine || !right) return;
+    stopAll();
+    playAnchoredPhrase(mine.makamId, question.anchorCents, mine.cents, () => {
+      const t = setTimeout(() => {
+        playAnchoredPhrase(right.makamId, question.anchorCents, right.cents);
+      }, AB_GAP);
+      timersRef.current.push(t);
+    });
+  };
 
   // A/B compare: play each candidate's scale (each prefixed by the SAME durak
   // anchor, placed at that candidate's own root) so they can be weighed.
@@ -385,6 +426,8 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
       if (score / questions.length >= 0.7) {
         setReward({ kind: 'daily', title: 'Good ears', subtitle: `${score} of ${questions.length} by ear.` });
       }
+      audioEngine.stopDrone();
+      setDroneOn(false);
       setDone(true);
     }
   };
@@ -406,6 +449,58 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
     return <EarResultView score={score} total={questions.length} onRestart={onExit} onRetry={restart} />;
   }
 
+  const isTeachBusy = activity !== 'idle';
+
+  // ── TEACH: meet the first sound before any question ────────────────────────
+  if (phase === 'teach' && question) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.navBar}>
+          <TouchableOpacity onPress={() => { stopAll(); audioEngine.stopDrone(); setDroneOn(false); onExit(); }} style={styles.quitButton}>
+            <Ionicons name="close" size={22} color={COLORS.textPrimary} />
+          </TouchableOpacity>
+          <Text style={styles.questionCount}>Warm up</Text>
+          <View style={{ width: 22 }} />
+        </View>
+        <ScrollView contentContainerStyle={styles.questionContent} showsVerticalScrollIndicator={false}>
+          <Text style={styles.earKicker}>Meet the sound</Text>
+          <Text style={styles.prompt}>{question.makamName}</Text>
+          <Text style={styles.earInstruction}>
+            Before you're asked anything, just listen. Home (the durak) plays first, then the makam.
+            {'\n'}Listen for {question.characterNote}.
+          </Text>
+          <BreathingView active={!isTeachBusy}>
+            <TouchableOpacity
+              style={[styles.playButton, isTeachBusy && styles.playButtonActive]}
+              onPress={isTeachBusy ? stopAll : playItem}
+              activeOpacity={0.85}
+            >
+              <Ionicons name={isTeachBusy ? 'stop' : 'play'} size={26} color={COLORS.background} />
+              <Text style={styles.playButtonText}>{isTeachBusy ? 'Stop' : hasPlayed ? 'Hear it again' : 'Play it'}</Text>
+            </TouchableOpacity>
+          </BreathingView>
+          <TouchableOpacity
+            style={[styles.compareButton, droneOn && { backgroundColor: COLORS.accent + '22', borderColor: COLORS.accent + '66', borderWidth: 1, borderRadius: 999 }]}
+            onPress={toggleDrone}
+            activeOpacity={0.85}
+          >
+            <Ionicons name={droneOn ? 'radio' : 'radio-outline'} size={15} color={COLORS.accent} />
+            <Text style={styles.compareButtonText}>
+              {droneOn ? `Drone on — ${question.durak} · tap to stop` : `Drone · hold home (${question.durak})`}
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.earHint}>{question.teaching}</Text>
+        </ScrollView>
+        <View style={styles.footer}>
+          <PressableScale style={styles.nextButton} onPress={() => { stopAll(); setHasPlayed(false); setPhase('quiz'); }}>
+            <Text style={styles.nextButtonText}>I'm ready — quiz me</Text>
+            <Ionicons name="arrow-forward" size={16} color={COLORS.background} />
+          </PressableScale>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const progress = (index + 1) / questions.length;
   const isCorrect = selected === question.correctAnswer;
   const isBusy = activity !== 'idle';
@@ -420,7 +515,7 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => { stopAll(); onExit(); }} style={styles.quitButton}>
+        <TouchableOpacity onPress={() => { stopAll(); audioEngine.stopDrone(); setDroneOn(false); onExit(); }} style={styles.quitButton}>
           <Ionicons name="close" size={22} color={COLORS.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.questionCount}>{index + 1} / {questions.length}</Text>
@@ -468,6 +563,17 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
           <Ionicons name="git-compare" size={16} color={isBusy ? COLORS.textTertiary : COLORS.accent} />
           <Text style={[styles.compareButtonText, isBusy && { color: COLORS.textTertiary }]}>
             Hear each makam
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.compareButton, droneOn && { backgroundColor: COLORS.accent + '22', borderColor: COLORS.accent + '66', borderWidth: 1, borderRadius: 999 }]}
+          onPress={toggleDrone}
+          activeOpacity={0.85}
+        >
+          <Ionicons name={droneOn ? 'radio' : 'radio-outline'} size={15} color={COLORS.accent} />
+          <Text style={styles.compareButtonText}>
+            {droneOn ? `Drone on — ${question.durak} · tap to stop` : `Drone · hold home (${question.durak})`}
           </Text>
         </TouchableOpacity>
 
@@ -535,6 +641,14 @@ function MakamEarFlow({ level, onExit }: { level: EarLevel; onExit: () => void }
               </View>
             </View>
             <Text style={styles.explanationText}>{question.teaching}</Text>
+            {!isCorrect && (
+              <TouchableOpacity style={styles.compareButton} onPress={playDifference} activeOpacity={0.85} disabled={isBusy}>
+                <Ionicons name="swap-horizontal" size={15} color={isBusy ? COLORS.textTertiary : COLORS.accent} />
+                <Text style={[styles.compareButtonText, isBusy && { color: COLORS.textTertiary }]}>
+                  Hear the difference — yours, then {question.makamName}
+                </Text>
+              </TouchableOpacity>
+            )}
             {question.mood.length > 0 && (
               <Text style={styles.revealMood}>{question.mood.slice(0, 3).join(' · ')}</Text>
             )}

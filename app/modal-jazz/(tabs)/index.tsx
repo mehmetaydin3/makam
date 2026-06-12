@@ -78,6 +78,30 @@ export default function ModalJazzHome() {
     });
   }, [search, filter]);
 
+  // Group the filtered modes by parent scale (major modes, then melodic-minor
+  // modes), injecting a header row before each group so the two harmonic
+  // families read as distinct worlds rather than one long list.
+  const listData = useMemo(() => {
+    const order = ['major', 'melodic minor'];
+    const rows: ({ type: 'header'; key: string; label: string; sub: string } | { type: 'mode'; key: string; mode: Mode })[] = [];
+    for (const ps of order) {
+      const group = filtered.filter((m) => m.parentScale === ps);
+      if (group.length === 0) continue;
+      rows.push({
+        type: 'header',
+        key: 'h-' + ps,
+        label: ps === 'major' ? 'Modes of the Major Scale' : 'Modes of Melodic Minor',
+        sub: ps === 'major' ? 'Seven colors of consonance' : 'The language of tension',
+      });
+      for (const m of group) rows.push({ type: 'mode', key: m.id, mode: m });
+    }
+    // Any modes with an unexpected parent scale still appear.
+    const known = new Set(order);
+    const rest = filtered.filter((m) => !known.has(m.parentScale));
+    for (const m of rest) rows.push({ type: 'mode', key: m.id, mode: m });
+    return rows;
+  }, [filtered]);
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
@@ -86,7 +110,7 @@ export default function ModalJazzHome() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.heading}>The Modes</Text>
-          <Text style={styles.subheading}>Seven modes, seven colors of feeling.</Text>
+          <Text style={styles.subheading}>Fourteen modes across two scales — the colors of consonance and of tension.</Text>
         </View>
 
         {/* Animated search bar */}
@@ -145,8 +169,8 @@ export default function ModalJazzHome() {
 
         {/* Mode list */}
         <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
+          data={listData}
+          keyExtractor={(item) => item.key}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
@@ -154,13 +178,20 @@ export default function ModalJazzHome() {
           ListEmptyComponent={
             <Text style={styles.empty}>No modes match your search.</Text>
           }
-          renderItem={({ item }) => (
-            <ModeCard
-              mode={item}
-              stripeColor={BRIGHTNESS_BASE[item.brightness] || JAZZ_COLORS.accent}
-              onPress={() => router.push(('/modal-jazz/mode/' + item.id) as any)}
-            />
-          )}
+          renderItem={({ item }) =>
+            item.type === 'header' ? (
+              <View style={styles.groupHeader}>
+                <Text style={styles.groupHeaderLabel}>{item.label}</Text>
+                <Text style={styles.groupHeaderSub}>{item.sub}</Text>
+              </View>
+            ) : (
+              <ModeCard
+                mode={item.mode}
+                stripeColor={BRIGHTNESS_BASE[item.mode.brightness] || JAZZ_COLORS.accent}
+                onPress={() => router.push(('/modal-jazz/mode/' + item.mode.id) as any)}
+              />
+            )
+          }
         />
       </View>
 
@@ -226,6 +257,9 @@ const makeStyles = (JAZZ_COLORS: JazzColorScheme) => StyleSheet.create({
   header: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
   heading: { fontSize: 40, fontWeight: '200', color: JAZZ_COLORS.textPrimary, letterSpacing: -1, marginBottom: 6 },
   subheading: { fontSize: 13, color: JAZZ_COLORS.textSecondary, lineHeight: 19 },
+  groupHeader: { marginTop: 18, marginBottom: 8, paddingHorizontal: 2 },
+  groupHeaderLabel: { fontSize: 12, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', color: JAZZ_COLORS.textSecondary },
+  groupHeaderSub: { fontSize: 12, color: JAZZ_COLORS.textTertiary, marginTop: 2 },
   searchRow: {
     flexDirection: 'row', alignItems: 'center',
     marginHorizontal: SPACING.lg, marginTop: SPACING.sm, marginBottom: SPACING.md, gap: SPACING.sm,

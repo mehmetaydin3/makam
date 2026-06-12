@@ -2,13 +2,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getUsulById } from '../../../data/usuls';
+import { getSongsByMakam, GENRE_LABEL } from '../../../data/songs';
+import { getCrossroadsForMakam } from '../../../data/crossroads';
+import { CrossroadsBridge } from '../../../components/common/CrossroadsBridge';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import { getMakamById, AudioExample } from '../../../data/makams';
+import { getMakamById, getMakamByName, AudioExample } from '../../../data/makams';
 import { useLanguage } from '../../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import ShareableCard from '../../../components/ShareableCard';
-import { SPACING, RADIUS, ColorScheme } from '../../../data/constants';
+import { SPACING, RADIUS, ColorScheme , FEATURES } from '../../../data/constants';
 import { useTheme } from '../../../context/ThemeContext';
 import { useProgress } from '../../../hooks/useProgress';
 import { MasteryBar } from '../../../components/mastery/MasteryBar';
@@ -16,6 +19,7 @@ import { audioEngine, PlaybackState, PLAYABLE_MAKAM_IDS } from '../../../audio/a
 import { MakamScaleDiagram } from '../../../components/scale/MakamScaleDiagram';
 import { Accordion } from '../../../components/common/Accordion';
 import { CharacterBand } from '../../../components/common/CharacterBand';
+import { ArtistLink } from '../../../components/common/ArtistLink';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const PLAYER_HEIGHT = (SCREEN_WIDTH - SPACING.lg * 2) * 9 / 16;
@@ -53,8 +57,13 @@ function AudioCard({
 
       <Text style={styles.audioTitle}>{example.title}</Text>
       <Text style={styles.audioMeta}>
-        {example.composer}
-        {example.performer !== example.composer ? ' · ' + example.performer : ''}
+        <ArtistLink name={example.composer} accent={color} />
+        {example.performer !== example.composer ? (
+          <Text>
+            {' · '}
+            <ArtistLink name={example.performer} accent={color} />
+          </Text>
+        ) : null}
         {example.year ? ' · ' + example.year : ''}
       </Text>
       <Text style={styles.audioDescription}>{example.description}</Text>
@@ -81,7 +90,7 @@ export default function MakamDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { t, language, noteNames } = useLanguage();
-  const { colors } = useTheme();
+  const { colors, jazzColors } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const COLORS = colors;
   const [showShare, setShowShare] = useState(false);
@@ -205,7 +214,7 @@ export default function MakamDetailScreen() {
 
         {/* DRONE / PLAY ALONG — hold the durak and sing/play the makam over it.
             Only for makams the ney engine can voice at a correct root. */}
-        {PLAYABLE_MAKAM_IDS.includes(makam.id) && (
+        {FEATURES.dronePlayAlong && PLAYABLE_MAKAM_IDS.includes(makam.id) && (
           <TouchableOpacity
             style={[styles.droneEntry, { borderColor: accent + '55' }]}
             onPress={() => { audioEngine.stop(); router.push(('/turkish-makam/makam/drone?id=' + makam.id) as any); }}
@@ -259,7 +268,7 @@ export default function MakamDetailScreen() {
         </Accordion>
 
         {/* LISTENING SECTION */}
-        <View style={styles.section}>
+        <View style={[styles.section, { marginBottom: 0 }]}>
           <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'Dinle' : 'Listen'}</Text>
           {makam.listening.sarki.youtubeId && (
             <AudioCard
@@ -277,6 +286,76 @@ export default function MakamDetailScreen() {
             />
           )}
         </View>
+
+        {/* CROSS-TRADITION BRIDGE — this makam's twin in the jazz world */}
+        {getCrossroadsForMakam(makam.id) && (
+          <CrossroadsBridge
+            piece={getCrossroadsForMakam(makam.id)!}
+            fromSide="makam"
+            makamColor={accent}
+            jazzColor={jazzColors.accent}
+            surface={COLORS.surface}
+            textPrimary={COLORS.textPrimary}
+            textSecondary={COLORS.textSecondary}
+            textTertiary={COLORS.textTertiary}
+            border={COLORS.border}
+          />
+        )}
+
+        {/* NOTABLE PIECES — core repertoire in this makam (collapsed) */}
+        {(makam.notablePieces || []).length > 0 && (
+          <Accordion title={language === 'tr' ? 'Önemli Eserler' : 'Notable Pieces'} accent={accent} colors={COLORS}>
+            <View style={{ backgroundColor: accent + '11', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
+              <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
+                {language === 'tr'
+                  ? 'Bu makamın dağarındaki temel eserler. Bestecisine dokunarak müzisyeni keşfedin.'
+                  : 'Cornerstone works composed in this makam. Tap a composer to explore the musician.'}
+              </Text>
+            </View>
+            {(makam.notablePieces || []).map((piece, i) => (
+              <View
+                key={piece.title + i}
+                style={[styles.pieceRow, i === (makam.notablePieces.length - 1) && { borderBottomWidth: 0 }]}
+              >
+                <View style={styles.pieceTitleRow}>
+                  <Text style={styles.pieceTitle}>{piece.title}</Text>
+                  {piece.usul ? (
+                    <View style={styles.pieceUsulBadge}>
+                      <Text style={styles.pieceUsulText}>{piece.usul}</Text>
+                    </View>
+                  ) : null}
+                </View>
+                <Text style={styles.pieceComposer}>
+                  <ArtistLink name={piece.composer} accent={accent} />
+                </Text>
+              </View>
+            ))}
+          </Accordion>
+        )}
+
+        {/* IN THE WILD — songs people already know, carried by this makam */}
+        {getSongsByMakam(makam.id).length > 0 && (
+          <Accordion title={language === 'tr' ? 'Bu Makamda Şarkılar' : 'Songs in this Makam'} accent={accent} colors={COLORS}>
+            <View style={{ backgroundColor: accent + '11', borderRadius: RADIUS.md, padding: SPACING.md, marginBottom: SPACING.md, borderWidth: 1, borderColor: accent + '33' }}>
+              <Text style={{ fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 }}>
+                {language === 'tr'
+                  ? 'Bu makam, bildiğiniz şarkıların içinde yaşıyor — klasikten arabeske ve rock\'a.'
+                  : 'This makam lives inside songs you may already know — from classical to arabesk to rock.'}
+              </Text>
+            </View>
+            {getSongsByMakam(makam.id).map((song, i, arr) => (
+              <View key={song.title + i} style={[styles.pieceRow, i === arr.length - 1 && { borderBottomWidth: 0 }]}>
+                <View style={styles.pieceTitleRow}>
+                  <Text style={styles.pieceTitle}>{song.title}</Text>
+                  <View style={styles.pieceUsulBadge}>
+                    <Text style={styles.pieceUsulText}>{GENRE_LABEL[song.genre]}</Text>
+                  </View>
+                </View>
+                <Text style={styles.pieceComposer}>{song.artist}</Text>
+              </View>
+            ))}
+          </Accordion>
+        )}
 
         {/* CHARACTERISTIC MOVEMENT (collapsed) */}
         <Accordion title="Characteristic Movement" accent={accent} colors={COLORS}>
@@ -337,25 +416,27 @@ export default function MakamDetailScreen() {
         <View style={{ marginBottom: 80 }}>
           <Text style={[styles.sectionLabel, { color: accent }]}>{language === 'tr' ? 'İlgili Makamlar' : 'Related Makams'}</Text>
           <View style={styles.relatedRow}>
-            {(makam.relatedMakams || []).map((name) => (
-              <TouchableOpacity
-                key={name}
-                style={styles.relatedTag}
-                onPress={() => {
-                const nameToId: Record<string, string> = {
-                  'Rast': 'rast', 'Uşşak': 'ussak', 'Ussak': 'ussak',
-                  'Hicaz': 'hicaz', 'Hüseyni': 'huseyni', 'Huseyni': 'huseyni',
-                  'Saba': 'saba', 'Segah': 'segah', 'Kurd': 'kurd',
-                  'Neva': 'neva', 'Buselik': 'buselik', 'Çargah': 'cargah',
-                  'Nihavend': 'nihavend',
-                };
-                const targetId = nameToId[name] || name.toLowerCase();
-                router.push(('/turkish-makam/makam/' + targetId) as any);
-              }}
-              >
-                <Text style={styles.relatedText}>{name}</Text>
-              </TouchableOpacity>
-            ))}
+            {(makam.relatedMakams || []).map((name) => {
+              const target = getMakamByName(name);
+              // Only link makams that actually exist in the guide; others are
+              // shown as plain tags so a tap never lands on a "not found" screen.
+              if (!target) {
+                return (
+                  <View key={name} style={[styles.relatedTag, styles.relatedTagInactive]}>
+                    <Text style={[styles.relatedText, styles.relatedTextInactive]}>{name}</Text>
+                  </View>
+                );
+              }
+              return (
+                <TouchableOpacity
+                  key={name}
+                  style={[styles.relatedTag, { borderColor: accent + '55' }]}
+                  onPress={() => router.push(('/turkish-makam/makam/' + target.id) as any)}
+                >
+                  <Text style={[styles.relatedText, { color: accent }]}>{name}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -469,7 +550,9 @@ const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   seyirType: { fontSize: 15, fontWeight: '500', color: COLORS.textPrimary },
   relatedRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   relatedTag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, borderWidth: 1, borderColor: COLORS.border },
+  relatedTagInactive: { borderStyle: 'dashed', opacity: 0.55 },
   relatedText: { fontSize: 13, color: COLORS.textSecondary },
+  relatedTextInactive: { color: COLORS.textTertiary },
   usulRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginBottom: SPACING.lg },
   usulTag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: COLORS.accent + '55', backgroundColor: COLORS.surface },
   usulTagText: { fontSize: 13, color: COLORS.accent, fontWeight: '500' },

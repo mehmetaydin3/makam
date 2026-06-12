@@ -13,6 +13,11 @@ let currentPlayer: AudioPlayer | null = null;
 let isPlaying = false;
 let generation = 0;  // bumped on every stop/new-play so stale loops self-cancel
 
+// Independent drone channel: a real drone must SUSTAIN — including underneath
+// phrase playback — so it gets its own player + generation, untouched by stop().
+let dronePlayer: AudioPlayer | null = null;
+let droneGen = 0;
+
 const ROOT_OFFSETS: Record<string, number> = {
   rast:     -900,
   ussak:    -700,
@@ -199,19 +204,67 @@ export const audioEngine = {
     callback('playing');
     // Re-trigger the durak note slightly before the previous one would end, so
     // the drone sounds continuous. The loop self-cancels when generation moves.
-    const RETRIGGER_MS = 1900; // < NOTE_MAX_MS sample length, for a seamless loop
+    // True overlap: the next durak note starts while the previous still rings,
+    // and each player is cleaned up only after its natural decay. (Previously
+    // the old player was killed before the new one started — an audible gap.)
+    const RETRIGGER_MS = 1500;
+    const CLEANUP_MS = 3600;
     while (myGen === generation) {
-      if (currentPlayer) {
-        try { currentPlayer.pause(); } catch {}
-        try { currentPlayer.remove(); } catch {}
-        currentPlayer = null;
-      }
       const player = createAudioPlayer(moduleId);
       currentPlayer = player;
       try { player.play(); } catch {}
+      setTimeout(() => {
+        try { player.pause(); } catch {}
+        try { player.remove(); } catch {}
+      }, CLEANUP_MS);
       await delay(RETRIGGER_MS);
     }
     // Superseded by stop()/another playback; leave cleanup to whoever bumped gen.
+  },
+
+  // ── Drone channel (sustains independently of phrase playback) ──────────────
+  // Starts a continuous durak drone on its own channel. Unlike playDrone above,
+  // this is NOT killed by stop()/playScale — it keeps sounding under phrases
+  // (at reduced volume) until stopDrone() is called. Returns false if the root
+  // sample is unavailable.
+  async startDrone(makamId: string): Promise<boolean> {
+    await this.stopDrone();
+    const myGen = ++droneGen;
+    const rootOffset = ROOT_OFFSETS[makamId.toLowerCase()] ?? 0;
+    const closest = findClosest(rootOffset);
+    const moduleId = AUDIO_SAMPLES[`ney_c${closest}.wav`];
+    if (moduleId == null) {
+      console.warn('Drone sample not found for', makamId);
+      return false;
+    }
+    // True overlap: start the next note while the previous is still sounding,
+    // and let the old one decay naturally before cleanup. Killing the previous
+    // player first (the old approach) guaranteed an audible gap.
+    const RETRIGGER_MS = 1500;   // start next note well inside the current one
+    const CLEANUP_MS = 3600;     // remove a player only after it has decayed
+    (async () => {
+      while (myGen === droneGen) {
+        const player = createAudioPlayer(moduleId);
+        dronePlayer = player;
+        try { player.volume = 0.5; } catch {} // sit under the phrase, not on it
+        try { player.play(); } catch {}
+        setTimeout(() => {
+          try { player.pause(); } catch {}
+          try { player.remove(); } catch {}
+        }, CLEANUP_MS);
+        await delay(RETRIGGER_MS);
+      }
+    })();
+    return true;
+  },
+
+  async stopDrone() {
+    droneGen++;
+    if (dronePlayer) {
+      try { dronePlayer.pause(); } catch {}
+      try { dronePlayer.remove(); } catch {}
+      dronePlayer = null;
+    }
   },
 
   async stop() {

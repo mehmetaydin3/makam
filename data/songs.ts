@@ -125,3 +125,12 @@ export const SONGS: Song[] = [
 export function getSongsByMakam(makamId: string): Song[] {
   return SONGS.filter(s => s.makamId === makamId);
 }
+
+export const GENRE_LABEL: Record<Song['genre'], string> = {
+  classical: 'Classical',
+  folk: 'Folk',
+  arabesk: 'Arabesk',
+  rock: 'Rock',
+  pop: 'Pop',
+  sufi: 'Sufi',
+};

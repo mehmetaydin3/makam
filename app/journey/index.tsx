@@ -133,7 +133,7 @@ export default function JourneyScreen() {
           <Ionicons name="chevron-back" size={22} color={COLORS.accent} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push('/journey/settings' as any)} style={styles.settingsButton}>
-          <Ionicons name="settings-outline" size={20} color={COLORS.textSecondary} />
+          <Ionicons name="settings-outline" size={22} color={COLORS.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -256,6 +256,27 @@ export default function JourneyScreen() {
           </View>
         )}
 
+        {/* REFERENCE — app-wide lookup tools, reachable outside the Learn tabs */}
+        <Text style={styles.sectionLabel}>REFERENCE</Text>
+        <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+          <TouchableOpacity
+            style={[styles.crossroadsCard, { flex: 1, marginBottom: 0 }]}
+            activeOpacity={0.8}
+            onPress={() => router.push('/glossary' as any)}
+          >
+            <Ionicons name="book-outline" size={20} color={COLORS.accent} style={{ marginBottom: SPACING.sm }} />
+            <Text style={styles.crossroadsText}>Glossary — the vocabulary of both traditions</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.crossroadsCard, { flex: 1, marginBottom: 0 }]}
+            activeOpacity={0.8}
+            onPress={() => router.push('/artist' as any)}
+          >
+            <Ionicons name="people-outline" size={20} color={COLORS.accent} style={{ marginBottom: SPACING.sm }} />
+            <Text style={styles.crossroadsText}>Musicians — the people behind the recordings</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={{ height: 60 }} />
       </ScrollView>
     </SafeAreaView>
@@ -264,9 +285,9 @@ export default function JourneyScreen() {
 
 const makeStyles = (COLORS: ColorScheme) => StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.sm },
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, paddingBottom: SPACING.xs },
   backButton: { marginLeft: -4 },
-  settingsButton: { padding: 4 },
+  settingsButton: { padding: 2 },
   scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
   eyebrow: { fontSize: 12, color: COLORS.accent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 },
   heading: { fontSize: 36, fontWeight: '200', color: COLORS.textPrimary, letterSpacing: -1, lineHeight: 42, marginBottom: SPACING.md },
