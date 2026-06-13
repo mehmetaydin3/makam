@@ -3,10 +3,18 @@ import { AUDIO_SAMPLES } from './neySamples';
 
 export type PlaybackState = 'idle' | 'loading' | 'playing' | 'stopped';
 
-// Configure the audio session once: play in silent mode, don't stay active in bg.
+// Configure the audio session once: play in silent mode, don't stay active in
+// bg, and MIX with other audio. `interruptionMode: 'mixWithOthers'` is essential
+// and not optional here: setting `playsInSilentMode` forces the iOS `.playback`
+// category, which — without the mix option — is exclusive and DEACTIVATES the
+// WKWebView Web Audio that the Rhodes engine (RhodesEngine.tsx) runs on. That is
+// what silenced the Rhodes on iOS once ney/usul moved to expo-audio (d387e94);
+// the native samples and the WebView synth must share the session, not fight
+// over it.
 setAudioModeAsync({
   playsInSilentMode: true,
   shouldPlayInBackground: false,
+  interruptionMode: 'mixWithOthers',
 }).catch(() => {});
 
 let currentPlayer: AudioPlayer | null = null;
